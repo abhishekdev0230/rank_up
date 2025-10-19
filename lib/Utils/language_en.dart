@@ -62,4 +62,88 @@ class LanguageEn extends Languages {
   String get termsAndConditions => "Terms & Conditions ";
   @override
   String get privacyPolicy => "Privacy Policy";
+  @override
+  String get signInWithMobileNumber => "Sign in with Mobile Number";
+  @override
+  String get verifyAccountWithOTP => "Verify account with OTP";
+  @override
+  String get helloThere => "Hello there";
+  @override
+  String get phoneNumber => "Phone Number";
+  @override
+  String get rememberMe => "Remember me";
+  @override
+  String get orContinueWith => "OR Continue with";
+  @override
+  String get letsBuildYour => "Let’s build your subject knowledge and \nrank higher in your exams";
+  @override
+  String get pleaseEnterYour => "Please enter your phone number. You will receive an OTP code in the next step for the verification process.";
+  @override
+  String get weHaveSentAnOtpCode => "We have sent an OTP code to phone number . ∙∙∙ ∙∙∙ ∙∙∙ ∙99. Enter the OTP code below to continue.";
+
+
+  @override
+  String get otpSentMessage => "We have sent an OTP code to phone number {phone}. Enter the OTP code below to continue.";
+
+  @override
+  String get enterOtp => "Enter OTP";
+
+  @override
+  String get didntReceiveCode => "Didn’t receive code?";
+
+  @override
+  String get resendCodeIn => "You can resend code in";
+
+  @override
+  String get verify => "Verify";
+
+
+  // Complete Profile Strings
+  @override
+  String get completeProfileTitle => "Complete your profile";
+
+  @override
+  String get completeProfileSubtitle =>
+      "Don't worry, only you can see your personal data. No one else will be able to see it.";
+
+  @override
+  String get fullNameLabel => "Full Name";
+
+  @override
+  String get fullNameHint => "Enter Full Name";
+
+  @override
+  String get emailLabel => "Email";
+
+  @override
+  String get emailHint => "Enter Email";
+
+  @override
+  String get phoneNumberLabel => "Phone Number";
+
+  @override
+  String get phoneNumberHint => "Enter Phone number";
+
+  @override
+  String get classLabel => "Class";
+
+  @override
+  String get classHint => "Select Class";
+
+  @override
+  String get stateLabel => "State";
+
+  @override
+  String get stateHint => "Select State";
+
+  @override
+  String get cityLabel => "City";
+
+  @override
+  String get cityHint => "Select City";
+
+  @override
+  String get continueButton => "Continue";
+
+
 }

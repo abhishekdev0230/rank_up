@@ -111,5 +111,16 @@ class MyColors {
   static const Color color19B287 = Color(0xFF19B287);
   static const Color color0036A4 = Color(0xFF0036A4);
   static const Color color949494 = Color(0xFF949494);
+  static const Color color668BAD = Color(0xFF668BAD);
+  static const Color color295176 = Color(0xFF295176);
+  static const Color color1BB287 = Color(0xFF1BB287);
+  static const Color colorF8CB52 = Color(0xFFF8CB52);
+  static const Color colorD84B48 = Color(0xFFD84B48);
+  static const Color color32B790 = Color(0xFF32B790);
+
+
+  ///..........
+  static const Color darkBlue = Color(0xFF0A2C54);
+  static const Color green = Color(0xFF19B287);
 
 }

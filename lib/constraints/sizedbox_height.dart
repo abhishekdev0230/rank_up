@@ -32,6 +32,7 @@ const hSized85 = SizedBox(height: 85,);
 const hSized90 = SizedBox(height: 90,);
 const hSized95 = SizedBox(height: 95,);
 const hSized100 = SizedBox(height: 100,);
+const hSized120 = SizedBox(height: 120,);
 const hSized150 = SizedBox(height: 150,);
 const hSized200 = SizedBox(height: 200,);
 const hSized250 = SizedBox(height: 250,);

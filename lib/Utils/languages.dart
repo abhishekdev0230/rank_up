@@ -41,4 +41,35 @@ abstract class Languages {
   String get termsAndConditions;
   String get privacyPolicy;
   String get bySigningUpText;
+  String get signInWithMobileNumber;
+  String get verifyAccountWithOTP;
+  String get weHaveSentAnOtpCode;
+  String get helloThere;
+  String get pleaseEnterYour;
+  String get letsBuildYour;
+  String get phoneNumber;
+  String get rememberMe;
+  String get orContinueWith;
+
+  String get enterOtp;
+  String get otpSentMessage;
+  String get didntReceiveCode;
+  String get resendCodeIn;
+  String get verify;
+
+  String get completeProfileTitle;
+  String get completeProfileSubtitle;
+  String get fullNameLabel;
+  String get fullNameHint;
+  String get emailLabel;
+  String get emailHint;
+  String get phoneNumberLabel;
+  String get phoneNumberHint;
+  String get classLabel;
+  String get classHint;
+  String get stateLabel;
+  String get stateHint;
+  String get cityLabel;
+  String get cityHint;
+  String get continueButton;
 }

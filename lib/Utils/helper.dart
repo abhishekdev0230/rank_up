@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -201,4 +202,144 @@ class CommonUtils {
       ),
     );
   }
+}
+
+
+
+
+/// ✅ Custom dotted line painter
+class DottedLine extends StatelessWidget {
+  const DottedLine({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: _DottedLinePainter(),
+      size: const Size(double.infinity, 1),
+    );
+  }
+}
+
+class _DottedLinePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const double dotWidth = 2;
+    const double space = 4;
+    final paint = Paint()
+      ..color = MyColors.color949494
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+
+    double startX = 0;
+    while (startX < size.width) {
+      canvas.drawLine(
+        Offset(startX, 0),
+        Offset(startX + dotWidth, 0),
+        paint,
+      );
+      startX += dotWidth + space;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+class HalfCirclePainter extends CustomPainter {
+  final double progress;
+  final Color backgroundColor;
+  final Color progressColor;
+  final double strokeWidth;
+
+  HalfCirclePainter({
+    required this.progress,
+    required this.backgroundColor,
+    required this.progressColor,
+    this.strokeWidth = 10,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height);
+    final radius = size.width / 1.6;
+
+    final backgroundPaint = Paint()
+      ..color = backgroundColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    final progressPaint = Paint()
+      ..color = progressColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    // Draw background arc
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      math.pi, // start angle (left side)
+      math.pi, // sweep angle (180° for half circle)
+      false,
+      backgroundPaint,
+    );
+
+    // Draw progress arc
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      math.pi,
+      math.pi * progress, // progress-based sweep
+      false,
+      progressPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+class RoundedCircularProgressPainter extends CustomPainter {
+  final double progress;
+  final Color color;
+  final Color backgroundColor;
+  final double strokeWidth;
+
+  RoundedCircularProgressPainter({
+    required this.progress,
+    required this.color,
+    required this.backgroundColor,
+    required this.strokeWidth,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint basePaint = Paint()
+      ..color = backgroundColor
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round; // smooth edge
+
+    final Paint progressPaint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round; // 👈 rounded progress ends
+
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.width / 2) - (strokeWidth / 2);
+
+    // Draw background circle
+    canvas.drawCircle(center, radius, basePaint);
+
+    // Draw progress arc
+    final sweepAngle = 2 * 3.1415926535 * progress;
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -3.1415926535 / 0.8, // start from top
+      sweepAngle,
+      false,
+      progressPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

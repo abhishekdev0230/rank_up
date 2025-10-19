@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rank_up/provider/AppProviders.dart';
 import 'package:rank_up/services/local_storage.dart';
+import 'package:rank_up/views/bottom_navigation_bar.dart';
 import 'package:rank_up/views/splash_view.dart';
 import 'Utils/app_localization_delegates.dart';
 
@@ -80,9 +81,10 @@ class _MyAppState extends State<MyApp> {
           useMaterial3: true,
         ),
 
-        home: const SafeArea(
+        home: SafeArea(
           top: false,
-          child: SplashScreen(),
+          // child: SplashScreen(),
+          child: BottomNavController(initialIndex: 0),
         ),
       ),
     );

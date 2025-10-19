@@ -166,13 +166,18 @@ class OnboardingScreen extends StatelessWidget {
                             ),
                             CommonButton(
                               borderRadius: 30,
-                              iconRight: Icon(Icons.arrow_forward_ios_sharp,color: MyColors.whiteText,size: 12,),
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              iconRight: Icon(
+                                Icons.arrow_forward_ios_sharp,
+                                color: MyColors.whiteText,
+                                size: 12,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
                               text: lang.next,
 
                               onPressed: () => _nextPage(provider),
                             ),
-
                           ],
                         ),
                       if (provider.currentPage == onboardingData.length - 1)

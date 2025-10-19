@@ -18,8 +18,8 @@ TextStyle lightTextStyle({
   );
 }
 
-TextStyle regularTextStyle({
-  required double fontSize,
+  TextStyle regularTextStyle({
+   double? fontSize,
   required Color color,
   double? height,
   double? wordSpacing,
@@ -36,7 +36,7 @@ TextStyle regularTextStyle({
 }
 
 TextStyle semiBoldTextStyle({
-  required double fontSize,
+   double? fontSize,
    Color? color,
   double? height,
   TextOverflow? overflow,
