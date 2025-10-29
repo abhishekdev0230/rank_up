@@ -22,7 +22,7 @@ class DimensionalAnalysis extends StatefulWidget {
 class _DimensionalAnalysisState extends State<DimensionalAnalysis> {
   bool isCorrect = false;
   bool startQuiz = false;
-  bool showCompleted = false; // 👈 new variable
+  bool showCompleted = false;
 
   @override
   Widget build(BuildContext context) {

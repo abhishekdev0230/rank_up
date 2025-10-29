@@ -4,6 +4,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:rank_up/constraints/icon_path.dart';
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
+import 'package:rank_up/views/tests_screen/tests_screen.dart';
 import 'FlashcardQ/flashcard_screen.dart';
 import 'Home/home_view.dart';
 import 'me_profile/me_profile.dart';
@@ -124,7 +125,7 @@ class _BottomNavControllerState extends State<BottomNavController> {
         item: _buildNavItem(IconsPath.bookBottomIcon, "FlashQ"),
       ),
       PersistentTabConfig(
-        screen: Container(color: Colors.blue),
+        screen: TestLeaderboardScreen(),
         item: _buildNavItem(IconsPath.noteBooksBottomIcon, "Test"),
       ),
 

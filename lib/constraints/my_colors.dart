@@ -102,6 +102,7 @@ class MyColors {
   ///............Rank Up new.............
 
   static const Color rankBg = Color(0xFFEEEEEE);
+  static const Color rankBgD8D8D8 = Color(0xFFD8D8D8);
 
   static const Color color7C7C7C = Color(0xFF7C7C7C);
   static const Color colorD5D5D5 = Color(0xFFD5D5D5);
@@ -117,6 +118,8 @@ class MyColors {
   static const Color colorF8CB52 = Color(0xFFF8CB52);
   static const Color colorD84B48 = Color(0xFFD84B48);
   static const Color color32B790 = Color(0xFF32B790);
+  static const Color colore9ECEC6 = Color(0xFF9ECEC6);
+  static const Color colorE4EAF0 = Color(0xFFE4EAF0);
 
 
   ///..........

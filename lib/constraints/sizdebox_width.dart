@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 const wSized5 = SizedBox(width: 5,);
 const wSized7 = SizedBox(width: 7,);
+const wSized8 = SizedBox(width: 8,);
 const wSized10 = SizedBox(width: 10,);
+const wSized11 = SizedBox(width: 11,);
+const wSized14 = SizedBox(width: 14,);
 const wSized15 = SizedBox(width: 15,);
 const wSized12 = SizedBox(width: 12,);
 const wSized20 = SizedBox(width: 20,);

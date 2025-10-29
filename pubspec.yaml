@@ -47,6 +47,9 @@ dependencies:
   flutter_otp_text_field: ^1.5.1+1
   image_picker: ^1.2.0
   persistent_bottom_nav_bar_v2: ^6.1.0
+  responsive_grid_list: ^1.4.1
+
+
 
 dev_dependencies:
   flutter_test:
