@@ -83,8 +83,8 @@ class _MyAppState extends State<MyApp> {
 
         home: SafeArea(
           top: false,
-          // child: SplashScreen(),
-          child: BottomNavController(initialIndex: 0),
+          child: SplashScreen(),
+          // child: BottomNavController(initialIndex: 0),
         ),
       ),
     );

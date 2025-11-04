@@ -154,7 +154,10 @@ class TestLeaderboardScreen extends StatelessWidget {
             children: [
               Text(
                 "Daily Practice",
-                style: semiBoldTextStyle(fontSize: 18, color: MyColors.blackColor),
+                style: semiBoldTextStyle(
+                  fontSize: 18,
+                  color: MyColors.blackColor,
+                ),
               ),
               const Spacer(),
               const Icon(Icons.info_outline, color: Colors.black),
@@ -183,7 +186,6 @@ class TestLeaderboardScreen extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _testTypeButton(
     String title, {
@@ -230,8 +232,7 @@ class TestLeaderboardScreen extends StatelessWidget {
           hSized15,
           Row(
             children: [
-              SizedBox(
-                width: 50,
+              Expanded(
                 child: Text(
                   "30 Mins 15 Q’s",
                   style: boldTextStyle(
@@ -240,22 +241,23 @@ class TestLeaderboardScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                constraints: const BoxConstraints(minHeight: 26),
-                decoration: BoxDecoration(
-                  color: MyColors.color32B790,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: MyColors.color32B790),
-                ),
-                child: Text(
-                  "Enroll/Start Test",
-                  textAlign: TextAlign.center,
-                  style: semiBoldTextStyle(
-                    fontSize: 10,
-                    color: MyColors.whiteText,
+              Expanded(
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  constraints: const BoxConstraints(minHeight: 26),
+                  decoration: BoxDecoration(
+                    color: MyColors.color32B790,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: MyColors.color32B790),
+                  ),
+                  child: Text(
+                    "Enroll/Start Test",
+                    textAlign: TextAlign.center,
+                    style: semiBoldTextStyle(
+                      fontSize: 10,
+                      color: MyColors.whiteText,
+                    ),
                   ),
                 ),
               ),
@@ -279,7 +281,7 @@ class TestLeaderboardScreen extends StatelessWidget {
         hSized10,
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(color: MyColors.hintTextFieldBorderColor),
@@ -290,11 +292,15 @@ class TestLeaderboardScreen extends StatelessWidget {
             children: [
               Column(
                 children: [
-                  Text(
-                    "Average Score: 72%",
-                    style: semiBoldTextStyle(
-                      fontSize: 16,
-                      color: MyColors.blackColor,
+                  SizedBox(
+                    // color: Colors.red,
+                    width: 140,
+                    child: Text(
+                      "Average Score: 72%",
+                      style: semiBoldTextStyle(
+                        fontSize: 16,
+                        color: MyColors.blackColor,
+                      ),
                     ),
                   ),
                   hSized15,

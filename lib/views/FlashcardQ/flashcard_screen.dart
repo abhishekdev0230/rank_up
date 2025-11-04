@@ -29,111 +29,114 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
       showBack: false,
       backgroundColor: MyColors.appTheme,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            hSized10,
-            /// ---------------- Tabs ----------------
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(tabs.length, (index) {
-                final bool isSelected = selectedTab == index;
-                return GestureDetector(
-                  onTap: () => setState(() => selectedTab = index),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? MyColors.green
-                          : MyColors.color295176,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      tabs[index],
-                      style: mediumTextStyle(
-                        color: Colors.white, fontSize: 14,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              hSized10,
+              /// ---------------- Tabs ----------------
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(tabs.length, (index) {
+                  final bool isSelected = selectedTab == index;
+                  return GestureDetector(
+                    onTap: () => setState(() => selectedTab = index),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? MyColors.green
+                            : MyColors.color295176,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        tabs[index],
+                        style: mediumTextStyle(
+                          color: Colors.white, fontSize: 14,
+                        ),
                       ),
                     ),
-                  ),
-                );
-              }),
-            ),
-
-            const SizedBox(height: 28),
-
-            /// ---------------- Featured Subjects ----------------
-            Text(
-              "Featured Subjects",
-              style: semiBoldTextStyle(
-                color: Colors.white,
-                fontSize: 19,
+                  );
+                }),
               ),
-            ),
-            const SizedBox(height: 16),
-
-            Column(
-              children: [
-                _subjectCard(
-                  onTap:
-                  () {
-                    CustomNavigator.pushNavigate(context, FlashcardInnerPhysicsScreen());
-                  },
-                  title: "Biology",
-                  subtitle:
-                  "Organic, Inorganic, Physical, Zoology, Botany & Reproduction",
-                  icon: Icons.biotech_rounded,
+          
+              const SizedBox(height: 28),
+          
+              /// ---------------- Featured Subjects ----------------
+              Text(
+                "Featured Subjects",
+                style: semiBoldTextStyle(
+                  color: Colors.white,
+                  fontSize: 19,
                 ),
-                const SizedBox(height: 12),
-                _subjectCard(
-                  onTap: () {
-
-                  },
-                  title: "Physics",
-                  subtitle: "Mechanics, Thermodynamics",
-                  icon: Icons.science_rounded,
-                ),
-                const SizedBox(height: 12),
-                _subjectCard(
-                  onTap: () {
-
-
-                  },
-                  title: "Chemistry",
-                  subtitle:
-                  "Organic, Inorganic, Physical, Zoology, Botany & Reproduction",
-                  icon: Icons.ac_unit_rounded,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 28),
-
-            /// ---------------- Recently Viewed ----------------
-            Text(
-              "Recently Viewed",
-              style: semiBoldTextStyle(
-                color: Colors.white,
-                fontSize: 16,
               ),
-            ),
-            const SizedBox(height: 14),
-
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
+              const SizedBox(height: 16),
+          
+              Column(
                 children: [
-                  _recentCard("Cell Cycle"),
-                  _recentCard("Chemical Bonding"),
-                  _recentCard("Motion in Plane"),
-                  _recentCard("Gravitation"),
+                  _subjectCard(
+                    onTap:
+                    () {
+                      CustomNavigator.pushNavigate(context, FlashcardInnerPhysicsScreen());
+                    },
+                    title: "Biology",
+                    subtitle:
+                    "Organic, Inorganic, Physical, Zoology, Botany & Reproduction",
+                    icon: Icons.biotech_rounded,
+                  ),
+                  const SizedBox(height: 12),
+                  _subjectCard(
+                    onTap: () {
+          
+                    },
+                    title: "Physics",
+                    subtitle: "Mechanics, Thermodynamics",
+                    icon: Icons.science_rounded,
+                  ),
+                  const SizedBox(height: 12),
+                  _subjectCard(
+                    onTap: () {
+          
+          
+                    },
+                    title: "Chemistry",
+                    subtitle:
+                    "Organic, Inorganic, Physical, Zoology, Botany & Reproduction",
+                    icon: Icons.ac_unit_rounded,
+                  ),
                 ],
               ),
-            ),
-          ],
+          
+              const SizedBox(height: 28),
+          
+              /// ---------------- Recently Viewed ----------------
+              Text(
+                "Recently Viewed",
+                style: semiBoldTextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 14),
+          
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _recentCard("Cell Cycle"),
+                    _recentCard("Chemical Bonding"),
+                    _recentCard("Motion in Plane"),
+                    _recentCard("Gravitation"),
+                  ],
+                ),
+              ),
+              hSized15,
+            ],
+          ),
         ),
       ),
     );

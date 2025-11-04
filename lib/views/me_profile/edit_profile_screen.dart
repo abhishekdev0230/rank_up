@@ -5,38 +5,33 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
-import 'package:rank_up/constraints/font_family.dart';
 import 'package:rank_up/constraints/sizedbox_height.dart';
 import 'package:rank_up/constraints/icon_path.dart';
+import 'package:rank_up/custom_classes/CommonProfileImage.dart';
 import 'package:rank_up/custom_classes/my_textfield.dart';
 import 'package:rank_up/custom_classes/validators.dart';
 import 'package:rank_up/provider/provider_classes/ProfileSetupProvider.dart';
+import 'package:rank_up/custom_classes/app_bar.dart';
 
-
-
-class ProfileSetupContainer extends StatefulWidget {
-  final dynamic lang;
-
-  const ProfileSetupContainer({super.key, required this.lang});
+class EditProfileScreen extends StatefulWidget {
+  const EditProfileScreen({super.key});
 
   @override
-  State<ProfileSetupContainer> createState() => _ProfileSetupContainerState();
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-class _ProfileSetupContainerState extends State<ProfileSetupContainer> {
+class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-
   late TextEditingController fullNameController;
   late TextEditingController emailController;
-  late TextEditingController phoneController;
 
   @override
   void initState() {
     super.initState();
-    final profileProvider = Provider.of<ProfileSetupProvider>(
-      context,
-      listen: false,
-    );
+    final profileProvider =
+    Provider.of<ProfileSetupProvider>(context, listen: false);
+
+    // Prefill data from provider
     fullNameController = TextEditingController(text: profileProvider.fullName);
     emailController = TextEditingController(text: profileProvider.email);
   }
@@ -45,66 +40,38 @@ class _ProfileSetupContainerState extends State<ProfileSetupContainer> {
   void dispose() {
     fullNameController.dispose();
     emailController.dispose();
-    phoneController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final lang = widget.lang;
     final profileProvider = Provider.of<ProfileSetupProvider>(context);
 
-    return Container(
-      height: context.hp(0.65),
-      width: double.infinity,
-      margin: const EdgeInsets.all(10),
-      padding: EdgeInsets.symmetric(
-        horizontal: context.wp(0.05),
-        vertical: context.hp(0.03),
-      ),
-      decoration: const BoxDecoration(
-        color: MyColors.whiteText,
-        borderRadius: BorderRadius.all(Radius.circular(25)),
-      ),
-      child: SingleChildScrollView(
+    return CommonScaffold(
+      title: "Edit Profile",
+      body: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                lang.completeProfileTitle,
-                style: semiBoldTextStyle(
-                  fontSize: 26,
-                  color: MyColors.blackColor,
-                ),
-              ),
-              hSized8,
-              Text(
-                lang.completeProfileSubtitle,
-                style: mediumTextStyle(
-                  fontSize: 18,
-                  color: MyColors.color949494,
-                ),
-              ),
-              hSized20,
-              /// ✅ Profile Image Section
+              hSized15,
               Center(
                 child: Stack(
                   children: [
-                    CircleAvatar(
-                      radius: 70,
-                      backgroundColor: MyColors.color949494.withOpacity(0.2),
-                      backgroundImage: profileProvider.profileImage != null
-                          ? FileImage(File(profileProvider.profileImage!.path))
-                          : AssetImage(IconsPath.defultImage) as ImageProvider,
+                    CommonProfileImage(
+                      radius: 60,
+                      localFile: profileProvider.profileImage != null
+                          ? File(profileProvider.profileImage!.path)
+                          : null,
+                      imageUrl: profileProvider.profilePictureGetApi,
+                      placeholderAsset: IconsPath.defultImage,
                     ),
                     Positioned(
-                      right: 7,
-                      bottom: 7,
+                      right: 4,
+                      bottom: 4,
                       child: GestureDetector(
-                        onTap: () =>
-                            _showImagePickerOptions(context, profileProvider),
+                        onTap: () => _showImagePickerOptions(context, profileProvider),
                         child: SvgPicture.asset(IconsPath.editProfile),
                       ),
                     ),
@@ -112,45 +79,31 @@ class _ProfileSetupContainerState extends State<ProfileSetupContainer> {
                 ),
               ),
 
-              hSized30,
+              hSized25,
 
               /// ✅ Full Name
               CommonTextField(
                 controller: fullNameController,
-                label: lang.fullNameLabel,
-                hintText: lang.fullNameHint,
-                validator: (val) => CommonValidators.validateName(
-                  val,
-                  fieldName: lang.fullNameLabel,
-                ),
+                label: "Full Name",
+                hintText: "Enter your name",
+                validator: (val) =>
+                    CommonValidators.validateName(val, fieldName: "Full Name"),
               ),
               hSized10,
 
               /// ✅ Email
               CommonTextField(
                 controller: emailController,
-                label: lang.emailLabel,
-                hintText: lang.emailHint,
+                label: "Email",
+                hintText: "Enter your email",
                 validator: (val) => CommonValidators.validateEmail(val),
               ),
               hSized10,
 
-              /// ✅ Phone
-              // CommonTextField(
-              //   controller: phoneController,
-              //   label: lang.phoneNumberLabel,
-              //   hintText: lang.phoneNumberHint,
-              //   maxLength: 10,
-              //   keyboardType: TextInputType.phone,
-              //   validator: (val) => CommonValidators.validateMobile(val, fieldName: lang.phoneNumberLabel),
-              // ),
-              // hSized10,
-
-              /// ✅ Class Dropdown
               /// ✅ Class Dropdown
               customDropdown(
-                label: lang.classLabel,
-                hint: lang.classHint,
+                label: "Class",
+                hint: "Select your class",
                 value: profileProvider.selectedClass,
                 items: profileProvider.classList,
                 onChanged: profileProvider.setSelectedClass,
@@ -159,8 +112,8 @@ class _ProfileSetupContainerState extends State<ProfileSetupContainer> {
 
               /// ✅ State Dropdown
               customDropdown(
-                label: lang.stateLabel,
-                hint: lang.stateHint,
+                label: "State",
+                hint: "Select your state",
                 value: profileProvider.selectedState,
                 items: profileProvider.stateList,
                 onChanged: profileProvider.setSelectedState,
@@ -169,17 +122,17 @@ class _ProfileSetupContainerState extends State<ProfileSetupContainer> {
 
               /// ✅ City Dropdown
               customDropdown(
-                label: lang.cityLabel,
-                hint: lang.cityHint,
+                label: "City",
+                hint: "Select your city",
                 value: profileProvider.selectedCity,
                 items: profileProvider.cityList,
                 onChanged: profileProvider.setSelectedCity,
               ),
-              hSized20,
+              hSized25,
 
-              /// ✅ Continue Button
+              /// ✅ Update Button
               CommonButton(
-                text: lang.continueButton,
+                text: "Save Changes",
                 borderRadius: 30,
                 textColor: MyColors.whiteText,
                 backgroundColor: MyColors.appTheme,
@@ -189,21 +142,10 @@ class _ProfileSetupContainerState extends State<ProfileSetupContainer> {
                       ..setFullName(fullNameController.text.trim())
                       ..setEmail(emailController.text.trim());
 
-                    final res = await ProfileSetupProvider.completeProfileApi(
-                      context: context,
-                      fullName: profileProvider.fullName,
-                      email: profileProvider.email,
-                      selectedClass: profileProvider.selectedClass ?? "",
-                      selectedState: profileProvider.selectedState ?? "",
-                      selectedCity: profileProvider.selectedCity ?? "",
-                      profileImage: profileProvider.profileImage != null
-                          ? File(profileProvider.profileImage!.path)
-                          : null,
-                    );
-
-
+                    await profileProvider.updateProfile(context);
                   }
                 },
+
               ),
             ],
           ),
@@ -212,11 +154,11 @@ class _ProfileSetupContainerState extends State<ProfileSetupContainer> {
     );
   }
 
-  /// ✅ Image picker bottom sheet
+  /// ✅ Image Picker Modal
   void _showImagePickerOptions(
-    BuildContext context,
-    ProfileSetupProvider provider,
-  ) {
+      BuildContext context,
+      ProfileSetupProvider provider,
+      ) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -229,7 +171,7 @@ class _ProfileSetupContainerState extends State<ProfileSetupContainer> {
           children: [
             hSized20,
             Text(
-              "Select Profile Picture",
+              "Change Profile Picture",
               style: semiBoldTextStyle(
                 fontSize: 18,
                 color: MyColors.blackColor,

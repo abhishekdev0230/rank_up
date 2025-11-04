@@ -188,6 +188,7 @@ class QuizQuestionWidget extends StatelessWidget {
               ),
             ],
           ),
+          hSized15,
         ],
       ),
     );

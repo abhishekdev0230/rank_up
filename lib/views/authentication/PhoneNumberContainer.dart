@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:rank_up/Utils/helper.dart';
 import 'package:rank_up/constraints/font_family.dart';
 import 'package:country_code_picker/country_code_picker.dart';
@@ -8,14 +9,19 @@ import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
 import 'package:rank_up/constraints/sizdebox_width.dart';
 import 'package:rank_up/constraints/sizedbox_height.dart';
-import '../../custom_classes/my_textfield.dart';
+import 'package:rank_up/custom_classes/loder.dart';
+import 'package:rank_up/custom_classes/my_textfield.dart';
+import 'package:rank_up/provider/provider_classes/otp_provider.dart';
 
 class PhoneNumberContainer extends StatefulWidget {
   final dynamic lang;
-  final Function(String phone, String countryCode)? onSignInTap;
+  final Function(String phone, String countryCode, bool rememberMe)? onSignInTap;
 
-
-  const PhoneNumberContainer({super.key, required this.lang, this.onSignInTap});
+  const PhoneNumberContainer({
+    super.key,
+    required this.lang,
+    this.onSignInTap,
+  });
 
   @override
   State<PhoneNumberContainer> createState() => _PhoneNumberContainerState();
@@ -23,7 +29,8 @@ class PhoneNumberContainer extends StatefulWidget {
 
 class _PhoneNumberContainerState extends State<PhoneNumberContainer> {
   final TextEditingController phoneController = TextEditingController();
-  bool rememberMe = false;
+
+  bool rememberMeBu = false;
   String countryCode = '+91';
 
   @override
@@ -35,30 +42,30 @@ class _PhoneNumberContainerState extends State<PhoneNumberContainer> {
   @override
   Widget build(BuildContext context) {
     final lang = widget.lang;
+    final otpProvider = Provider.of<OtpProvider>(context);
 
     return Container(
       key: const ValueKey('otpContainer'),
       height: context.hp(0.60),
       width: double.infinity,
-      decoration: const BoxDecoration(
-        color: MyColors.whiteText,
-        borderRadius: BorderRadius.all(Radius.circular(25)),
-      ),
       margin: const EdgeInsets.all(10),
       padding: EdgeInsets.symmetric(
         horizontal: context.wp(0.05),
         vertical: context.hp(0.03),
       ),
+      decoration: const BoxDecoration(
+        color: MyColors.whiteText,
+        borderRadius: BorderRadius.all(Radius.circular(25)),
+      ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// 🔹 Top Section (Scrollable content)
           Expanded(
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  /// 👋 Header Texts
                   Text(
                     lang.helloThere,
                     style: semiBoldTextStyle(
@@ -76,16 +83,15 @@ class _PhoneNumberContainerState extends State<PhoneNumberContainer> {
                   ),
                   hSized30,
 
-                  /// ✅ Phone Number Field
+                  /// 📱 Phone Number Field with Country Code
                   CommonTextField(
                     maxLength: 10,
                     controller: phoneController,
                     label: lang.phoneNumber,
                     keyboardType: TextInputType.phone,
-                    prefixIcon: Container(
+                    prefixIcon: SizedBox(
                       width: 90,
                       child: CountryCodePicker(
-
                         padding: EdgeInsets.zero,
                         onChanged: (code) {
                           setState(() {
@@ -105,23 +111,23 @@ class _PhoneNumberContainerState extends State<PhoneNumberContainer> {
                     ),
                   ),
 
-
                   hSized10,
 
-                  /// ✅ "Remember Me" checkbox
+                  /// ☑️ Remember Me Checkbox
                   Row(
                     children: [
                       SizedBox(
                         width: 20,
                         child: Checkbox(
-                          value: rememberMe,
+                          value: rememberMeBu,
                           activeColor: MyColors.appTheme,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4),
                           ),
                           onChanged: (value) {
                             setState(() {
-                              rememberMe = value ?? false;
+                              rememberMeBu = value ?? false;
+
                             });
                           },
                         ),
@@ -138,21 +144,37 @@ class _PhoneNumberContainerState extends State<PhoneNumberContainer> {
                   ),
 
                   hSized20,
+
+                  /// 🔘 Sign In Button
                   CommonButton(
                     borderRadius: 30,
-                    text: lang.signIn,
+                    text: otpProvider.isLoading
+                        ? "Please wait..."
+                        : lang.signIn,
                     textColor: MyColors.whiteText,
                     backgroundColor: MyColors.appTheme,
-                    onTap: () {
-                      if (widget.onSignInTap != null) {
-                        widget.onSignInTap!(phoneController.text, countryCode); // pass phone + country code
+                    onTap: otpProvider.isLoading
+                        ? () {}
+                        : () async {
+                      final success = await otpProvider.sendOtp(
+                        context: context,
+                        phoneNumber: phoneController.text,
+                        countryCode: countryCode,
+                      );
+
+                      if (success) {
+                        widget.onSignInTap?.call(
+                          phoneController.text,
+                          countryCode,
+                          rememberMeBu,
+                        );
                       }
                     },
                   ),
 
                   hSized20,
-                  /// ✅ "Or Continue With" — with dotted lines
 
+                  /// --- OR CONTINUE WITH ---
                   Row(
                     children: [
                       const Expanded(child: DottedLine()),
@@ -169,7 +191,10 @@ class _PhoneNumberContainerState extends State<PhoneNumberContainer> {
                       const Expanded(child: DottedLine()),
                     ],
                   ),
+
                   hSized20,
+
+                  /// 🔹 Google Sign-In Button
                   CommonButton(
                     borderRadius: 30,
                     text: lang.signInWithGoogle,
@@ -179,17 +204,14 @@ class _PhoneNumberContainerState extends State<PhoneNumberContainer> {
                     ),
                     textColor: MyColors.whiteText,
                     backgroundColor: MyColors.appTheme,
-                    onTap: () {},
+                    onTap: () {
+                      // TODO: Add Google login logic here
+                    },
                   ),
                 ],
               ),
             ),
           ),
-
-
-
-          /// 🔹 Bottom Fixed Button
-
         ],
       ),
     );

@@ -28,40 +28,43 @@ class _NeetPYQsFlashcardsInnerState extends State<NeetPYQsFlashcardsInner> {
     return CommonScaffold(
       backgroundColor: MyColors.appTheme,
       title: "Neet PYQs-Biology",
-      body: Column(
-        children: [
-          hSized20,
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 16),
-            width: double.infinity,
-            // height: 430,
-            decoration: BoxDecoration(
-              color: MyColors.rankBg,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            hSized20,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 16),
+              width: double.infinity,
+              // height: 430,
+              decoration: BoxDecoration(
+                color: MyColors.rankBg,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: _showAnswer ? _buildAnswerCard() : _buildQuestionCard(),
+              ),
             ),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: _showAnswer ? _buildAnswerCard() : _buildQuestionCard(),
-            ),
-          ),
-          hSized30,
-          if (_showAnswer)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _circularButton("Don’t\nKnow", MyColors.color1BB287),
-                _circularButton("Suspend", MyColors.colorF8CB52),
-                _circularButton("Know", MyColors.colorD84B48),
-              ],
-            ),
-        ],
+            hSized30,
+            if (_showAnswer)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _circularButton("Don’t\nKnow", MyColors.color1BB287),
+                  _circularButton("Suspend", MyColors.colorF8CB52),
+                  _circularButton("Know", MyColors.colorD84B48),
+                ],
+              ),
+            hSized15,
+          ],
+        ),
       ),
     );
   }

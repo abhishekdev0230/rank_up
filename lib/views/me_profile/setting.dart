@@ -5,6 +5,9 @@ import 'package:rank_up/constraints/icon_path.dart';
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
 import 'package:rank_up/constraints/sizedbox_height.dart';
+import 'package:rank_up/custom_classes/custom_navigator.dart';
+import 'package:rank_up/services/local_storage.dart';
+import 'package:rank_up/views/authentication/RankUpLoginScreen.dart';
 
 class SettingsSheet {
   /// Show the settings bottom sheet
@@ -69,8 +72,8 @@ class SettingsSheet {
                       context,
                       title: "Logout Confirmation",
                       message: "Are you sure you want to logout?",
-                      messageColor:MyColors.color969696,
-                      messageSize:12,
+                      messageColor: MyColors.color969696,
+                      messageSize: 12,
                       confirmColor: MyColors.color19B287,
                     );
 
@@ -78,7 +81,13 @@ class SettingsSheet {
 
                     if (result == true) {
                       // Logout logic
-                      print("User Logged Out");
+                      await StorageManager.clearData();
+
+                      // ✅ Navigate to Login screen (clear all previous routes)
+                      CustomNavigator.pushRemoveUntil(
+                        context,
+                        RankUpLoginScreen(),
+                      );
                     }
                   },
                 ),
@@ -123,7 +132,7 @@ class SettingsSheet {
     VoidCallback? onTap,
   }) {
     return GestureDetector(
-      onTap:onTap ,
+      onTap: onTap,
       child: Container(
         alignment: Alignment.center,
         height: 43,
@@ -140,7 +149,10 @@ class SettingsSheet {
             Expanded(
               child: Text(
                 title,
-                style: mediumTextStyle(fontSize: 14, color: MyColors.blackColor),
+                style: mediumTextStyle(
+                  fontSize: 14,
+                  color: MyColors.blackColor,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),

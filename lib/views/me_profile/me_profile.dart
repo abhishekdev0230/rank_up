@@ -1,14 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:rank_up/constraints/icon_path.dart';
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
 import 'package:rank_up/constraints/sizedbox_height.dart';
 import 'package:rank_up/constraints/sizdebox_width.dart';
+import 'package:rank_up/custom_classes/CommonProfileImage.dart';
 import 'package:rank_up/custom_classes/app_bar.dart';
 import 'package:rank_up/custom_classes/custom_navigator.dart';
+import 'package:rank_up/provider/provider_classes/ProfileSetupProvider.dart';
+import 'package:rank_up/views/me_profile/ProfileScreen.dart';
 import 'package:rank_up/views/me_profile/setting.dart';
-
 import 'BlogScreen.dart';
 import 'FaqScreen.dart';
 import 'MyQueriesScreen.dart';
@@ -22,8 +27,23 @@ class MeProfile extends StatefulWidget {
 }
 
 class _MeProfileState extends State<MeProfile> {
+
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<ProfileSetupProvider>(
+        context,
+        listen: false,
+      );
+      provider.getProfileApi(context);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final profileProvider = Provider.of<ProfileSetupProvider>(context);
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       child: CommonScaffold(
@@ -63,48 +83,61 @@ class _MeProfileState extends State<MeProfile> {
               hSized20,
 
               // ---------- User info ----------
-              Container(
-                decoration: BoxDecoration(
-                  color: MyColors.appTheme,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 24,
-                      backgroundImage: AssetImage(
-                        'assets/images/defultImage.png',
+              GestureDetector(
+                onTap: () {
+                  CustomNavigator.pushNavigate(context, ProfileScreen());
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: MyColors.appTheme,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      CommonProfileImage(
+                        localFile: profileProvider.profileImage != null
+                            ? File(profileProvider.profileImage!.path)
+                            : null,
+                        imageUrl: profileProvider.profilePictureGetApi?.toString(),
+                        placeholderAsset: IconsPath.defultImage,
+                        radius: 24,
                       ),
-                    ),
-                    wSized10,
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Guy Hawkins",
-                            style: semiBoldTextStyle(
-                              fontSize: 16,
-                              color: MyColors.whiteText,
+
+
+                      wSized10,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              profileProvider.fullName.isNotEmpty
+                                  ? profileProvider.fullName
+                                  : "User Name",
+                              style: semiBoldTextStyle(
+                                fontSize: 16,
+                                color: MyColors.whiteText,
+                              ),
                             ),
-                          ),
-                          Text(
-                            "guyhawkins12@gmail.com",
-                            style: mediumTextStyle(
-                              fontSize: 12,
-                              color: MyColors.whiteText,
+                            Text(
+                              profileProvider.email.isNotEmpty
+                                  ? profileProvider.email
+                                  : "email@example.com",
+                              style: mediumTextStyle(
+                                fontSize: 12,
+                                color: MyColors.whiteText,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  ],
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -221,28 +254,6 @@ class _MeProfileState extends State<MeProfile> {
                 ],
               ),
 
-              hSized20,
-
-              // ---------- Logout ----------
-              Center(
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Log out",
-                        style: mediumTextStyle(
-                          fontSize: 16,
-                          color: MyColors.blackColor,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.logout, color: Colors.black, size: 18),
-                    ],
-                  ),
-                ),
-              ),
               hSized20,
             ],
           ),

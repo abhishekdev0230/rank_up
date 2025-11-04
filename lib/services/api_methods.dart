@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
+import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:rank_up/custom_classes/loder.dart';
 
 import '../Utils/helper.dart';
 import 'api_key_word.dart';
@@ -262,64 +263,65 @@ class ApiMethods {
   //   }
   // }
 
-  // Future<CommonResponse?> postMultipartMethodMultipalPhotosCM({
-  //   required String method,
-  //   required List<File> files,
-  //   required String fileFieldName,
-  //   required Map<String, String> fields,
-  //   Map<String, String>? headers,
-  // }) async {
-  //   if (await Helper.checkInternetConnection()) {
-  //     try {
-  //       log('📤 POST Multipart URL: $method');
-  //       log('📤 Fields: $fields');
-  //       log('📤 File Paths: ${files.map((e) => e.path).toList()}');
-  //
-  //       var uri = Uri.parse(method);
-  //       var request = http.MultipartRequest('POST', uri);
-  //
-  //       // Add headers if available
-  //       if (headers != null) {
-  //         request.headers.addAll(headers);
-  //       }
-  //
-  //       // Add fields
-  //       request.fields.addAll(fields);
-  //
-  //       // Add multiple files
-  //       for (var file in files) {
-  //         request.files.add(
-  //           await http.MultipartFile.fromPath(
-  //             fileFieldName,
-  //             file.path,
-  //             contentType: MediaType('image', 'jpeg'), // or 'png'
-  //           ),
-  //         );
-  //       }
-  //
-  //       var streamedResponse = await request.send();
-  //       var response = await http.Response.fromStream(streamedResponse);
-  //
-  //       log('📩 Multipart Status Code: ${response.statusCode}');
-  //       log('📩 Multipart Raw Response: ${response.body}');
-  //
-  //       final Map<String, dynamic> json = jsonDecode(response.body);
-  //       log('📩 Parsed JSON: $json');
-  //
-  //       final commonRes = CommonResponse.fromJson(json);
-  //
-  //       Helper.customToast(commonRes.message ?? "Something went wrong");
-  //
-  //       return commonRes;
-  //     } catch (ex) {
-  //       log('❌ Multipart Error: $ex');
-  //       return CommonResponse(status: false, message: "Something went wrong");
-  //     }
-  //   } else {
-  //     Helper.customToast("No internet");
-  //     return CommonResponse(status: false, message: "No internet");
-  //   }
-  // }
+  ///--------------Single Multipart PATCH Method (for single file upload)-----------------------
+  Future<CommonResponse?> patchMultipartMethodCM({
+    required String method,
+    File? file,
+    String? fileFieldName,
+    required Map<String, String> fields,
+    Map<String, String>? headers,
+  }) async {
+    if (await Helper.checkInternetConnection()) {
+      try {
+        log('📤 PATCH Multipart URL: $method');
+        log('📤 Fields: $fields');
+        log('📤 File: ${file?.path ?? 'No file selected'}');
+
+        var uri = Uri.parse(method);
+        var request = http.MultipartRequest('PATCH', uri);
+
+        // Add headers if available
+        if (headers != null) {
+          request.headers.addAll(headers);
+        }
+
+        // Add fields
+        request.fields.addAll(fields);
+
+        // Add file if provided
+        if (file != null && fileFieldName != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              fileFieldName,
+              file.path,
+              contentType: MediaType('image', 'jpeg'),
+            ),
+          );
+        }
+
+        // Send request
+        var streamedResponse = await request.send();
+        var response = await http.Response.fromStream(streamedResponse);
+
+        log('📩 PATCH Status Code: ${response.statusCode}');
+        log('📩 PATCH Raw Response: ${response.body}');
+
+        final Map<String, dynamic> json = jsonDecode(response.body);
+        final commonRes = CommonResponse.fromJson(json);
+
+        Helper.customToast(commonRes.message ?? "Something went wrong");
+        return commonRes;
+      } catch (ex) {
+        log('❌ PATCH Multipart Error: $ex');
+        return CommonResponse(status: false, message: "Something went wrong");
+      }
+    } else {
+      Helper.customToast("No internet");
+      return CommonResponse(status: false, message: "No internet");
+    }
+  }
+
+
 
   ///--------------Post Method-----------------------
 
@@ -383,7 +385,6 @@ class ApiMethods {
           Helper.customToast(commonResponse.message!);
         }
 
-
         return commonResponse;
       } catch (ex) {
 
@@ -400,3 +401,32 @@ class ApiMethods {
 
 
 }
+class ApiHelper {
+  static Future<CommonResponse?> callPostApi({
+    required BuildContext context,
+    required String endpoint,
+    required Map<String, dynamic> body,
+  }) async {
+    try {
+      CommonLoaderApi.show(context);
+
+      final res = await ApiMethods().postMethodCM(
+        method: endpoint,
+        body: body,
+        header: {
+          "Content-Type": "application/json",
+        },
+      );
+
+      CommonLoaderApi.hide(context);
+
+      Helper.customToast(res?.message ?? "Something went wrong");
+      return res;
+    } catch (e) {
+      CommonLoaderApi.hide(context);
+      Helper.customToast("API error occurred");
+      return CommonResponse(status: false, message: "Error: $e");
+    }
+  }
+}
+

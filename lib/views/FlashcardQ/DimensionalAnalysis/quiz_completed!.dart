@@ -219,6 +219,7 @@ class QuizCompletedWidget extends StatelessWidget {
               },
             ),
           ),
+          hSized15,
         ],
       ),
     );

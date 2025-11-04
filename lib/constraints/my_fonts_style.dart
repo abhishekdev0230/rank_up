@@ -50,7 +50,7 @@ TextStyle semiBoldTextStyle({
   );
 }
 TextStyle mediumTextStyle({
-  required double fontSize,
+   double? fontSize,
    Color? color,
   double? height,
   TextOverflow? overflow,

@@ -23,6 +23,7 @@ class _RankUpLoginScreenState extends State<RankUpLoginScreen> {
   bool showOtpContainer = false;
   bool showOtpVerifyContainer = false;
   bool showProfileSetup = false;
+  bool rememberMe1 = false;
 
   String phoneNumber = '';
   String countryCode = '+91';
@@ -56,7 +57,7 @@ class _RankUpLoginScreenState extends State<RankUpLoginScreen> {
                       color: MyColors.whiteText.withOpacity(0.7),
                     ),
                   ),
-                  SizedBox(height: context.hp(0.20)),
+                  SizedBox(height: context.hp(0.15)),
                   if (!showOtpContainer &&
                       !showOtpVerifyContainer &&
                       !showProfileSetup) ...[
@@ -97,6 +98,7 @@ class _RankUpLoginScreenState extends State<RankUpLoginScreen> {
                     ? ProfileSetupContainer(lang: lang)
                     : showOtpVerifyContainer
                     ? OtpVerificationContainer(
+                  rememberMe: rememberMe1.toString(),
                   lang: lang,
                   phoneNumber: phoneNumber,
                   countryCode: countryCode,
@@ -110,8 +112,9 @@ class _RankUpLoginScreenState extends State<RankUpLoginScreen> {
                     : showOtpContainer
                     ? PhoneNumberContainer(
                   lang: lang,
-                  onSignInTap: (phone, code) {
+                  onSignInTap: (phone, code,rememberMe) {
                     setState(() {
+                      rememberMe1 = rememberMe;
                       phoneNumber = phone;
                       countryCode = code;
                       showOtpVerifyContainer = true;
