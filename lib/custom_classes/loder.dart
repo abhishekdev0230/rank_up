@@ -16,7 +16,6 @@ class CommonLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black.withOpacity(0.4),
       child: Center(
         child: LoadingAnimationWidget.hexagonDots(
           color: color,

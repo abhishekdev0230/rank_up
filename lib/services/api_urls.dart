@@ -10,12 +10,18 @@ class ApiUrls {
       'https://maps.googleapis.com/maps/api/place/details/json?';
 
   /// --------------------->>>>>  Base URL (Production)  <<<<<----------------------------
-  static const String baseUrl = "https://rankup-backend-production.up.railway.app/api/v1/auth/";
+  static const String baseUrl = "https://rankup-backend-production.up.railway.app/api/v1/";
 
   /// --------------------->>>>>  Auth APIs  <<<<<----------------------------
-  static const String sendOtp = "${baseUrl}send-otp";
-  static const String verifyOtp = "${baseUrl}verify-otp";
-  static const String completeProfile = "${baseUrl}complete-profile";
-  static const String profile = "${baseUrl}profile";
-  static const String profileUpdate = "${baseUrl}profile-update";
+  static const String sendOtp = "${baseUrl}auth/send-otp";
+  static const String verifyOtp = "${baseUrl}auth/verify-otp";
+  static const String completeProfile = "${baseUrl}auth/complete-profile";
+  static const String profile = "${baseUrl}auth/profile";
+  static const String profileUpdate = "${baseUrl}auth/profile-update";
+
+
+  /// --------------------->>>>>  Flashcards APIs  <<<<<----------------------------
+  static const String flashcardsClasses = "${baseUrl}flashcards/classes/:classCode/subjects";
+  static const String flashcardsChapters = "${baseUrl}flashcards/subjects/:subjectId/chapters";
+  static const String flashcardsTopics = "${baseUrl}flashcards/chapters/:chapterId/topics";
 }

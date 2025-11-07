@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:rank_up/constraints/icon_path.dart';
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
-import 'package:rank_up/constraints/sizdebox_width.dart';
 import 'package:rank_up/constraints/sizedbox_height.dart';
+import 'package:rank_up/constraints/sizdebox_width.dart';
 import 'package:rank_up/custom_classes/app_bar.dart';
 import 'package:rank_up/custom_classes/custom_navigator.dart';
+import 'package:rank_up/custom_classes/loder.dart';
+import 'package:rank_up/provider/provider_classes/flashcard_provider.dart';
 import 'package:rank_up/views/FlashcardQ/flashcards_innner_1.dart';
 
 class FlashcardScreen extends StatefulWidget {
@@ -17,140 +20,172 @@ class FlashcardScreen extends StatefulWidget {
 }
 
 class _FlashcardScreenState extends State<FlashcardScreen> {
-  int selectedTab = 0;
-
-  final List<String> tabs = ["Class 11", "Class 12", "Achiever"];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<FlashcardProvider>(context, listen: false).init(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
+    final provider = Provider.of<FlashcardProvider>(context);
+    final recentlyViewed = provider.flashcardData?.data?.recentlyViewed ?? [];
+    final subjects = provider.flashcardData?.data?.subjects;
 
-    title: "Flashcards",
+    return CommonScaffold(
+      title: "Flashcards",
       showBack: false,
       backgroundColor: MyColors.appTheme,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              hSized10,
-              /// ---------------- Tabs ----------------
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(tabs.length, (index) {
-                  final bool isSelected = selectedTab == index;
-                  return GestureDetector(
-                    onTap: () => setState(() => selectedTab = index),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? MyColors.green
-                            : MyColors.color295176,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        tabs[index],
-                        style: mediumTextStyle(
-                          color: Colors.white, fontSize: 14,
+        child: provider.isLoading
+            ? const Center(child: CommonLoader(color: Colors.white))
+            : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    hSized10,
+
+                    /// ---------------- Tabs ----------------
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: List.generate(3, (index) {
+                        final tabNames = ["Class 11", "Class 12", "Achiever"];
+                        final isSelected = provider.selectedTab == index;
+                        return GestureDetector(
+                          onTap: () => provider.changeTab(index, context),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? MyColors.green
+                                  : MyColors.color295176,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              tabNames[index],
+                              style: mediumTextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    /// ---------------- Featured Subjects ----------------
+                    Column(
+                      children: [
+                        Text(
+                          "Featured Subjects",
+                          style: semiBoldTextStyle(
+                            color: Colors.white,
+                            fontSize: 19,
+                          ),
                         ),
+                      ],
+                    ),
+hSized10,
+                    provider.isTabLoading
+                        ? SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.6,
+                            child: const Center(
+                              child: CommonLoader(color: Colors.white),
+                            ),
+                          )
+                        : subjects == null
+                        ? SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.6,
+                            child: const Center(
+                              child: Text(
+                                "No subjects found",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          )
+                        : Column(
+                            children: subjects.map((subject) {
+                              String classCode = provider.selectedTab == 0
+                                  ? "11"
+                                  : provider.selectedTab == 1
+                                  ? "12"
+                                  : "13";
+
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12.0),
+                                child: _subjectCard(
+                                  context: context,
+                                  title: subject.name ?? "Unknown",
+                                  subtitle: subject.description ?? "",
+                                  subjectId: subject.id ?? "",
+                                  selectedClassCode: classCode,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                    const SizedBox(height: 28),
+
+                    /// ---------------- Recently Viewed ----------------
+                    Text(
+                      "Recently Viewed",
+                      style: semiBoldTextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
                       ),
                     ),
-                  );
-                }),
-              ),
-          
-              const SizedBox(height: 28),
-          
-              /// ---------------- Featured Subjects ----------------
-              Text(
-                "Featured Subjects",
-                style: semiBoldTextStyle(
-                  color: Colors.white,
-                  fontSize: 19,
-                ),
-              ),
-              const SizedBox(height: 16),
-          
-              Column(
-                children: [
-                  _subjectCard(
-                    onTap:
-                    () {
-                      CustomNavigator.pushNavigate(context, FlashcardInnerPhysicsScreen());
-                    },
-                    title: "Biology",
-                    subtitle:
-                    "Organic, Inorganic, Physical, Zoology, Botany & Reproduction",
-                    icon: Icons.biotech_rounded,
-                  ),
-                  const SizedBox(height: 12),
-                  _subjectCard(
-                    onTap: () {
-          
-                    },
-                    title: "Physics",
-                    subtitle: "Mechanics, Thermodynamics",
-                    icon: Icons.science_rounded,
-                  ),
-                  const SizedBox(height: 12),
-                  _subjectCard(
-                    onTap: () {
-          
-          
-                    },
-                    title: "Chemistry",
-                    subtitle:
-                    "Organic, Inorganic, Physical, Zoology, Botany & Reproduction",
-                    icon: Icons.ac_unit_rounded,
-                  ),
-                ],
-              ),
-          
-              const SizedBox(height: 28),
-          
-              /// ---------------- Recently Viewed ----------------
-              Text(
-                "Recently Viewed",
-                style: semiBoldTextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 14),
-          
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _recentCard("Cell Cycle"),
-                    _recentCard("Chemical Bonding"),
-                    _recentCard("Motion in Plane"),
-                    _recentCard("Gravitation"),
+                    const SizedBox(height: 14),
+                    recentlyViewed.isEmpty
+                        ? Text(
+                            "No recent topics viewed",
+                            style: regularTextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                            ),
+                          )
+                        : SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: recentlyViewed
+                                  .map(
+                                    (item) => _recentCard(
+                                      item.topicName ?? "Untitled",
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          ),
+                    hSized15,
                   ],
                 ),
               ),
-              hSized15,
-            ],
-          ),
-        ),
       ),
     );
   }
 
   /// ---------------- Subject Card ----------------
   Widget _subjectCard({
-    required VoidCallback onTap,
+    required BuildContext context,
     required String title,
     required String subtitle,
-    required IconData icon,
+    required String subjectId,
+    required String selectedClassCode,
   }) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => CustomNavigator.pushNavigate(
+        context,
+        FlashcardInnerPhysicsScreen(
+          selectIndexId: subjectId,
+          selectClass: selectedClassCode,
+        ),
+      ),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
@@ -163,14 +198,11 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
           children: [
             Row(
               children: [
-                Icon(icon, color: Colors.white, size: 28),
+                const Icon(Icons.book_rounded, color: Colors.white, size: 28),
                 wSized5,
                 Text(
                   title,
-                  style: semiBoldTextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
+                  style: semiBoldTextStyle(color: Colors.white, fontSize: 18),
                 ),
               ],
             ),
@@ -188,13 +220,12 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
     );
   }
 
-  /// ---------------- Recently Viewed Card ----------------
   Widget _recentCard(String title) {
     return Container(
       height: 93,
       width: 117,
-      margin: const EdgeInsets.only(right: 12,),
-      padding: const EdgeInsets.symmetric(horizontal: 8,),
+      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         color: MyColors.color295176,
         borderRadius: BorderRadius.circular(12),
@@ -203,14 +234,11 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-       SvgPicture.asset(IconsPath.flashQ),
+          SvgPicture.asset(IconsPath.flashQ),
           hSized20,
           Text(
             title,
-            style: regularTextStyle(
-              color: Colors.white,
-              fontSize: 12,
-            ),
+            style: regularTextStyle(color: Colors.white, fontSize: 12),
           ),
         ],
       ),
