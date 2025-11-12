@@ -9,5 +9,8 @@ class ApiKeyWord {
   static const String otp = "otp";
   static const String rememberMe = "rememberMe";
   static const String countryCode = "countryCode";
+  static const String confidenceLevel = "confidenceLevel";
+  static const String contentId = "contentId";
+  static const String contentType = "contentType";
 
 }

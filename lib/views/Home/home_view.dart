@@ -5,17 +5,34 @@ import 'package:rank_up/constraints/font_family.dart';
 import 'package:rank_up/constraints/icon_path.dart';
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
-import 'package:rank_up/constraints/sizdebox_width.dart';
 import 'package:rank_up/constraints/sizedbox_height.dart';
+import 'package:rank_up/constraints/sizdebox_width.dart';
+import 'package:rank_up/custom_classes/CommonProfileImage.dart';
 import 'package:rank_up/custom_classes/app_bar.dart';
+import 'package:rank_up/custom_classes/custom_navigator.dart';
+import 'package:rank_up/custom_classes/loder.dart';
 import 'package:rank_up/provider/provider_classes/HomeProvider.dart';
+import 'package:rank_up/views/FlashcardQ/NeetPYQsFlashcardsInner.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Access provider without listening
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<HomeProvider>(context, listen: false).fetchHomeData(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final provider = Provider.of<HomeProvider>(context);
 
     return CommonScaffold(
@@ -24,16 +41,26 @@ class HomeScreen extends StatelessWidget {
       padding: false,
       showBack: false,
       useSafeArea: false,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [_headerSection(provider), _mainBody(context, provider)],
+      body: RefreshIndicator(
+        color: MyColors.appTheme,
+        onRefresh: () async {
+          await provider.fetchHomeData(context, showLoader: false);
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              _headerSection(provider, context),
+              _mainBody(context, provider),
+            ],
+          ),
         ),
       ),
     );
   }
 
   /// ---------------- Header Section ----------------
-  Widget _headerSection(HomeProvider provider) {
+  Widget _headerSection(HomeProvider provider, BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 25),
@@ -41,7 +68,8 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _headerTop(provider),
+          _headerTop(provider, context),
+
           const SizedBox(height: 24),
           _progressSection(provider),
         ],
@@ -49,15 +77,18 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _headerTop(HomeProvider provider) {
+  Widget _headerTop(HomeProvider provider, BuildContext context) {
+    final homeProvider = Provider.of<HomeProvider>(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: [
-            const CircleAvatar(
+            CommonProfileImage(
+              imageUrl: homeProvider.profilePicture,
+              placeholderAsset: IconsPath.defultImage,
               radius: 24,
-              backgroundImage: AssetImage(IconsPath.defultImage),
             ),
             const SizedBox(width: 12),
             Column(
@@ -90,19 +121,16 @@ class HomeScreen extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: LinearProgressIndicator(
-            borderRadius: BorderRadius.circular(23),
-            value: provider.completedModules / 5,
+            value: provider.moduleProgress,
             minHeight: 7,
             color: MyColors.color19B287,
             backgroundColor: Colors.white,
           ),
         ),
         const SizedBox(height: 10),
-        Center(
-          child: Text(
-            "${provider.completedModules} Module Completed",
-            style: semiBoldTextStyle(fontSize: 14, color: MyColors.whiteText),
-          ),
+        Text(
+          "${provider.completedModules} Module Completed",
+          style: semiBoldTextStyle(fontSize: 14, color: MyColors.whiteText),
         ),
       ],
     );
@@ -125,25 +153,7 @@ class HomeScreen extends StatelessWidget {
           hSized24,
           _title("Question/Flashcard of the Day"),
           hSized10,
-          commonContainer(
-            Row(
-              children: [
-                SvgPicture.asset(IconsPath.homeRevealImage),
-                wSized7,
-                Expanded(
-                  child: Text(
-                    "Q: ${provider.qotd}",
-                    style: regularTextStyle(
-                      fontSize: 16,
-                      color: MyColors.color949494,
-                    ),
-                  ),
-                ),
-                wSized10,
-                CommonButton(title: "Reveal", onPressed: () {}),
-              ],
-            ),
-          ),
+          _qotdSection(provider),
           hSized24,
           _sectionTitle("Featured Deck", 180),
           hSized10,
@@ -170,7 +180,81 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  /// ---------- Reusable Widgets ----------
+  /// ---------- Sections ----------
+  Widget _qotdSection(HomeProvider provider) {
+    return commonContainer(
+      Row(
+        children: [
+          SvgPicture.asset(IconsPath.homeRevealImage),
+          wSized7,
+          Expanded(
+            child: Text(
+              "Q: ${provider.qotd}",
+              style: regularTextStyle(
+                fontSize: 16,
+                color: MyColors.color949494,
+              ),
+            ),
+          ),
+          wSized10,
+          CommonButton(title: "Reveal", onPressed: () {}),
+        ],
+      ),
+    );
+  }
+
+  Widget _featuredDecks(HomeProvider provider) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: List.generate(provider.featuredDecks.length, (index) {
+          final deck = provider.featuredDecks[index];
+          final isSelected = provider.selectedIndex == index;
+
+          return GestureDetector(
+            onTap: () {
+              provider.selectedIndex = index;
+              provider.notifyListeners();
+              CustomNavigator.pushNavigate(
+                context,
+                NeetPYQsFlashcardsInner(topicId: deck['id']),
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.only(right: 10),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: isSelected ? MyColors.appTheme : Colors.transparent,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(13),
+              ),
+              child: Container(
+                height: 65,
+                width: 78,
+                padding: EdgeInsets.all(5),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Color(deck['color']),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Text(
+                  deck['title'],
+                  textAlign: TextAlign.center,
+                  style: mediumTextStyle(
+                    fontSize: 12,
+                    color: MyColors.whiteText,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  /// ------------- Helper Methods Must be inside HomeScreen -------------
   Widget _title(String text) => Text(
     text,
     style: mediumTextStyle(fontSize: 18, color: MyColors.blackColor),
@@ -192,59 +276,6 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
-  Widget _featuredDecks(HomeProvider provider) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-
-
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: List.generate(provider.featuredDecks.length, (index) {
-              final deck = provider.featuredDecks[index];
-              final bool isSelected =provider.selectedIndex == index;
-
-              return GestureDetector(
-                onTap: () {
-                  setState(() => provider.selectedIndex = index);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(2), // border spacing
-                  margin: const EdgeInsets.only(right: 10),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: isSelected ? MyColors.appTheme : Colors.transparent,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(13),
-                  ),
-                  child: Container(
-                    height: 65,
-                    width: 78,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Color(deck['color']),
-                      borderRadius: BorderRadius.circular(11),
-                    ),
-                    child: Text(
-                      deck['title'],
-                      textAlign: TextAlign.center,
-                      style: mediumTextStyle(
-                        fontSize: 12,
-                        color: MyColors.whiteText,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        );
-      },
-    );
-  }
-
 
   Widget _liveTestCard(HomeProvider provider) {
     return Container(
@@ -321,7 +352,6 @@ class HomeScreen extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: LinearProgressIndicator(
-                    borderRadius: BorderRadius.circular(20),
                     value: provider.moduleProgress,
                     color: MyColors.appTheme,
                     backgroundColor: MyColors.rankBg,
@@ -379,7 +409,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  /// ---------- Reusable Styles ----------
+  /// ---------- Reusable Widgets ----------
   BoxDecoration _cardDecoration(Color color) {
     return BoxDecoration(
       color: color,
@@ -425,7 +455,7 @@ class CommonButton extends StatelessWidget {
   final VoidCallback onPressed;
   final double? fontSize;
   final Color? textColor;
-  final double? borderRadius; // 👈 added this
+  final double? borderRadius;
 
   const CommonButton({
     super.key,
@@ -433,7 +463,7 @@ class CommonButton extends StatelessWidget {
     required this.onPressed,
     this.fontSize,
     this.textColor,
-    this.borderRadius, // 👈 added this
+    this.borderRadius,
   });
 
   @override
@@ -444,7 +474,7 @@ class CommonButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 5),
         decoration: BoxDecoration(
           color: MyColors.appTheme,
-          borderRadius: BorderRadius.circular(borderRadius ?? 19), // 👈 use custom or default
+          borderRadius: BorderRadius.circular(borderRadius ?? 19),
           border: Border.all(color: MyColors.whiteText),
         ),
         child: Text(
@@ -458,6 +488,7 @@ class CommonButton extends StatelessWidget {
     );
   }
 }
+
 class CommonButton1 extends StatelessWidget {
   final String title;
   final VoidCallback onPressed;
@@ -488,15 +519,15 @@ class CommonButton1 extends StatelessWidget {
         height: height,
         width: width,
         padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 5),
+        alignment: Alignment.center,
         decoration: BoxDecoration(
           color: bgColor ?? MyColors.color32B790,
           borderRadius: BorderRadius.circular(borderRadius ?? 8),
           border: Border.all(color: bgColor ?? MyColors.color32B790),
         ),
-        alignment: Alignment.center,
         child: Text(
-          textAlign: TextAlign.center,
           title,
+          textAlign: TextAlign.center,
           style: semiBoldTextStyle(
             fontSize: fontSize ?? 12,
             color: textColor ?? MyColors.whiteText,
@@ -506,5 +537,3 @@ class CommonButton1 extends StatelessWidget {
     );
   }
 }
-
-

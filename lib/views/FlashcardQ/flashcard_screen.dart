@@ -41,129 +41,137 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
       body: SafeArea(
         child: provider.isLoading
             ? const Center(child: CommonLoader(color: Colors.white))
-            : SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    hSized10,
+            : RefreshIndicator(
+                color: MyColors.appTheme,
+                onRefresh: () async {
+                  // Pull-to-refresh: refresh without showing full-page loader
+                  await provider.init(context, showLoader: false);
+                },
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      hSized10,
 
-                    /// ---------------- Tabs ----------------
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(3, (index) {
-                        final tabNames = ["Class 11", "Class 12", "Achiever"];
-                        final isSelected = provider.selectedTab == index;
-                        return GestureDetector(
-                          onTap: () => provider.changeTab(index, context),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 10,
+                      /// ---------------- Tabs ----------------
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: List.generate(3, (index) {
+                          final tabNames = ["Class 11", "Class 12", "Achiever"];
+                          final isSelected = provider.selectedTab == index;
+                          return GestureDetector(
+                            onTap: () => provider.changeTab(index, context),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? MyColors.green
+                                    : MyColors.color295176,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                tabNames[index],
+                                style: mediumTextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
                             ),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? MyColors.green
-                                  : MyColors.color295176,
-                              borderRadius: BorderRadius.circular(10),
+                          );
+                        }),
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      /// ---------------- Featured Subjects ----------------
+                      Column(
+                        children: [
+                          Text(
+                            "Featured Subjects",
+                            style: semiBoldTextStyle(
+                              color: Colors.white,
+                              fontSize: 19,
                             ),
-                            child: Text(
-                              tabNames[index],
-                              style: mediumTextStyle(
-                                color: Colors.white,
+                          ),
+                        ],
+                      ),
+                      hSized10,
+                      provider.isTabLoading
+                          ? SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.6,
+                              child: const Center(
+                                child: CommonLoader(color: Colors.white),
+                              ),
+                            )
+                          : subjects == null
+                          ? SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.6,
+                              child: const Center(
+                                child: Text(
+                                  "No subjects found",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            )
+                          : Column(
+                              children: subjects.map((subject) {
+                                String classCode = provider.selectedTab == 0
+                                    ? "11"
+                                    : provider.selectedTab == 1
+                                    ? "12"
+                                    : "13";
+
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12.0),
+                                  child: _subjectCard(
+                                    context: context,
+                                    title: subject.name ?? "Unknown",
+                                    subtitle: subject.description ?? "",
+                                    subjectId: subject.id ?? "",
+                                    selectedClassCode: classCode,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                      const SizedBox(height: 28),
+
+                      /// ---------------- Recently Viewed ----------------
+                      Text(
+                        "Recently Viewed",
+                        style: semiBoldTextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      recentlyViewed.isEmpty
+                          ? Text(
+                              "No recent topics viewed",
+                              style: regularTextStyle(
+                                color: Colors.white70,
                                 fontSize: 14,
                               ),
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-
-                    const SizedBox(height: 28),
-
-                    /// ---------------- Featured Subjects ----------------
-                    Column(
-                      children: [
-                        Text(
-                          "Featured Subjects",
-                          style: semiBoldTextStyle(
-                            color: Colors.white,
-                            fontSize: 19,
-                          ),
-                        ),
-                      ],
-                    ),
-hSized10,
-                    provider.isTabLoading
-                        ? SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.6,
-                            child: const Center(
-                              child: CommonLoader(color: Colors.white),
-                            ),
-                          )
-                        : subjects == null
-                        ? SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.6,
-                            child: const Center(
-                              child: Text(
-                                "No subjects found",
-                                style: TextStyle(color: Colors.white),
+                            )
+                          : SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: recentlyViewed
+                                    .map(
+                                      (item) => _recentCard(
+                                        item.topicName ?? "Untitled",
+                                      ),
+                                    )
+                                    .toList(),
                               ),
                             ),
-                          )
-                        : Column(
-                            children: subjects.map((subject) {
-                              String classCode = provider.selectedTab == 0
-                                  ? "11"
-                                  : provider.selectedTab == 1
-                                  ? "12"
-                                  : "13";
-
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 12.0),
-                                child: _subjectCard(
-                                  context: context,
-                                  title: subject.name ?? "Unknown",
-                                  subtitle: subject.description ?? "",
-                                  subjectId: subject.id ?? "",
-                                  selectedClassCode: classCode,
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                    const SizedBox(height: 28),
-
-                    /// ---------------- Recently Viewed ----------------
-                    Text(
-                      "Recently Viewed",
-                      style: semiBoldTextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    recentlyViewed.isEmpty
-                        ? Text(
-                            "No recent topics viewed",
-                            style: regularTextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                            ),
-                          )
-                        : SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: recentlyViewed
-                                  .map(
-                                    (item) => _recentCard(
-                                      item.topicName ?? "Untitled",
-                                    ),
-                                  )
-                                  .toList(),
-                            ),
-                          ),
-                    hSized15,
-                  ],
+                      hSized15,
+                    ],
+                  ),
                 ),
               ),
       ),
@@ -225,7 +233,7 @@ hSized10,
       height: 93,
       width: 117,
       margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 5),
       decoration: BoxDecoration(
         color: MyColors.color295176,
         borderRadius: BorderRadius.circular(12),
@@ -235,7 +243,7 @@ hSized10,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SvgPicture.asset(IconsPath.flashQ),
-          hSized20,
+          hSized10,
           Text(
             title,
             style: regularTextStyle(color: Colors.white, fontSize: 12),

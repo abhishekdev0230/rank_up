@@ -13,6 +13,7 @@ import 'package:rank_up/custom_classes/app_bar.dart';
 import 'package:rank_up/custom_classes/custom_navigator.dart';
 import 'package:rank_up/provider/provider_classes/ProfileSetupProvider.dart';
 import 'package:rank_up/views/me_profile/ProfileScreen.dart';
+import 'package:rank_up/views/me_profile/bookmarked_cards.dart';
 import 'package:rank_up/views/me_profile/setting.dart';
 import 'BlogScreen.dart';
 import 'FaqScreen.dart';
@@ -185,17 +186,25 @@ class _MeProfileState extends State<MeProfile> {
                 children: [
                   Expanded(
                     child: _smallInfoCard(
+                    onTap: () {
+                      CustomNavigator.pushNavigate(context, BookmarkedCards(type:"Bookmarked Cards" ,));
+                    },
                       title: "Bookmarked Cards",
-                      subtitle: "0 Cards",
+                      subtitle: "${profileProvider.bookmarkedCount} Cards",
                       icon: SvgPicture.asset(IconsPath.suspendedCards),
                     ),
                   ),
                   wSized10,
                   Expanded(
-                    child: _smallInfoCard(
-                      title: "Suspended Cards",
-                      subtitle: "0 Cards",
-                      icon: SvgPicture.asset(IconsPath.bookmarkedCards),
+                    child: GestureDetector(
+                      onTap: () {
+                        CustomNavigator.pushNavigate(context, BookmarkedCards(type:"Suspended Cards",));
+                      },
+                      child: _smallInfoCard(
+                        title: "Suspended Cards",
+                        subtitle: "${profileProvider.suspendedCardCount} Cards",
+                        icon: SvgPicture.asset(IconsPath.bookmarkedCards),
+                      ),
                     ),
                   ),
                 ],
@@ -298,28 +307,34 @@ class _MeProfileState extends State<MeProfile> {
     required String title,
     required String subtitle,
     required Widget icon,
+    VoidCallback? onTap, // 👈 add this line
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: MyColors.whiteText,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          icon,
-          const SizedBox(height: 6),
-          Text(
-            title,
-            style: mediumTextStyle(fontSize: 14, color: MyColors.blackColor),
-          ),
-          Text(
-            subtitle,
-            style: mediumTextStyle(fontSize: 10, color: MyColors.blackColor),
-          ),
-        ],
+    return InkWell(
+      onTap: onTap, // 👈 make whole card clickable
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        decoration: BoxDecoration(
+          color: MyColors.whiteText,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            icon,
+            const SizedBox(height: 6),
+            Text(
+              title,
+              style: mediumTextStyle(fontSize: 14, color: MyColors.blackColor),
+            ),
+            Text(
+              subtitle,
+              style: mediumTextStyle(fontSize: 10, color: MyColors.blackColor),
+            ),
+          ],
+        ),
       ),
     );
   }
+
 }

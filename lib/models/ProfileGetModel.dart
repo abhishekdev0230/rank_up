@@ -48,6 +48,7 @@ class Data {
   String? role;
   bool? isProfileComplete;
   DateTime? createdAt;
+  Stats? stats;
 
   Data({
     this.id,
@@ -61,6 +62,7 @@ class Data {
     this.role,
     this.isProfileComplete,
     this.createdAt,
+    this.stats,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
@@ -75,6 +77,7 @@ class Data {
     role: json["role"],
     isProfileComplete: json["isProfileComplete"],
     createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
+    stats: json["stats"] == null ? null : Stats.fromJson(json["stats"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -89,5 +92,26 @@ class Data {
     "role": role,
     "isProfileComplete": isProfileComplete,
     "createdAt": createdAt?.toIso8601String(),
+    "stats": stats?.toJson(),
+  };
+}
+
+class Stats {
+  int? bookmarks;
+  int? suspendedFlashcards;
+
+  Stats({
+    this.bookmarks,
+    this.suspendedFlashcards,
+  });
+
+  factory Stats.fromJson(Map<String, dynamic> json) => Stats(
+    bookmarks: json["bookmarks"],
+    suspendedFlashcards: json["suspendedFlashcards"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "bookmarks": bookmarks,
+    "suspendedFlashcards": suspendedFlashcards,
   };
 }

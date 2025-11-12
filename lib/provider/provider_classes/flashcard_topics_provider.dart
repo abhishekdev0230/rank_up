@@ -8,16 +8,17 @@ class FlashcardTopicsProvider extends ChangeNotifier {
   bool isLoading = false;
   FlashcardTopicsModel? topicsModel;
 
-  Future<void> fetchTopics(BuildContext context, String chapterId) async {
-    isLoading = true;
-    notifyListeners();
+  Future<void> fetchTopics(BuildContext context, String chapterId, {bool isPullRefresh = false}) async {
+    if (!isPullRefresh) {
+      isLoading = true;
+      notifyListeners();
+    }
 
     try {
       final headers = await ApiHeaders.withStoredToken();
-      final String url = ApiUrls.flashcardsTopics.replaceFirst(':chapterId', chapterId);
-
+      final String url =
+      ApiUrls.flashcardsTopics.replaceFirst(':chapterId', chapterId);
       debugPrint("📘 Fetching Topics → $url");
-
       final response = await ApiMethods().getMethodTwo(
         header: headers,
         method: url,
@@ -38,5 +39,24 @@ class FlashcardTopicsProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+
+
+
+
+  ///...............track topic................
+  Future<void> viewChapters(BuildContext context, String topicId) async {
+    final headers = await ApiHeaders.withStoredToken();
+    final String url = ApiUrls.flashcardsTopicsView.replaceFirst(':topicId', topicId);
+
+    debugPrint("📘 Viewing Chapter → $url");
+
+    final response = await ApiMethods().postMethodCM(
+      header: headers,
+      method: url,
+      body: {},
+    );
+
   }
 }

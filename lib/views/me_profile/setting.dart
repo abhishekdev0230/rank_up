@@ -9,6 +9,8 @@ import 'package:rank_up/custom_classes/custom_navigator.dart';
 import 'package:rank_up/services/local_storage.dart';
 import 'package:rank_up/views/authentication/RankUpLoginScreen.dart';
 
+import 'StaticPageScreenPriTermAbout.dart';
+
 class SettingsSheet {
   /// Show the settings bottom sheet
   static void show(BuildContext context) {
@@ -55,13 +57,51 @@ class SettingsSheet {
 
                 // ---------- Options ----------
                 _menuContainer("Share", Icons.share_outlined),
-                _menuContainer("About App", Icons.info_outline),
+                _menuContainer(
+                  "About App",
+                  Icons.info_outline,
+                  onTap: () {
+                    Navigator.pop(context);
+                    CustomNavigator.pushNavigate(
+                      context,
+                      const StaticPageScreen(title: "About App", slug: "about"),
+                    );
+                  },
+                ),
                 _menuContainer(
                   "Terms & Conditions",
                   Icons.description_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    CustomNavigator.pushNavigate(
+                      context,
+                      const StaticPageScreen(title: "Terms & Conditions", slug: "terms"),
+                    );
+                  },
                 ),
-                _menuContainer("Privacy Policy", Icons.privacy_tip_outlined),
-                _menuContainer("Refund Policy", Icons.receipt_long_outlined),
+                _menuContainer(
+                  "Privacy Policy",
+                  Icons.privacy_tip_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    CustomNavigator.pushNavigate(
+                      context,
+                      const StaticPageScreen(title: "Privacy Policy", slug: "privacy"),
+                    );
+                  },
+                ),
+                _menuContainer(
+                  "Refund Policy",
+                  Icons.receipt_long_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    CustomNavigator.pushNavigate(
+                      context,
+                      const StaticPageScreen(title: "Refund Policy", slug: "refund"),
+                    );
+                  },
+                ),
+
                 _menuContainer("Reset Account", Icons.restart_alt_outlined),
                 _menuContainer(
                   "Log out",

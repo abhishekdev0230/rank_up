@@ -6,16 +6,23 @@ import 'package:rank_up/services/api_urls.dart';
 
 class FlashcardChapterProvider extends ChangeNotifier {
   bool isLoading = false;
+  bool isRefreshing = false;
   FlashcardChapterModel? chapterModel;
 
   /// Fetch chapters by subject ID
-  Future<void> fetchChapters(BuildContext context, String subjectId) async {
-    isLoading = true;
+  Future<void> fetchChapters(BuildContext context, String subjectId,
+      {bool isPullRefresh = false}) async {
+    if (isPullRefresh) {
+      isRefreshing = true;
+    } else {
+      isLoading = true;
+    }
     notifyListeners();
 
     try {
       final headers = await ApiHeaders.withStoredToken();
-      final String url = ApiUrls.flashcardsChapters.replaceFirst(':subjectId', subjectId);
+      final String url =
+      ApiUrls.flashcardsChapters.replaceFirst(':subjectId', subjectId);
 
       debugPrint("📘 Fetching Chapters → $url");
 
@@ -27,7 +34,6 @@ class FlashcardChapterProvider extends ChangeNotifier {
 
       if (response.isNotEmpty) {
         final data = jsonDecode(response);
-
         chapterModel = FlashcardChapterModel.fromJson(data);
 
         if (chapterModel?.status == true) {
@@ -43,7 +49,10 @@ class FlashcardChapterProvider extends ChangeNotifier {
       debugPrint(st.toString());
     } finally {
       isLoading = false;
+      isRefreshing = false;
       notifyListeners();
     }
   }
+
+
 }

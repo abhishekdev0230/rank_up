@@ -9,7 +9,7 @@ import 'package:rank_up/custom_classes/loder.dart';
 import 'package:rank_up/provider/provider_classes/flashcard_chapter_provider.dart';
 import 'package:rank_up/views/FlashcardQ/classIn_study_all_flashcards.dart';
 
-class FlashcardInnerPhysicsScreen extends StatelessWidget {
+class FlashcardInnerPhysicsScreen extends StatefulWidget {
   final String selectIndexId;
   final String selectClass;
 
@@ -20,16 +20,27 @@ class FlashcardInnerPhysicsScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final provider = Provider.of<FlashcardChapterProvider>(context);
+  State<FlashcardInnerPhysicsScreen> createState() =>
+      _FlashcardInnerPhysicsScreenState();
+}
 
-    // Fetch data after first frame
+class _FlashcardInnerPhysicsScreenState
+    extends State<FlashcardInnerPhysicsScreen> {
+  @override
+  void initState() {
+    super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<FlashcardChapterProvider>();
       if (provider.chapterModel == null && !provider.isLoading) {
-        provider.fetchChapters(context, selectIndexId);
+        provider.fetchChapters(context, widget.selectIndexId);
       }
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    final provider = Provider.of<FlashcardChapterProvider>(context);
     final chapters = provider.chapterModel?.data ?? [];
 
     return CommonScaffold(
@@ -38,53 +49,80 @@ class FlashcardInnerPhysicsScreen extends StatelessWidget {
       backgroundColor: MyColors.appTheme,
       body: provider.isLoading
           ? const Center(child: CommonLoader(color: Colors.white))
-          : chapters.isEmpty
-          ? Center(
-              child: Text(
-                "No chapters found",
-                style: regularTextStyle(color: Colors.white70, fontSize: 15),
-              ),
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                hSized20,
-                Text(
-                  "$selectClass Topics",
-                  style: semiBoldTextStyle(color: Colors.white, fontSize: 19),
-                ),
-                const SizedBox(height: 16),
+          : RefreshIndicator(
+              color: MyColors.appTheme,
+              backgroundColor: Colors.white,
+              onRefresh: () async {
+                await provider.fetchChapters(
+                  context,
+                  widget.selectIndexId,
+                  isPullRefresh: true,
+                );
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    hSized15,
+                    Text(
+                      "${widget.selectClass} Topics",
+                      style: semiBoldTextStyle(
+                        color: Colors.white,
+                        fontSize: 19,
+                      ),
+                    ),
+                    hSized10,
+                    if (provider.chapterModel?.data == null ||
+                        provider.chapterModel!.data!.isEmpty)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 80),
+                          child: Text(
+                            "No chapters found",
+                            style: regularTextStyle(
+                              color: Colors.white70,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      ListView.separated(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: provider.chapterModel!.data!.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final topic = provider.chapterModel!.data![index];
+                          return GestureDetector(
+                            onTap: () {
 
-                /// ---------------- Chapters List ----------------
-                Expanded(
-                  child: ListView.separated(
-                    itemCount: chapters.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final topic = chapters[index];
-                      return GestureDetector(
-                        onTap: () {
-                          print(">>>>>>>>>>>>>>>>>${topic.id}");
-                          CustomNavigator.pushNavigate(
-                            context,
-                            ClassStudyFlashcardsScreen(type:topic.name ?? "" ,selectId: topic.id ?? "",),
+                              CustomNavigator.pushNavigate(
+                                context,
+                                ClassStudyFlashcardsScreen(
+                                  type: topic.name ?? "",
+                                  selectId: topic.id ?? "",
+                                ),
+                              );
+                            },
+
+                            child: _chapterCard(
+                              title: topic.name ?? "Untitled",
+                              flashcards: topic.totalFlashcards ?? 0,
+                              quizzes: topic.totalQuestions ?? 0,
+                            ),
                           );
                         },
-                        child: _chapterCard(
-                          title: topic.name ?? "Untitled",
-                          flashcards: topic.totalFlashcards ?? 0,
-                          quizzes: topic.totalQuestions ?? 0,
-                        ),
-                      );
-                    },
-                  ),
+                      ),
+                  ],
                 ),
-              ],
+              ),
             ),
     );
   }
 
-  /// ---------------- Chapter Card Widget (UI same as image) ----------------
+  /// ---------------- Chapter Card Widget ----------------
   Widget _chapterCard({
     required String title,
     required int flashcards,
@@ -94,20 +132,17 @@ class FlashcardInnerPhysicsScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1F4E79), // Matches your blue tone
+        color: const Color(0xFF1F4E79),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title
           Text(
             title,
             style: semiBoldTextStyle(color: Colors.white, fontSize: 18),
           ),
           const SizedBox(height: 8),
-
-          // Subtitle (flashcards + quizzes)
           Text(
             "$flashcards Flashcards | $quizzes Quizzes",
             style: regularTextStyle(

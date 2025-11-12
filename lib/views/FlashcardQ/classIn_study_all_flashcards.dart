@@ -21,18 +21,22 @@ class ClassStudyFlashcardsScreen extends StatefulWidget {
   });
 
   @override
-  State<ClassStudyFlashcardsScreen> createState() => _ClassStudyFlashcardsScreenState();
+  State<ClassStudyFlashcardsScreen> createState() =>
+      _ClassStudyFlashcardsScreenState();
 }
 
-class _ClassStudyFlashcardsScreenState extends State<ClassStudyFlashcardsScreen> {
-  bool _isFetched = false; // 👈 Flag to make sure API runs only once
+class _ClassStudyFlashcardsScreenState
+    extends State<ClassStudyFlashcardsScreen> {
+  bool _isFetched = false;
 
   @override
   void initState() {
     super.initState();
-    // Delay the API call until after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = Provider.of<FlashcardTopicsProvider>(context, listen: false);
+      final provider = Provider.of<FlashcardTopicsProvider>(
+        context,
+        listen: false,
+      );
       if (!_isFetched) {
         _isFetched = true;
         provider.fetchTopics(context, widget.selectId);
@@ -51,46 +55,83 @@ class _ClassStudyFlashcardsScreenState extends State<ClassStudyFlashcardsScreen>
       backgroundColor: MyColors.appTheme,
       body: provider.isLoading
           ? const Center(child: CommonLoader(color: Colors.white))
-          : topics.isEmpty
-          ? Center(
-        child: Text(
-          "No topics found",
-          style: regularTextStyle(color: Colors.white70, fontSize: 15),
-        ),
-      )
-          : Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          hSized20,
-          Text(
-            "Study All ${_getTotalFlashcards(topics)} Flashcards",
-            style: semiBoldTextStyle(color: Colors.white, fontSize: 19),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: ListView.separated(
-              itemCount: topics.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final topic = topics[index];
-                return GestureDetector(
-                  onTap: () {
-                    CustomNavigator.pushNavigate(
-                      context,
-                      DimensionalAnalysis(type: topic.id ?? ""),
-                    );
-                  },
-                  child: _topicCard(
-                    title: topic.name ?? "Untitled",
-                    flashcards: topic.totalFlashcards ?? 0,
-                    quizzes: topic.totalQuestions ?? 0,
-                  ),
+          : RefreshIndicator(
+              color: MyColors.appTheme,
+              backgroundColor: Colors.white,
+              onRefresh: () async {
+                await provider.fetchTopics(
+                  context,
+                  widget.selectId,
+                  isPullRefresh: true,
                 );
               },
+              child: topics.isEmpty
+                  ? ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        const SizedBox(height: 200),
+                        Center(
+                          child: Text(
+                            "No topics found",
+                            style: regularTextStyle(
+                              color: Colors.white70,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            hSized20,
+                            Text(
+                              "Study All ${_getTotalFlashcards(topics)} Flashcards",
+                              style: semiBoldTextStyle(
+                                color: Colors.white,
+                                fontSize: 19,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ListView.separated(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: topics.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (context, index) {
+                                final topic = topics[index];
+                                return GestureDetector(
+                                  onTap: () async {
+                                    final provider = context
+                                        .read<FlashcardTopicsProvider>();
+                                    await provider.viewChapters(
+                                      context,
+                                      topic.id ?? "",
+                                    );
+
+                                    CustomNavigator.pushNavigate(
+                                      context,
+                                      DimensionalAnalysis(totalFlashcards: topic.totalFlashcards.toString(),type: topic.id ?? "",topicId: topic.id ?? "",),
+                                    );
+                                  },
+                                  child: _topicCard(
+                                    title: topic.name ?? "Untitled",
+                                    flashcards: topic.totalFlashcards ?? 0,
+                                    quizzes: topic.totalQuestions ?? 0,
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -119,7 +160,11 @@ class _ClassStudyFlashcardsScreenState extends State<ClassStudyFlashcardsScreen>
         children: [
           Row(
             children: [
-              const Icon(Icons.menu_book_rounded, color: Colors.white, size: 26),
+              const Icon(
+                Icons.menu_book_rounded,
+                color: Colors.white,
+                size: 26,
+              ),
               wSized8,
               Expanded(
                 child: Text(

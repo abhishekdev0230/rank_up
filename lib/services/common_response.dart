@@ -12,7 +12,7 @@ class CommonResponse {
   int? statusCode;
   String? accessToken;
   String? refreshToken;
-  bool? isNewUser; // 👈 Added for your login/verifyOtp API
+  bool? isNewUser;
 
   CommonResponse({
     this.status,

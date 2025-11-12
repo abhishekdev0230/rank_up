@@ -33,10 +33,11 @@ class CommonLoaderApi {
       context: context,
       barrierDismissible: false,
       barrierColor: Colors.black.withOpacity(0.3),
+      useRootNavigator: true, // always use rootNavigator explicitly
       builder: (context) {
         return const Center(
-          child: CircularProgressIndicator(
-            color: MyColors.appTheme,
+          child: CommonLoader(
+            color: MyColors.whiteText,
           ),
         );
       },
@@ -44,8 +45,11 @@ class CommonLoaderApi {
   }
 
   static void hide(BuildContext context) {
-    if (Navigator.canPop(context)) {
-      Navigator.of(context, rootNavigator: true).pop();
+    try {
+      Navigator.of(context, rootNavigator: true).pop(); // match rootNavigator
+    } catch (e) {
+      // Already closed or not shown, ignore
+      print("Loader hide error: $e");
     }
   }
 }

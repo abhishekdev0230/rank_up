@@ -13,7 +13,9 @@ import 'QuizQuestionWidget.dart';
 
 class DimensionalAnalysis extends StatefulWidget {
   final String type;
-  const DimensionalAnalysis({super.key, required this.type});
+  final String totalFlashcards;
+  final String topicId;
+  const DimensionalAnalysis({super.key, required this.type, required this.totalFlashcards, required this.topicId});
 
   @override
   State<DimensionalAnalysis> createState() => _DimensionalAnalysisState();
@@ -67,7 +69,7 @@ class _DimensionalAnalysisState extends State<DimensionalAnalysis> {
             onTap: () {
               pushScreen(
                 context,
-                screen: NeetPYQsFlashcardsInner(),
+                screen: NeetPYQsFlashcardsInner(topicId: widget.topicId,),
                 withNavBar: true,
                 pageTransitionAnimation:
                 PageTransitionAnimation.cupertino,
@@ -75,7 +77,7 @@ class _DimensionalAnalysisState extends State<DimensionalAnalysis> {
             },
             child: FlashcardOrQuizTile(
               title: "Flashcards",
-              subtitle: "30 Total Flashcards",
+              subtitle: "${widget.totalFlashcards} Total Flashcards",
               iconPath: IconsPath.flashcardsIcon,
             ),
           ),

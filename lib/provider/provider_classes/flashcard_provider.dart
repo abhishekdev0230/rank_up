@@ -12,15 +12,19 @@ class FlashcardProvider extends ChangeNotifier {
 
   FlashcardSubjectModel? flashcardData;
 
-  /// Called first time when screen opens
-  Future<void> init(BuildContext context) async {
-    isLoading = true;
-    notifyListeners();
+  /// Called first time when screen opens or on pull-to-refresh
+  Future<void> init(BuildContext context, {bool showLoader = true}) async {
+    if (showLoader) {
+      isLoading = true;
+      notifyListeners();
+    }
 
     await flashcardsClassesGetApi(context);
 
-    isLoading = false;
-    notifyListeners();
+    if (showLoader) {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   /// When user changes tab
@@ -73,3 +77,4 @@ class FlashcardProvider extends ChangeNotifier {
     }
   }
 }
+

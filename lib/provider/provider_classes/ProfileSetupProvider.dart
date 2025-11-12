@@ -14,6 +14,8 @@ import '../../models/ProfileGetModel.dart';
 
 class ProfileSetupProvider extends ChangeNotifier {
   String fullName = '';
+  String bookmarkedCount = '';
+  String suspendedCardCount = '';
   String email = '';
   String? phoneNumber;
 
@@ -258,6 +260,8 @@ class ProfileSetupProvider extends ChangeNotifier {
 
       if (profileData.status == true && profileData.data != null) {
         fullName = profileData.data!.fullName ?? '';
+        bookmarkedCount = profileData.data!.stats?.bookmarks.toString() ?? '';
+        suspendedCardCount = profileData.data!.stats?.suspendedFlashcards.toString() ?? '';
         email = profileData.data!.email ?? '';
         String? apiClass = profileData.data!.dataClass;
         if (apiClass != null) {

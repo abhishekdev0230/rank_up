@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
+import 'package:provider/provider.dart';
+import 'package:rank_up/Utils/helper.dart';
 import 'package:rank_up/constraints/icon_path.dart';
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
@@ -8,12 +9,14 @@ import 'package:rank_up/constraints/sizdebox_width.dart';
 import 'package:rank_up/constraints/sizedbox_height.dart';
 import 'package:rank_up/custom_classes/app_bar.dart';
 import 'package:rank_up/custom_classes/custom_navigator.dart';
+import 'package:rank_up/provider/provider_classes/FlashcardsQuestionsProvider.dart';
 import 'package:rank_up/views/Home/home_view.dart';
-
 import 'FlashcardCompletionScreen.dart';
 
 class NeetPYQsFlashcardsInner extends StatefulWidget {
-  const NeetPYQsFlashcardsInner({super.key});
+  final String topicId;
+
+  const NeetPYQsFlashcardsInner({super.key, required this.topicId});
 
   @override
   State<NeetPYQsFlashcardsInner> createState() =>
@@ -24,56 +27,143 @@ class _NeetPYQsFlashcardsInnerState extends State<NeetPYQsFlashcardsInner> {
   bool _showAnswer = false;
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      context.read<FlashcardsQuestionsProvider>().fetchTopics(
+        context,
+        widget.topicId,
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      backgroundColor: MyColors.appTheme,
-      title: "Neet PYQs-Biology",
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            hSized20,
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 16),
-              width: double.infinity,
-              // height: 430,
-              decoration: BoxDecoration(
-                color: MyColors.rankBg,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
+    return Consumer<FlashcardsQuestionsProvider>(
+      builder: (context, provider, _) {
+        return CommonScaffold(
+          backgroundColor: MyColors.appTheme,
+          title: provider.flashcardModel?.data?.topicName ?? "Neet PYQs",
+          body: provider.currentCard == null
+              ? const Center(child: Text("No flashcard data found"))
+              : SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      hSized20,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 13,
+                          vertical: 16,
+                        ),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: MyColors.rankBg,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: _showAnswer
+                              ? _buildAnswerCard(provider)
+                              : _buildQuestionCard(provider),
+                        ),
+                      ),
+                      hSized30,
+                      if (_showAnswer)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                if (provider.currentCard?.confidence == 0) {
+                                  await provider
+                                      .flashcardsTopicsQuetionsprogress(
+                                        flashcardId:
+                                            provider.currentCard?.id
+                                                .toString() ??
+                                            '',
+                                        context: context,
+                                        confidenceLevel: 1,
+                                      );
+                                } else {
+                                  Helper.customToast(
+                                    "You’ve already marked this card.",
+                                  );
+                                }
+                              },
+                              child: _circularButton(
+                                "Don’t\nKnow",
+                                MyColors.color1BB287,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () async {
+                                if (provider.currentCard?.confidence == 0) {
+                                  await provider
+                                      .flashcardsTopicsQuetionsprogress(
+                                        flashcardId:
+                                            provider.currentCard?.id
+                                                .toString() ??
+                                            '',
+                                        context: context,
+                                        confidenceLevel: 2, // Suspend
+                                      );
+                                } else {
+                                  Helper.customToast(
+                                    "You’ve already marked this card.",
+                                  );
+                                }
+                              },
+                              child: _circularButton(
+                                "Suspend",
+                                MyColors.colorF8CB52,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () async {
+                                if (provider.currentCard?.confidence == 0) {
+                                  await provider
+                                      .flashcardsTopicsQuetionsprogress(
+                                        flashcardId:
+                                            provider.currentCard?.id
+                                                .toString() ??
+                                            '',
+                                        context: context,
+                                        confidenceLevel: 3, // Know
+                                      );
+                                } else {
+                                  Helper.customToast(
+                                    "You’ve already marked this card.",
+                                  );
+                                }
+                              },
+                              child: _circularButton(
+                                "Know",
+                                MyColors.colorD84B48,
+                              ),
+                            ),
+                          ],
+                        ),
+                      hSized15,
+                    ],
                   ),
-                ],
-              ),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: _showAnswer ? _buildAnswerCard() : _buildQuestionCard(),
-              ),
-            ),
-            hSized30,
-            if (_showAnswer)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _circularButton("Don’t\nKnow", MyColors.color1BB287),
-                  _circularButton("Suspend", MyColors.colorF8CB52),
-                  _circularButton("Know", MyColors.colorD84B48),
-                ],
-              ),
-            hSized15,
-          ],
-        ),
-      ),
+                ),
+        );
+      },
     );
   }
 
-  Widget _buildQuestionCard() {
+  // ---------- Question Card ----------
+  Widget _buildQuestionCard(FlashcardsQuestionsProvider provider) {
     return Column(
       key: const ValueKey(1),
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Align(
           alignment: Alignment.topLeft,
@@ -84,15 +174,16 @@ class _NeetPYQsFlashcardsInnerState extends State<NeetPYQsFlashcardsInner> {
           height: 230,
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Text(
-            "Q: What the full form of SI Units?",
+            "Q: ${provider.currentCard?.question ?? 'No question available'}",
             style: semiBoldTextStyle(color: MyColors.blackColor, fontSize: 22),
+            textAlign: TextAlign.center,
           ),
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "1/15 Flashcards in Deck",
+              "${provider.currentIndex + 1}/${provider.flashcardModel?.data?.totalFlashcards ?? 0} Flashcards in Deck",
               style: regularTextStyle(color: MyColors.blackColor, fontSize: 14),
             ),
             hSized10,
@@ -100,9 +191,7 @@ class _NeetPYQsFlashcardsInnerState extends State<NeetPYQsFlashcardsInner> {
               borderRadius: 8,
               title: "Reveal answer",
               onPressed: () {
-                setState(() {
-                  _showAnswer = true;
-                });
+                setState(() => _showAnswer = true);
               },
             ),
           ],
@@ -111,7 +200,9 @@ class _NeetPYQsFlashcardsInnerState extends State<NeetPYQsFlashcardsInner> {
     );
   }
 
-  Widget _buildAnswerCard() {
+  ///............bookMark.............
+  // ---------- Answer Card ----------
+  Widget _buildAnswerCard(FlashcardsQuestionsProvider provider) {
     return Column(
       key: const ValueKey(2),
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,55 +210,88 @@ class _NeetPYQsFlashcardsInnerState extends State<NeetPYQsFlashcardsInner> {
         Row(
           children: [
             SvgPicture.asset(IconsPath.woldCupIcon, height: 38),
-            Spacer(),
-            SvgPicture.asset(IconsPath.bokMarkSave, height: 27),
+            const Spacer(),
+            GestureDetector(
+              onTap: (provider.currentCard?.isBookmarked == true ||
+                  provider.isBookmarked(provider.currentCard?.id ?? ''))
+                  ? null
+                  : () {
+                provider.bookmarkAdd(
+                  contentId: provider.currentCard?.id.toString() ?? '',
+                  context: context,
+                );
+              },
+              child: SvgPicture.asset(
+                provider.currentCard?.isBookmarked == true ||
+                    provider.isBookmarked(provider.currentCard?.id ?? '')
+                    ? IconsPath.bookmarktrueCards
+                    : IconsPath.bokMarkSave,
+                height: 27,
+
+              ),
+            ),
+
+
           ],
         ),
         hSized8,
         Text(
-          "Friction",
+          provider.flashcardModel?.data?.topicName ?? '',
           style: semiBoldTextStyle(color: MyColors.blackColor, fontSize: 20),
         ),
         Text(
-          "Card 1/15",
+          "Card ${provider.currentIndex + 1}/${provider.flashcardModel?.data?.totalFlashcards ?? 0}",
           style: regularTextStyle(color: MyColors.color949494, fontSize: 16),
         ),
         hSized10,
-        // ---------- Question ----------
         Text(
-          "Q: What the full form of SI Units?",
+          "Q: ${provider.currentCard?.question ?? ''}",
           style: semiBoldTextStyle(color: MyColors.blackColor, fontSize: 22),
         ),
         hSized10,
-        // ---------- Answer Paragraph ----------
-        Container(
+        SizedBox(
           height: 150,
           child: Text(
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt "
-            "ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco "
-            "laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in "
-            "voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+            provider.currentCard?.answer ?? '',
             style: regularTextStyle(color: MyColors.color949494, fontSize: 15),
           ),
         ),
         hSized15,
-        // ---------- Tag Buttons ----------
-        Row(children: [_tagButton("PYQ"), wSized10, _tagButton("PYQ")]),
-
+        Row(
+          children: [
+            if (provider.currentCard?.difficulty != null)
+              _tagButton(provider.currentCard!.difficulty!),
+            wSized10,
+            _tagButton("PYQ"),
+          ],
+        ),
         hSized15,
-        // ---------- Navigation Arrows ----------
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SvgPicture.asset(IconsPath.backCart),
-
+            if (provider.currentIndex != 0)
+              GestureDetector(
+                onTap: provider.currentIndex == 0 ? null : provider.prevCard,
+                child: SvgPicture.asset(IconsPath.backCart),
+              ),
+            Spacer(),
             GestureDetector(
-              onTap: () {
-                CustomNavigator.pushNavigate(
-                  context,
-                  FlashcardCompletionScreen(),
-                );
+              onTap: () async {
+                final totalCards =
+                    provider.flashcardModel?.data?.flashcards?.length ?? 0;
+
+                if (provider.currentIndex + 1 >= totalCards) {
+                  // last card → show completion
+                  CustomNavigator.pushRemoveUntil(
+                    context,
+                    FlashcardCompletionScreen(topicId: widget.topicId),
+                  );
+                } else {
+                  await provider.nextCard(context, widget.topicId);
+                  setState(() => _showAnswer = false);
+                }
               },
+
               child: SvgPicture.asset(IconsPath.next),
             ),
           ],
@@ -176,7 +300,7 @@ class _NeetPYQsFlashcardsInnerState extends State<NeetPYQsFlashcardsInner> {
     );
   }
 
-  // ---------- Small Green Tag Buttons (PYQ etc.) ----------
+  // ---------- Helper Buttons ----------
   Widget _tagButton(String title) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
