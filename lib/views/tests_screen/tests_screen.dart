@@ -7,12 +7,15 @@ import 'package:rank_up/constraints/sizedbox_height.dart';
 import 'package:rank_up/constraints/sizdebox_width.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
 import 'package:rank_up/custom_classes/app_bar.dart';
+import 'package:rank_up/custom_classes/custom_navigator.dart';
+import 'package:rank_up/custom_classes/loder.dart';
 import 'package:rank_up/provider/provider_classes/TestLeaderboardProvider.dart';
 import 'package:rank_up/views/Home/home_view.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
 import '../../constraints/font_family.dart';
 import '../../models/TestScreenModel.dart';
 import '../../Utils/helper.dart';
+import '../FlashcardQ/NeetPYQsFlashcardsInner.dart';
 import 'ShowStartTestDialog.dart';
 
 class TestLeaderboardScreen extends StatefulWidget {
@@ -23,23 +26,23 @@ class TestLeaderboardScreen extends StatefulWidget {
 }
 
 class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
-
   String selectedTestType = "minor";
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<TestLeaderboardProvider>(context, listen: false).fetchDashboard(context);
+      Provider.of<TestLeaderboardProvider>(
+        context,
+        listen: false,
+      ).fetchDashboard(context);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<TestLeaderboardProvider>(context);
     return Consumer<TestLeaderboardProvider>(
       builder: (context, provider, child) {
-
         final model = provider.testModel?.data;
         if (model == null) {
           return const Center(child: Text("No Data Found"));
@@ -57,7 +60,6 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
               await provider.fetchDashboard(context, isRefresh: true);
             },
 
-
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
@@ -65,7 +67,9 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
                 children: [
                   hSized20,
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppPadding.horizontal),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppPadding.horizontal,
+                    ),
                     child: _testCardSection(model.featuredTest),
                   ),
                   hSized20,
@@ -106,9 +110,20 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
               CommonButton1(
                 bgColor: Colors.white,
                 textColor: MyColors.appTheme,
-                title: "Enroll/Start Test",
-                onPressed: () {},
+                title: test?.isPremium == true
+                    ? "Premium"
+                    : "Enroll/Start Test",
+                onPressed: () {
+                  if (test?.isPremium == true) {
+                    Helper.customToast(
+                      "This is a premium test. Please upgrade.",
+                    );
+                  } else {
+                    GrandTestShowInstructionDialog.show(context);
+                  }
+                },
               ),
+
               Icon(
                 test?.isPremium == true ? Icons.lock : Icons.check_circle,
                 color: Colors.white,
@@ -141,7 +156,10 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
             hSized20,
             Text(
               "Upcoming Tests",
-              style: semiBoldTextStyle(fontSize: 19, color: MyColors.blackColor),
+              style: semiBoldTextStyle(
+                fontSize: 19,
+                color: MyColors.blackColor,
+              ),
             ),
             hSized15,
 
@@ -185,17 +203,21 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
               verticalGridSpacing: 10,
 
               /// 🔥 Dynamic List Switching
-              children: (selectedTestType == "minor"
-                  ? (model.upcomingTests?.minor ?? [])
-                  : (model.upcomingTests?.major ?? []))
-                  .map((e) => _upcomingTestCard(e))
-                  .toList(),
+              children:
+                  (selectedTestType == "minor"
+                          ? (model.upcomingTests?.minor ?? [])
+                          : (model.upcomingTests?.major ?? []))
+                      .map((e) => _upcomingTestCard(e))
+                      .toList(),
             ),
 
             hSized20,
             Text(
               "Leaderboard",
-              style: semiBoldTextStyle(fontSize: 19, color: MyColors.blackColor),
+              style: semiBoldTextStyle(
+                fontSize: 19,
+                color: MyColors.blackColor,
+              ),
             ),
             hSized15,
             _leaderboardSection(model.leaderboard),
@@ -224,7 +246,8 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
               const Spacer(),
               Tooltip(
                 triggerMode: TooltipTriggerMode.tap,
-                message: "Daily Practice gives you fresh questions every day. It's a quick way to stay consistent and improve.",
+                message:
+                    "Daily Practice gives you fresh questions every day. It's a quick way to stay consistent and improve.",
                 textStyle: TextStyle(fontSize: 14, color: Colors.white),
                 decoration: BoxDecoration(
                   color: Colors.black87,
@@ -232,8 +255,6 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
                 ),
                 child: Icon(Icons.info_outline),
               ),
-
-
             ],
           ),
           Text(
@@ -245,15 +266,21 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
             width: 150,
             bgColor: MyColors.appTheme,
             textColor: Colors.white,
-            title: daily?.startAvailable == true ? "Start New Session" : "Not Available",
+            title: "Start New Session",
             onPressed: () {
-              if (daily?.startAvailable == true) {
-                GrandTestShowInstructionDialog.show(ctx);
+              if ((daily?.questionsToday ?? 0) != 0) {
+                CustomNavigator.pushNavigate(
+                  context,
+                  NeetPYQsFlashcardsInner(
+                    topicId: daily?.attemptId.toString() ?? "",
+                  ),
+                );
               } else {
-                Helper.customToast("Session Not Available");
+                Helper.customToast("No questions available today");
               }
             },
           ),
+
           hSized20,
           Text(
             "${daily?.questionsToday ?? 0} New Questions await!",
@@ -266,10 +293,10 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
 
   /// Button UI Not Changed (Fully Same)
   Widget _testTypeButton(
-      String title, {
-        required bool isSelected,
-        required VoidCallback onTap,
-      }) {
+    String title, {
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: CommonButton1(
@@ -283,6 +310,11 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
   }
 
   Widget _upcomingTestCard(Major test) {
+    final provider = Provider.of<TestLeaderboardProvider>(
+      context,
+      listen: false,
+    );
+
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -290,6 +322,7 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
@@ -300,62 +333,68 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
               wSized10,
               Expanded(
                 child: Text(
-                  maxLines: 2,
                   test.title ?? "",
+                  maxLines: 2,
                   style: boldTextStyle(fontSize: 12),
                 ),
               ),
             ],
           ),
+
           hSized15,
+
           Row(
             children: [
               Expanded(
                 child: Text(
-                  "${test.duration} Mins  ${test.totalQuestions} Q's",
+                  "${test.duration} Mins  |  ${test.totalQuestions} Q's",
                   style: boldTextStyle(fontSize: 12, color: MyColors.color949494),
                 ),
               ),
               Expanded(
-                child: Container(
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: MyColors.color32B790,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    test.isPremium == true ? "Premium" : "Enroll/Start",
-                    style: semiBoldTextStyle(fontSize: 10, color: Colors.white),
-                  ),
+                flex: 2,
+                child: provider.testActionButton(
+                  buttonState: test.buttonState ?? "",
+
+                  onStart: () {
+                    GrandTestShowInstructionDialog.show(context);
+                  },
+
+                  onEnroll: () {
+                    Helper.customToast("Enrolled Successfully!");
+                  },
+
+                  onUpgrade: () {
+                    Helper.customToast("Upgrade to access premium tests");
+                  },
+
+                  onResume: () {
+                    GrandTestShowInstructionDialog.show(context);
+                  },
+
+                  onViewResult: () {
+                    Helper.customToast("Opening Result…");
+                  },
                 ),
               ),
             ],
           ),
+
+          // hSized10,
+
+
         ],
       ),
     );
   }
 
   Widget _leaderboardSection(Leaderboard? data) {
-    final solved = data?.solved ?? 0;
-    final total = data?.total ?? 0;
-    final avg = data?.averageScore ?? 0;
-
-    double progress = 0;
-    if (total > 0) {
-      progress = solved / total;
-    }
-
-    final remaining = total - solved;
-
     return Container(
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: MyColors.whiteText,
 
-        borderRadius:  BorderRadius.all(Radius.circular(20)
-        ),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
       ),
       child: LeaderboardChart(
         averageScore: data?.averageScore ?? 0,
@@ -364,23 +403,5 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
         size: 120,
       ),
     );
-
   }
-
-  Widget _statTile(String title, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: boldTextStyle(fontSize: 13, color: MyColors.color949494),
-        ),
-        Text(
-          value,
-          style: boldTextStyle(fontSize: 15, color: MyColors.blackColor),
-        ),
-      ],
-    );
-  }
-
 }

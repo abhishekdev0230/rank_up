@@ -73,26 +73,28 @@ class OtpProvider extends ChangeNotifier {
     notifyListeners();
 
     if (res?.status == true) {
-      // ✅ Access Token Save
+      // Save Token
       if (res?.accessToken != null && res!.accessToken!.isNotEmpty) {
-        await StorageManager.savingData(StorageManager.accessToken, res.accessToken!);
+        await StorageManager.savingData(
+          StorageManager.accessToken,
+          res.accessToken!,
+        );
         debugPrint("✅ Access Token Saved: ${res.accessToken}");
       }
 
-      // ✅ Return full response to caller (to check isNewUser)
+      // 👉 RETURN FULL DATA HERE
       return {
         "success": true,
         "isNewUser": res?.isNewUser ?? false,
-      };
-    } else {
-      return {
-        "success": false,
+        "data": res?.data, // ✅ FIX ADDED
       };
     }
+
+    return {"success": false};
   }
 
 
-  /// ✅ Helper: set OTP code from input field
+
   void setOtp(String value) {
     otpCode = value;
     notifyListeners();

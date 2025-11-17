@@ -130,16 +130,32 @@ class _OtpVerificationContainerState extends State<OtpVerificationContainer> {
                 );
 
                 if (result?["success"] == true) {
-                  if (result?["profileComplete"] == true) {
+
+                  final data = result?["data"];
+
+                  final profileComplete = data != null
+                      ? (data["profileComplete"] ?? false)
+                      : false;
+
+                  if (profileComplete.toString().toLowerCase() == "true") {
+
+                    if (!context.mounted) return;
+
+                    // Save login
                     await StorageManager.savingData(StorageManager.isLogin, true);
+
+                    // Navigate to Home
                     CustomNavigator.pushRemoveUntil(
                       context,
                       BottomNavController(initialIndex: 0),
                     );
+
                   } else {
                     widget.onOtpVerified();
                   }
                 }
+
+
               },
 
             ),

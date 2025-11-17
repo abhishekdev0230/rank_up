@@ -518,49 +518,64 @@ class CommonButton extends StatelessWidget {
 
 class CommonButton1 extends StatelessWidget {
   final String title;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double? fontSize;
   final Color? textColor;
   final double? borderRadius;
   final Color? bgColor;
+  final Color? borderColor;
   final double? height;
   final double? width;
+  final EdgeInsetsGeometry? padding;       // <-- ADD THIS
 
   const CommonButton1({
     super.key,
     required this.title,
-    required this.onPressed,
+    this.onPressed,
     this.fontSize,
     this.textColor,
     this.borderRadius,
     this.bgColor,
+    this.borderColor,
     this.height,
     this.width,
+    this.padding,                          // <-- ADD THIS
   });
 
   @override
   Widget build(BuildContext context) {
+    final bool isDisabled = onPressed == null;
+
     return GestureDetector(
-      onTap: onPressed,
+      onTap: isDisabled ? null : onPressed,
       child: Container(
         height: height,
         width: width,
-        padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 5),
+        padding: padding ??
+            const EdgeInsets.symmetric(horizontal: 17, vertical: 5),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: bgColor ?? MyColors.color32B790,
+          color: isDisabled
+              ? Colors.grey.withOpacity(0.4)
+              : (bgColor ?? MyColors.color32B790),
           borderRadius: BorderRadius.circular(borderRadius ?? 8),
-          border: Border.all(color: bgColor ?? MyColors.color32B790),
+          border: Border.all(
+            color: borderColor ?? bgColor ?? MyColors.color32B790,
+          ),
         ),
         child: Text(
           title,
           textAlign: TextAlign.center,
           style: semiBoldTextStyle(
             fontSize: fontSize ?? 12,
-            color: textColor ?? MyColors.whiteText,
+            color: isDisabled
+                ? Colors.black54
+                : (textColor ?? MyColors.whiteText),
           ),
         ),
       ),
     );
   }
 }
+
+

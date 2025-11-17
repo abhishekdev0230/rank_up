@@ -20,6 +20,7 @@ class StorageManager {
   static const address = 'address';
   static const myId = 'myId';
   static const userName = 'userName';
+  static const profileComplete = 'profileComplete';
 
   /// --------------------- Save Data ------------------------
   static Future<void> savingData(String key, dynamic data) async {

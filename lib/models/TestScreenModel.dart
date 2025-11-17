@@ -4,9 +4,11 @@
 
 import 'dart:convert';
 
-TestScreenModel testScreenModelFromJson(String str) => TestScreenModel.fromJson(json.decode(str));
+TestScreenModel testScreenModelFromJson(String str) =>
+    TestScreenModel.fromJson(json.decode(str));
 
-String testScreenModelToJson(TestScreenModel data) => json.encode(data.toJson());
+String testScreenModelToJson(TestScreenModel data) =>
+    json.encode(data.toJson());
 
 class TestScreenModel {
   bool? status;
@@ -21,12 +23,14 @@ class TestScreenModel {
     this.data,
   });
 
-  factory TestScreenModel.fromJson(Map<String, dynamic> json) => TestScreenModel(
-    status: json["status"],
-    code: json["code"],
-    message: json["message"],
-    data: json["data"] == null ? null : TestScreenData.fromJson(json["data"]),
-  );
+  factory TestScreenModel.fromJson(Map<String, dynamic> json) =>
+      TestScreenModel(
+        status: json["status"],
+        code: json["code"],
+        message: json["message"],
+        data:
+        json["data"] == null ? null : TestScreenData.fromJson(json["data"]),
+      );
 
   Map<String, dynamic> toJson() => {
     "status": status,
@@ -57,16 +61,29 @@ class TestScreenData {
     this.subscription,
   });
 
-  factory TestScreenData.fromJson(Map<String, dynamic> json) => TestScreenData(
-    user: json["user"] == null ? null : User.fromJson(json["user"]),
-    featuredTest: json["featuredTest"] == null ? null : FeaturedTest.fromJson(json["featuredTest"]),
-    dailyPractice: json["dailyPractice"] == null ? null : DailyPractice.fromJson(json["dailyPractice"]),
-    upcomingTests: json["upcomingTests"] == null ? null : UpcomingTests.fromJson(json["upcomingTests"]),
-    leaderboard: json["leaderboard"] == null ? null : Leaderboard.fromJson(json["leaderboard"]),
-    streak: json["streak"] == null ? null : Streak.fromJson(json["streak"]),
-    achievements: json["achievements"] == null ? [] : List<dynamic>.from(json["achievements"]!.map((x) => x)),
-    subscription: json["subscription"] == null ? null : Subscription.fromJson(json["subscription"]),
-  );
+  factory TestScreenData.fromJson(Map<String, dynamic> json) =>
+      TestScreenData(
+        user: json["user"] == null ? null : User.fromJson(json["user"]),
+        featuredTest: json["featuredTest"] == null
+            ? null
+            : FeaturedTest.fromJson(json["featuredTest"]),
+        dailyPractice: json["dailyPractice"] == null
+            ? null
+            : DailyPractice.fromJson(json["dailyPractice"]),
+        upcomingTests: json["upcomingTests"] == null
+            ? null
+            : UpcomingTests.fromJson(json["upcomingTests"]),
+        leaderboard: json["leaderboard"] == null
+            ? null
+            : Leaderboard.fromJson(json["leaderboard"]),
+        streak: json["streak"] == null ? null : Streak.fromJson(json["streak"]),
+        achievements: json["achievements"] == null
+            ? []
+            : List<dynamic>.from(json["achievements"]!.map((x) => x)),
+        subscription: json["subscription"] == null
+            ? null
+            : Subscription.fromJson(json["subscription"]),
+      );
 
   Map<String, dynamic> toJson() => {
     "user": user?.toJson(),
@@ -75,32 +92,41 @@ class TestScreenData {
     "upcomingTests": upcomingTests?.toJson(),
     "leaderboard": leaderboard?.toJson(),
     "streak": streak?.toJson(),
-    "achievements": achievements == null ? [] : List<dynamic>.from(achievements!.map((x) => x)),
+    "achievements":
+    achievements == null ? [] : List<dynamic>.from(achievements!.map((x) => x)),
     "subscription": subscription?.toJson(),
   };
 }
 
 class DailyPractice {
+  String? attemptId;
   bool? isCompleted;
-  bool? startAvailable;
+  bool? hasAttempt;
   int? questionsToday;
+  String? buttonState;
 
   DailyPractice({
+    this.attemptId,
     this.isCompleted,
-    this.startAvailable,
+    this.hasAttempt,
     this.questionsToday,
+    this.buttonState,
   });
 
   factory DailyPractice.fromJson(Map<String, dynamic> json) => DailyPractice(
+    attemptId: json["attemptId"],
     isCompleted: json["isCompleted"],
-    startAvailable: json["startAvailable"],
+    hasAttempt: json["hasAttempt"],
     questionsToday: json["questionsToday"],
+    buttonState: json["buttonState"],
   );
 
   Map<String, dynamic> toJson() => {
+    "attemptId": attemptId,
     "isCompleted": isCompleted,
-    "startAvailable": startAvailable,
+    "hasAttempt": hasAttempt,
     "questionsToday": questionsToday,
+    "buttonState": buttonState,
   };
 }
 
@@ -108,35 +134,55 @@ class FeaturedTest {
   String? id;
   String? title;
   String? description;
+  bool? isPublished;
   DateTime? startDate;
+  DateTime? endDate;
   String? type;
   bool? isPremium;
+  bool? isEnrolled;
+  String? buttonState;
 
   FeaturedTest({
     this.id,
     this.title,
     this.description,
+    this.isPublished,
     this.startDate,
+    this.endDate,
     this.type,
     this.isPremium,
+    this.isEnrolled,
+    this.buttonState,
   });
 
-  factory FeaturedTest.fromJson(Map<String, dynamic> json) => FeaturedTest(
-    id: json["id"],
-    title: json["title"],
-    description: json["description"],
-    startDate: json["startDate"] == null ? null : DateTime.parse(json["startDate"]),
-    type: json["type"],
-    isPremium: json["isPremium"],
-  );
+  factory FeaturedTest.fromJson(Map<String, dynamic> json) =>
+      FeaturedTest(
+        id: json["id"],
+        title: json["title"],
+        description: json["description"],
+        isPublished: json["isPublished"],
+        startDate: json["startDate"] == null
+            ? null
+            : DateTime.parse(json["startDate"]),
+        endDate:
+        json["endDate"] == null ? null : DateTime.parse(json["endDate"]),
+        type: json["type"],
+        isPremium: json["isPremium"],
+        isEnrolled: json["isEnrolled"],
+        buttonState: json["buttonState"],
+      );
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "title": title,
     "description": description,
+    "isPublished": isPublished,
     "startDate": startDate?.toIso8601String(),
+    "endDate": endDate?.toIso8601String(),
     "type": type,
     "isPremium": isPremium,
+    "isEnrolled": isEnrolled,
+    "buttonState": buttonState,
   };
 }
 
@@ -144,23 +190,31 @@ class Leaderboard {
   int? averageScore;
   int? solved;
   int? total;
+  List<dynamic>? graph;
 
   Leaderboard({
     this.averageScore,
     this.solved,
     this.total,
+    this.graph,
   });
 
   factory Leaderboard.fromJson(Map<String, dynamic> json) => Leaderboard(
     averageScore: json["averageScore"],
     solved: json["solved"],
     total: json["total"],
+    graph: json["graph"] == null
+        ? []
+        : List<dynamic>.from(json["graph"].map((x) => x)),
   );
 
   Map<String, dynamic> toJson() => {
     "averageScore": averageScore,
     "solved": solved,
     "total": total,
+    "graph": graph == null
+        ? []
+        : List<dynamic>.from(graph!.map((x) => x)),
   };
 }
 
@@ -213,14 +267,25 @@ class UpcomingTests {
     this.major,
   });
 
-  factory UpcomingTests.fromJson(Map<String, dynamic> json) => UpcomingTests(
-    minor: json["minor"] == null ? [] : List<Major>.from(json["minor"]!.map((x) => Major.fromJson(x))),
-    major: json["major"] == null ? [] : List<Major>.from(json["major"]!.map((x) => Major.fromJson(x))),
-  );
+  factory UpcomingTests.fromJson(Map<String, dynamic> json) =>
+      UpcomingTests(
+        minor: json["minor"] == null
+            ? []
+            : List<Major>.from(
+            json["minor"].map((x) => Major.fromJson(x))),
+        major: json["major"] == null
+            ? []
+            : List<Major>.from(
+            json["major"].map((x) => Major.fromJson(x))),
+      );
 
   Map<String, dynamic> toJson() => {
-    "minor": minor == null ? [] : List<dynamic>.from(minor!.map((x) => x.toJson())),
-    "major": major == null ? [] : List<dynamic>.from(major!.map((x) => x.toJson())),
+    "minor": minor == null
+        ? []
+        : List<dynamic>.from(minor!.map((x) => x.toJson())),
+    "major": major == null
+        ? []
+        : List<dynamic>.from(major!.map((x) => x.toJson())),
   };
 }
 
@@ -231,6 +296,12 @@ class Major {
   int? duration;
   String? type;
   bool? isPremium;
+  DateTime? startDate;
+  DateTime? endDate;
+  dynamic icon;
+  bool? isPublished;
+  bool? isEnrolled;
+  String? buttonState;
 
   Major({
     this.id,
@@ -239,6 +310,12 @@ class Major {
     this.duration,
     this.type,
     this.isPremium,
+    this.startDate,
+    this.endDate,
+    this.icon,
+    this.isPublished,
+    this.isEnrolled,
+    this.buttonState,
   });
 
   factory Major.fromJson(Map<String, dynamic> json) => Major(
@@ -248,6 +325,16 @@ class Major {
     duration: json["duration"],
     type: json["type"],
     isPremium: json["isPremium"],
+    startDate: json["startDate"] == null
+        ? null
+        : DateTime.parse(json["startDate"]),
+    endDate: json["endDate"] == null
+        ? null
+        : DateTime.parse(json["endDate"]),
+    icon: json["icon"],
+    isPublished: json["isPublished"],
+    isEnrolled: json["isEnrolled"],
+    buttonState: json["buttonState"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -257,6 +344,12 @@ class Major {
     "duration": duration,
     "type": type,
     "isPremium": isPremium,
+    "startDate": startDate?.toIso8601String(),
+    "endDate": endDate?.toIso8601String(),
+    "icon": icon,
+    "isPublished": isPublished,
+    "isEnrolled": isEnrolled,
+    "buttonState": buttonState,
   };
 }
 
