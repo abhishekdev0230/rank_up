@@ -25,6 +25,7 @@ class NeetPYQsFlashcardsInner extends StatefulWidget {
 
 class _NeetPYQsFlashcardsInnerState extends State<NeetPYQsFlashcardsInner> {
   bool _showAnswer = false;
+  bool _isSwipeLocked = false;
 
   @override
   void initState() {
@@ -50,28 +51,73 @@ class _NeetPYQsFlashcardsInnerState extends State<NeetPYQsFlashcardsInner> {
                   child: Column(
                     children: [
                       hSized20,
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 13,
-                          vertical: 16,
-                        ),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: MyColors.rankBg,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: _showAnswer
-                              ? _buildAnswerCard(provider)
-                              : _buildQuestionCard(provider),
+                      GestureDetector(
+                        onTap: () {
+                          if (!_showAnswer) {
+                            setState(() => _showAnswer = true);
+                          }
+                        },
+
+                        onPanStart: (_) {
+                          _isSwipeLocked = false;
+                        },
+
+                        onPanEnd: (_) {
+                          _isSwipeLocked = false;
+                        },
+
+                        onPanUpdate: (details) async {
+                          if (_isSwipeLocked) return;
+
+                          final totalCards = provider.flashcardModel?.data?.flashcards?.length ?? 0;
+
+                          if (details.delta.dx > 15) {
+                            _isSwipeLocked = true;
+
+                            if (provider.currentIndex > 0) {
+                              provider.prevCard();
+                              setState(() => _showAnswer = false);
+                            }
+                          }
+
+                          if (details.delta.dx < -15) {
+                            _isSwipeLocked = true;
+
+                            if (provider.currentIndex + 1 >= totalCards) {
+                              CustomNavigator.pushRemoveUntil(
+                                context,
+                                FlashcardCompletionScreen(topicId: widget.topicId),
+                              );
+                            } else {
+                              await provider.nextCard(context, widget.topicId);
+                              setState(() => _showAnswer = false);
+                            }
+                          }
+                        },
+
+
+
+
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 16),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: MyColors.rankBg,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: _showAnswer
+                                ? _buildAnswerCard(provider)
+                                : _buildQuestionCard(provider),
+                          ),
                         ),
                       ),
                       hSized30,

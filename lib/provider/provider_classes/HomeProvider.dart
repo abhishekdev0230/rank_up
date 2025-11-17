@@ -37,6 +37,8 @@ class HomeProvider with ChangeNotifier {
   // ---------------- QUIZ SECTION ----------------
   String quizTitle = "";
   String quizDescription = "";
+  List<ImportantTopic> importantTopics = [];
+
 
   // ---------------- ERROR STATE ----------------
   String errorMessage = "";
@@ -95,11 +97,13 @@ class HomeProvider with ChangeNotifier {
         }
 
         liveTestTitle = homeData.liveTest?.title ?? "";
-        liveTestTimer = "${homeData.liveTest?.timeRemaining ?? 0} mins";
+        liveTestTimer = "${homeData.liveTest?.duration ?? 0} mins";
 
         if (homeData.importantTopics != null && homeData.importantTopics!.isNotEmpty) {
           quizTitle = homeData.importantTopics!.first.name ?? "";
           quizDescription = homeData.importantTopics!.first.description ?? "";
+          importantTopics = homeData.importantTopics ?? [];
+
         }
 
         notifyListeners();

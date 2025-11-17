@@ -29,15 +29,43 @@ class ApiUrls {
   static const String flashcardsTopicsQuetionsprogress = "${baseUrl}flashcards/:flashcardId/progress";
   static const String flashcardsTopicsQuetionsCompletion = "${baseUrl}flashcards/topic/:topicId/completion";
   static const String bookmarks = "${baseUrl}bookmarks";
+
+
   ///..............profile.................
   static const String bookmarksListApi = "${baseUrl}bookmarks";
   static const String bookmarksListRemoveApi = "${baseUrl}bookmarks/:bookmarkId/remove";
   static const String suspendedCards = "${baseUrl}suspended-cards";
   static const String suspendedCardsRemove = "${baseUrl}suspended-cards/:progressId/remove";
+
+
   ///................terms privacy refund about............
   static const String staticPageBySlug = "${baseUrl}static-pages/slug/:slug";
   static const String faq = "${baseUrl}faq";
 
+
+  ///....................blog...........................
+  static const String blog = "${baseUrl}blog";
+  static const String blogDetail = "${baseUrl}blog/:id";
+
+
+///.........................my queries.................
+  static const String supportMyTickets = "${baseUrl}support/my-tickets";
+  static const String supportMyTicketsCreat = "${baseUrl}support/tickets";
+  static const String supportMyTicketsReplies = "${baseUrl}support/tickets/:id/replies";
+
+
+  ///...............quiz..............
+  static const String quizTopic = "${baseUrl}quiz/topic/:topicId";
+  static const String quizStart = "${baseUrl}quiz/start";
+  static const String quizAns = "${baseUrl}quiz/attempt/:attemptId/answer";
+  static const String quizComplete = "${baseUrl}quiz/complete";
+  static const String attemptReview = "${baseUrl}quiz/attempt/review";
+  static const String quizBookmark = "${baseUrl}quiz/attempt/bookmark";
+
+  ///..............test..............................
+  static const String testsDashboard = "${baseUrl}tests/dashboard";
+
   /// --------------------->>>>>  home APIs  <<<<<----------------------------
   static const String homeDashboard = "${baseUrl}home/dashboard";
+
 }

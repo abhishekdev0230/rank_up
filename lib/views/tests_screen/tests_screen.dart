@@ -1,46 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:rank_up/constraints/font_family.dart';
+import 'package:provider/provider.dart';
 import 'package:rank_up/constraints/icon_path.dart';
 import 'package:rank_up/constraints/my_colors.dart';
-import 'package:rank_up/constraints/my_fonts_style.dart';
-import 'package:rank_up/constraints/sizdebox_width.dart';
 import 'package:rank_up/constraints/sizedbox_height.dart';
+import 'package:rank_up/constraints/sizdebox_width.dart';
+import 'package:rank_up/constraints/my_fonts_style.dart';
 import 'package:rank_up/custom_classes/app_bar.dart';
+import 'package:rank_up/provider/provider_classes/TestLeaderboardProvider.dart';
 import 'package:rank_up/views/Home/home_view.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
-
+import '../../constraints/font_family.dart';
+import '../../models/TestScreenModel.dart';
 import '../../Utils/helper.dart';
 import 'ShowStartTestDialog.dart';
 
-class TestLeaderboardScreen extends StatelessWidget {
-  const TestLeaderboardScreen({Key? key}) : super(key: key);
+class TestLeaderboardScreen extends StatefulWidget {
+  const TestLeaderboardScreen({super.key});
+
+  @override
+  State<TestLeaderboardScreen> createState() => _TestLeaderboardScreenState();
+}
+
+class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
+
+  String selectedTestType = "minor";
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<TestLeaderboardProvider>(context, listen: false).fetchDashboard(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      padding: false,
-      backgroundColor: MyColors.appTheme,
-      title: "Tests",
-      showBack: false,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            hSized20,
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppPadding.horizontal),
-              child: _testCardSection(),
+    final provider = Provider.of<TestLeaderboardProvider>(context);
+    return Consumer<TestLeaderboardProvider>(
+      builder: (context, provider, child) {
+
+        final model = provider.testModel?.data;
+        if (model == null) {
+          return const Center(child: Text("No Data Found"));
+        }
+
+        return CommonScaffold(
+          padding: false,
+          backgroundColor: MyColors.appTheme,
+          title: "Tests",
+          showBack: false,
+
+          body: RefreshIndicator(
+            color: MyColors.appTheme,
+            onRefresh: () async {
+              await provider.fetchDashboard(context, isRefresh: true);
+            },
+
+
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  hSized20,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: AppPadding.horizontal),
+                    child: _testCardSection(model.featuredTest),
+                  ),
+                  hSized20,
+                  _bottomSection(context, model),
+                ],
+              ),
             ),
-            const SizedBox(height: 20),
-            _bottomSection(context),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _testCardSection() {
+  // FEATURED TEST CARD
+  Widget _testCardSection(FeaturedTest? test) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -51,12 +91,12 @@ class TestLeaderboardScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "NEET Mock Test Series - #1\nMay 25, 2025",
+            "${test?.title ?? "No Title"}\n${test?.startDate != null ? test!.startDate!.toLocal().toString().substring(0, 10) : ""}",
             style: semiBoldTextStyle(fontSize: 18, color: MyColors.whiteText),
           ),
           const SizedBox(height: 8),
           Text(
-            "Full Syllabus",
+            test?.description ?? "No Description",
             style: boldTextStyle(fontSize: 14, color: MyColors.whiteText),
           ),
           const SizedBox(height: 16),
@@ -69,7 +109,11 @@ class TestLeaderboardScreen extends StatelessWidget {
                 title: "Enroll/Start Test",
                 onPressed: () {},
               ),
-              const Icon(Icons.check_circle, color: Colors.white, size: 28),
+              Icon(
+                test?.isPremium == true ? Icons.lock : Icons.check_circle,
+                color: Colors.white,
+                size: 28,
+              ),
             ],
           ),
         ],
@@ -77,7 +121,7 @@ class TestLeaderboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _bottomSection(BuildContext context) {
+  Widget _bottomSection(BuildContext context, TestScreenData model) {
     return Container(
       decoration: BoxDecoration(
         color: MyColors.rankBgD8D8D8,
@@ -93,29 +137,43 @@ class TestLeaderboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             hSized20,
-            _dailyPracticeCard(context),
+            _dailyPracticeCard(context, model.dailyPractice),
             hSized20,
             Text(
               "Upcoming Tests",
-              style: semiBoldTextStyle(
-                fontSize: 19,
-                color: MyColors.blackColor,
-              ),
+              style: semiBoldTextStyle(fontSize: 19, color: MyColors.blackColor),
             ),
             hSized15,
+
+            /// Minor + Major Buttons
             Row(
               children: [
-                Expanded(child: _testTypeButton("Minor Test")),
+                Expanded(
+                  child: _testTypeButton(
+                    "Minor Test",
+                    isSelected: selectedTestType == "minor",
+                    onTap: () {
+                      setState(() {
+                        selectedTestType = "minor";
+                      });
+                    },
+                  ),
+                ),
                 wSized10,
                 Expanded(
                   child: _testTypeButton(
                     "Major Test",
-                    bgColor: Colors.white,
-                    textColor: Colors.black,
+                    isSelected: selectedTestType == "major",
+                    onTap: () {
+                      setState(() {
+                        selectedTestType = "major";
+                      });
+                    },
                   ),
                 ),
               ],
             ),
+
             hSized15,
             ResponsiveGridList(
               listViewBuilderOptions: ListViewBuilderOptions(
@@ -125,13 +183,22 @@ class TestLeaderboardScreen extends StatelessWidget {
               minItemWidth: 160,
               horizontalGridSpacing: 10,
               verticalGridSpacing: 10,
-              minItemsPerRow: 2,
-              maxItemsPerRow: 4,
-              children: List.generate(4, (index) => _upcomingTestCard()),
+
+              /// 🔥 Dynamic List Switching
+              children: (selectedTestType == "minor"
+                  ? (model.upcomingTests?.minor ?? [])
+                  : (model.upcomingTests?.major ?? []))
+                  .map((e) => _upcomingTestCard(e))
+                  .toList(),
             ),
 
             hSized20,
-            _leaderboardSection(),
+            Text(
+              "Leaderboard",
+              style: semiBoldTextStyle(fontSize: 19, color: MyColors.blackColor),
+            ),
+            hSized15,
+            _leaderboardSection(model.leaderboard),
             hSized20,
           ],
         ),
@@ -139,7 +206,8 @@ class TestLeaderboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _dailyPracticeCard(BuildContext context) {
+  // DAILY PRACTICE
+  Widget _dailyPracticeCard(BuildContext ctx, DailyPractice? daily) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -152,34 +220,43 @@ class TestLeaderboardScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                "Daily Practice",
-                style: semiBoldTextStyle(
-                  fontSize: 18,
-                  color: MyColors.blackColor,
-                ),
-              ),
+              Text("Daily Practice", style: semiBoldTextStyle(fontSize: 18)),
               const Spacer(),
-              const Icon(Icons.info_outline, color: Colors.black),
+              Tooltip(
+                triggerMode: TooltipTriggerMode.tap,
+                message: "Daily Practice gives you fresh questions every day. It's a quick way to stay consistent and improve.",
+                textStyle: TextStyle(fontSize: 14, color: Colors.white),
+                decoration: BoxDecoration(
+                  color: Colors.black87,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.info_outline),
+              ),
+
+
             ],
           ),
           Text(
-            "Full Syllabus",
+            daily?.isCompleted == true ? "Completed Today" : "Not Completed",
             style: regularTextStyle(fontSize: 15, color: MyColors.color949494),
           ),
           hSized20,
           CommonButton1(
             width: 150,
             bgColor: MyColors.appTheme,
-            textColor: MyColors.whiteText,
-            title: "Start New Session",
+            textColor: Colors.white,
+            title: daily?.startAvailable == true ? "Start New Session" : "Not Available",
             onPressed: () {
-              GrandTestShowInstructionDialog.show(context);
+              if (daily?.startAvailable == true) {
+                GrandTestShowInstructionDialog.show(ctx);
+              } else {
+                Helper.customToast("Session Not Available");
+              }
             },
           ),
           hSized20,
           Text(
-            "30 New Questions await!",
+            "${daily?.questionsToday ?? 0} New Questions await!",
             style: regularTextStyle(fontSize: 15, color: MyColors.color949494),
           ),
         ],
@@ -187,21 +264,25 @@ class TestLeaderboardScreen extends StatelessWidget {
     );
   }
 
+  /// Button UI Not Changed (Fully Same)
   Widget _testTypeButton(
-    String title, {
-    Color bgColor = MyColors.appTheme,
-    Color textColor = Colors.white,
-  }) {
-    return CommonButton1(
-      height: 47,
-      bgColor: bgColor,
-      textColor: textColor,
-      title: title,
-      onPressed: () {},
+      String title, {
+        required bool isSelected,
+        required VoidCallback onTap,
+      }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: CommonButton1(
+        height: 47,
+        bgColor: isSelected ? MyColors.color19B287 : Colors.white,
+        textColor: isSelected ? Colors.white : Colors.black,
+        title: title,
+        onPressed: onTap,
+      ),
     );
   }
 
-  Widget _upcomingTestCard() {
+  Widget _upcomingTestCard(Major test) {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -211,7 +292,6 @@ class TestLeaderboardScreen extends StatelessWidget {
       child: Column(
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 color: MyColors.color949494,
@@ -220,11 +300,9 @@ class TestLeaderboardScreen extends StatelessWidget {
               wSized10,
               Expanded(
                 child: Text(
-                  "Biology: Cell Cycle & Division",
-                  style: boldTextStyle(
-                    fontSize: 12,
-                    color: MyColors.blackColor,
-                  ),
+                  maxLines: 2,
+                  test.title ?? "",
+                  style: boldTextStyle(fontSize: 12),
                 ),
               ),
             ],
@@ -234,30 +312,21 @@ class TestLeaderboardScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  "30 Mins 15 Q’s",
-                  style: boldTextStyle(
-                    fontSize: 12,
-                    color: MyColors.color949494,
-                  ),
+                  "${test.duration} Mins  ${test.totalQuestions} Q's",
+                  style: boldTextStyle(fontSize: 12, color: MyColors.color949494),
                 ),
               ),
               Expanded(
                 child: Container(
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  constraints: const BoxConstraints(minHeight: 26),
                   decoration: BoxDecoration(
                     color: MyColors.color32B790,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: MyColors.color32B790),
                   ),
                   child: Text(
-                    "Enroll/Start Test",
-                    textAlign: TextAlign.center,
-                    style: semiBoldTextStyle(
-                      fontSize: 10,
-                      color: MyColors.whiteText,
-                    ),
+                    test.isPremium == true ? "Premium" : "Enroll/Start",
+                    style: semiBoldTextStyle(fontSize: 10, color: Colors.white),
                   ),
                 ),
               ),
@@ -268,146 +337,50 @@ class TestLeaderboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _leaderboardSection() {
-    final List<double> weeklyScores = [50, 70, 90, 65, 80, 60, 85];
+  Widget _leaderboardSection(Leaderboard? data) {
+    final solved = data?.solved ?? 0;
+    final total = data?.total ?? 0;
+    final avg = data?.averageScore ?? 0;
 
+    double progress = 0;
+    if (total > 0) {
+      progress = solved / total;
+    }
+
+    final remaining = total - solved;
+
+    return Container(
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: MyColors.whiteText,
+
+        borderRadius:  BorderRadius.all(Radius.circular(20)
+        ),
+      ),
+      child: LeaderboardChart(
+        averageScore: data?.averageScore ?? 0,
+        solved: data?.solved ?? 0,
+        total: data?.total ?? 1,
+        size: 120,
+      ),
+    );
+
+  }
+
+  Widget _statTile(String title, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Leaderboard",
-          style: semiBoldTextStyle(fontSize: 19, color: MyColors.blackColor),
+          title,
+          style: boldTextStyle(fontSize: 13, color: MyColors.color949494),
         ),
-        hSized10,
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: MyColors.hintTextFieldBorderColor),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                children: [
-                  SizedBox(
-                    // color: Colors.red,
-                    width: 140,
-                    child: Text(
-                      "Average Score: 72%",
-                      style: semiBoldTextStyle(
-                        fontSize: 16,
-                        color: MyColors.blackColor,
-                      ),
-                    ),
-                  ),
-                  hSized15,
-
-                  ///.........rounded circur.........
-                  SizedBox(
-                    width: 120, // diameter = 2 * radius
-                    height: 120,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        CustomPaint(
-                          size: const Size(120, 120),
-                          painter: RoundedCircularProgressPainter(
-                            progress: 0.8, // 80%
-                            color: MyColors.color19B287,
-                            backgroundColor: const Color(0xFFE3F7EF),
-                            strokeWidth: 8,
-                          ),
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "1200/1500",
-                              style: boldTextStyle(
-                                fontSize: 14,
-                                color: MyColors.blackColor,
-                              ),
-                            ),
-                            Text(
-                              "Questions",
-                              style: boldTextStyle(
-                                fontSize: 14,
-                                color: MyColors.blackColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              _weeklyGraph(weeklyScores),
-            ],
-          ),
+        Text(
+          value,
+          style: boldTextStyle(fontSize: 15, color: MyColors.blackColor),
         ),
       ],
     );
   }
 
-  Widget _weeklyGraph(List<double> scores) {
-    const days = ["M", "T", "W", "T", "F", "S", "S"];
-    return SizedBox(
-      height: 150,
-      child: Column(
-        children: [
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: scores
-                  .map(
-                    (score) => Container(
-                      margin: EdgeInsets.only(right: 12),
-                      width: 10,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        color: MyColors.colorE4EAF0,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container(
-                          height: score,
-                          decoration: BoxDecoration(
-                            color: MyColors.colore9ECEC6,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-          hSized5,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: days
-                .map(
-                  (d) => Padding(
-                    padding: const EdgeInsets.only(right: 15.0),
-                    child: Text(
-                      d,
-                      style: boldTextStyle(
-                        fontSize: 10,
-                        color: MyColors.blackColor,
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-        ],
-      ),
-    );
-  }
 }

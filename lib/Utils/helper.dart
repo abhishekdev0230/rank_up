@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math' as math;
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,6 +10,50 @@ import 'package:rank_up/services/local_storage.dart';
 import '../constraints/my_colors.dart';
 
 class Helper {
+
+
+
+
+  static final ImagePicker _picker = ImagePicker();
+
+
+
+
+  static Future<File?> pickImage({ImageSource source = ImageSource.gallery}) async {
+    try {
+      final XFile? xfile = await _picker.pickImage(
+        source: source,
+        maxWidth: 2048,
+        maxHeight: 2048,
+        imageQuality: 85, // compress
+      );
+
+      if (xfile == null) return null;
+      return File(xfile.path);
+    } catch (e) {
+      // Optionally show toast or log
+      return null;
+    }
+  }
+
+  /// Pick multiple images from gallery (returns empty list if cancelled)
+  static Future<List<File>> pickMultipleImages() async {
+    try {
+      final List<XFile>? xfiles = await _picker.pickMultiImage(
+        maxWidth: 2048,
+        maxHeight: 2048,
+        imageQuality: 85,
+      );
+
+      if (xfiles == null || xfiles.isEmpty) return [];
+      return xfiles.map((x) => File(x.path)).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+
+
   ///.......Email validation...............
   static bool emailValidation(String email) {
     final bool emailValid =

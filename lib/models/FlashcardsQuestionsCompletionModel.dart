@@ -40,6 +40,8 @@ class Data {
   String? topicId;
   String? topicName;
   int? totalFlashcards;
+  int? quizQuestionsCount;
+  int? totalQuizzes;
   int? completedFlashcards;
   int? progressPercentage;
   int? score;
@@ -49,6 +51,8 @@ class Data {
     this.topicId,
     this.topicName,
     this.totalFlashcards,
+    this.totalQuizzes,
+    this.quizQuestionsCount,
     this.completedFlashcards,
     this.progressPercentage,
     this.score,
@@ -58,6 +62,8 @@ class Data {
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     topicId: json["topicId"],
     topicName: json["topicName"],
+    quizQuestionsCount: json["quizQuestionsCount"],
+    totalQuizzes: json["totalQuizzes"],
     totalFlashcards: json["totalFlashcards"],
     completedFlashcards: json["completedFlashcards"],
     progressPercentage: json["progressPercentage"],
@@ -68,6 +74,8 @@ class Data {
   Map<String, dynamic> toJson() => {
     "topicId": topicId,
     "topicName": topicName,
+    "quizQuestionsCount": quizQuestionsCount,
+    "totalQuizzes": totalQuizzes,
     "totalFlashcards": totalFlashcards,
     "completedFlashcards": completedFlashcards,
     "progressPercentage": progressPercentage,

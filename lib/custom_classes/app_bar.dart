@@ -82,6 +82,10 @@ class CommonScaffold extends StatelessWidget {
   final bool useSafeArea;
   final bool padding;
 
+  /// NEW: Floating Action Button support
+  final Widget? floatingActionButton;
+  final FloatingActionButtonLocation? floatingActionButtonLocation;
+
   const CommonScaffold({
     super.key,
     this.title,
@@ -97,6 +101,10 @@ class CommonScaffold extends StatelessWidget {
     this.useSafeArea = true,
     this.img,
     this.padding = true,
+
+    /// NEW
+    this.floatingActionButton,
+    this.floatingActionButtonLocation,
   });
 
   @override
@@ -113,26 +121,34 @@ class CommonScaffold extends StatelessWidget {
     }
 
     Widget scaffold = Scaffold(
+      backgroundColor: backgroundColor ?? MyColors.bgBackgroundColor,
+
+      /// NEW: FAB added here ⬇️
+      floatingActionButton: floatingActionButton,
+      floatingActionButtonLocation:
+      floatingActionButtonLocation ?? FloatingActionButtonLocation.endFloat,
+
       bottomNavigationBar: bottom == null
           ? null
           : Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppPaddings.symmetricHorizontal,
-              ),
-              child: bottom,
-            ),
-      backgroundColor: backgroundColor ?? MyColors.bgBackgroundColor,
+        padding: EdgeInsets.symmetric(
+          horizontal: AppPaddings.symmetricHorizontal,
+        ),
+        child: bottom,
+      ),
+
       appBar: appBarVisible
           ? CustomAppBar(
-              actions: actions,
-              img: img,
-              title: title,
-              title2: title2,
-              centerTitle: centerTitle,
-              showBack: showBack,
-              onBack: onBack,
-            )
+        actions: actions,
+        img: img,
+        title: title,
+        title2: title2,
+        centerTitle: centerTitle,
+        showBack: showBack,
+        onBack: onBack,
+      )
           : null,
+
       body: content,
     );
 
@@ -142,8 +158,6 @@ class CommonScaffold extends StatelessWidget {
         child: SafeArea(
           top: true,
           bottom: true,
-          left: false,
-          right: false,
           child: scaffold,
         ),
       );
@@ -152,3 +166,4 @@ class CommonScaffold extends StatelessWidget {
     return scaffold;
   }
 }
+

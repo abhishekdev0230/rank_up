@@ -10,7 +10,6 @@ import 'package:rank_up/constraints/sizdebox_width.dart';
 import 'package:rank_up/custom_classes/CommonProfileImage.dart';
 import 'package:rank_up/custom_classes/app_bar.dart';
 import 'package:rank_up/custom_classes/custom_navigator.dart';
-import 'package:rank_up/custom_classes/loder.dart';
 import 'package:rank_up/provider/provider_classes/HomeProvider.dart';
 import 'package:rank_up/views/FlashcardQ/NeetPYQsFlashcardsInner.dart';
 
@@ -22,10 +21,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   @override
   void initState() {
     super.initState();
-    // Access provider without listening
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<HomeProvider>(context, listen: false).fetchHomeData(context);
     });
@@ -34,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<HomeProvider>(context);
-
     return CommonScaffold(
       backgroundColor: MyColors.appTheme,
       appBarVisible: false,
@@ -161,17 +159,42 @@ class _HomeScreenState extends State<HomeScreen> {
           hSized24,
           _liveTestCard(provider),
           hSized24,
-          _sectionTitle("Paused Module", 180),
+          _sectionTitle("Flashcard Module", 180),
           hSized10,
           _moduleCard("Module 1:", "Human Physiology", provider),
           hSized24,
-          _sectionTitle("Solve Next", 180),
+          _sectionTitle("Resume Quiz", 180),
           hSized10,
           _moduleCard("Quiz:", "Human Physiology", provider),
           hSized24,
           _title("Important Topics"),
           hSized10,
-          _importantTopics(provider),
+          if (provider.importantTopics.isNotEmpty)
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: provider.importantTopics.map((topic) {
+                  return GestureDetector(
+
+                     onTap: () {
+                       CustomNavigator.pushNavigate(
+                         context,
+                         NeetPYQsFlashcardsInner(topicId:  topic.id.toString()),
+                       );
+                     },
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 12), // spacing between cards
+                      child: _importantTopicCard(
+                        topic.name ?? "",
+                        topic.description ?? "",
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+
+
           hSized20,
           _subscriptionButton(),
           hSized20,
@@ -372,24 +395,28 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _importantTopics(HomeProvider provider) {
-    return commonContainer(
-      Column(
+  Widget _importantTopicCard(String title, String description) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4),
+        ],
+      ),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            provider.quizTitle,
-            style: semiBoldTextStyle(fontSize: 18, color: MyColors.blackColor),
-          ),
-          hSized5,
-          Text(
-            provider.quizDescription,
-            style: mediumTextStyle(fontSize: 12, color: MyColors.blackColor),
-          ),
+          Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          SizedBox(height: 6),
+          Text(description, style: TextStyle(fontSize: 14, color: Colors.grey)),
         ],
       ),
     );
   }
+
 
   Widget _subscriptionButton() {
     return Center(

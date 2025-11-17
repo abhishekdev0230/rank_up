@@ -28,6 +28,16 @@ class _StaticPageScreenState extends State<StaticPageScreen> {
     });
   }
 
+  /// 🔥 HTML decode function
+  String decodeHtmlString(String html) {
+    return html
+        .replaceAll("&lt;", "<")
+        .replaceAll("&gt;", ">")
+        .replaceAll("&amp;", "&")
+        .replaceAll("&quot;", "\"")
+        .replaceAll("&#039;", "'");
+  }
+
   Future<void> _fetchPageContent() async {
     CommonLoaderApi.show(context);
     try {
@@ -44,9 +54,12 @@ class _StaticPageScreenState extends State<StaticPageScreen> {
 
       if (response.isNotEmpty) {
         final jsonData = jsonDecode(response);
+
         if (jsonData['status'] == true && jsonData['data'] != null) {
+          final rawContent = jsonData['data']['content'] ?? "";
+
           setState(() {
-            pageContent = jsonData['data']['content'] ?? "No content found.";
+            pageContent = decodeHtmlString(rawContent);
           });
         } else {
           Helper.customToast(jsonData['message'] ?? "Failed to load content");

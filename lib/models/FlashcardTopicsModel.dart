@@ -43,6 +43,8 @@ class Datum {
   String? description;
   int? displayOrder;
   int? totalFlashcards;
+  int? totalQuizQuestions;
+  int? totalQuizzes;
   int? totalQuestions;
 
   Datum({
@@ -51,6 +53,8 @@ class Datum {
     this.icon,
     this.description,
     this.displayOrder,
+    this.totalQuizzes,
+    this.totalQuizQuestions,
     this.totalFlashcards,
     this.totalQuestions,
   });
@@ -58,6 +62,8 @@ class Datum {
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
     id: json["id"],
     name: json["name"],
+    totalQuizQuestions: json["totalQuizQuestions"],
+    totalQuizzes: json["totalQuizzes"],
     icon: json["icon"],
     description: json["description"],
     displayOrder: json["displayOrder"],
@@ -68,6 +74,8 @@ class Datum {
   Map<String, dynamic> toJson() => {
     "id": id,
     "name": name,
+    "totalQuizzes": totalQuizzes,
+    "totalQuizQuestions": totalQuizQuestions,
     "icon": icon,
     "description": description,
     "displayOrder": displayOrder,

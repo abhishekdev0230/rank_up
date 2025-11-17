@@ -10,6 +10,7 @@ import 'package:rank_up/custom_classes/app_bar.dart';
 import 'package:rank_up/custom_classes/custom_navigator.dart';
 import 'package:rank_up/custom_classes/loder.dart';
 import 'package:rank_up/provider/provider_classes/flashcard_provider.dart';
+import 'package:rank_up/views/FlashcardQ/NeetPYQsFlashcardsInner.dart';
 import 'package:rank_up/views/FlashcardQ/flashcards_innner_1.dart';
 
 class FlashcardScreen extends StatefulWidget {
@@ -164,6 +165,13 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                                     .map(
                                       (item) => _recentCard(
                                         item.topicName ?? "Untitled",
+                                        onTab:(){
+
+                                          CustomNavigator.pushNavigate(
+                                            context,
+                                            NeetPYQsFlashcardsInner(topicId:  item.topicId.toString()),
+                                          );
+                                        }
                                       ),
                                     )
                                     .toList(),
@@ -228,27 +236,30 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
     );
   }
 
-  Widget _recentCard(String title) {
-    return Container(
-      height: 93,
-      width: 117,
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 5),
-      decoration: BoxDecoration(
-        color: MyColors.color295176,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset(IconsPath.flashQ),
-          hSized10,
-          Text(
-            title,
-            style: regularTextStyle(color: Colors.white, fontSize: 12),
-          ),
-        ],
+  Widget _recentCard(String title, {required VoidCallback onTab}) {
+    return GestureDetector(
+      onTap: onTab,
+      child: Container(
+        height: 93,
+        width: 117,
+        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 5),
+        decoration: BoxDecoration(
+          color: MyColors.color295176,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(IconsPath.flashQ),
+            hSized10,
+            Text(
+              title,
+              style: regularTextStyle(color: Colors.white, fontSize: 12),
+            ),
+          ],
+        ),
       ),
     );
   }

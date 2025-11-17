@@ -109,20 +109,28 @@ class _ClassStudyFlashcardsScreenState
                                   onTap: () async {
                                     final provider = context
                                         .read<FlashcardTopicsProvider>();
-                                    await provider.viewChapters(
+                                    provider.viewChapters(
                                       context,
                                       topic.id ?? "",
                                     );
 
                                     CustomNavigator.pushNavigate(
                                       context,
-                                      DimensionalAnalysis(totalFlashcards: topic.totalFlashcards.toString(),type: topic.id ?? "",topicId: topic.id ?? "",),
+                                      DimensionalAnalysis(
+                                        title: topic.name.toString(),
+                                        totalQuizzes: topic.totalQuizzes.toString(),
+                                        totalQuestions: topic.totalQuizQuestions.toString(),
+                                        totalFlashcards: topic.totalFlashcards
+                                            .toString(),
+                                        type: topic.id ?? "",
+                                        topicId: topic.id ?? "",
+                                      ),
                                     );
                                   },
                                   child: _topicCard(
                                     title: topic.name ?? "Untitled",
                                     flashcards: topic.totalFlashcards ?? 0,
-                                    quizzes: topic.totalQuestions ?? 0,
+                                    quizzes: topic.totalQuizzes ?? 0,
                                   ),
                                 );
                               },

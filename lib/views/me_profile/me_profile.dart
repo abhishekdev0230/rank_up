@@ -15,9 +15,9 @@ import 'package:rank_up/provider/provider_classes/ProfileSetupProvider.dart';
 import 'package:rank_up/views/me_profile/ProfileScreen.dart';
 import 'package:rank_up/views/me_profile/bookmarked_cards.dart';
 import 'package:rank_up/views/me_profile/setting.dart';
-import 'BlogScreen.dart';
+import 'blog/BlogScreen.dart';
 import 'FaqScreen.dart';
-import 'MyQueriesScreen.dart';
+import 'MyQueries/MyQueriesScreen.dart';
 import 'NotificationScreen.dart';
 
 class MeProfile extends StatefulWidget {

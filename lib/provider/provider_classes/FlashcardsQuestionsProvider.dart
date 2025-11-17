@@ -20,60 +20,59 @@ class FlashcardsQuestionsProvider extends ChangeNotifier {
 
   // ------------------ FETCH INITIAL + PAGINATED DATA ------------------
   Future<void> fetchTopics(
-    BuildContext context,
-    String topicId, {
-    int page = 1,
-  }) async {
+      BuildContext context,
+      String topicId, {
+        int page = 1,
+      }) async {
     CommonLoaderApi.show(context);
-    try {
-      final headers = await ApiHeaders.withStoredToken();
-      final String url =
-          "${ApiUrls.flashcardsTopicsQuetions.replaceFirst(':topicId', topicId)}?page=$page";
 
-      debugPrint("📡 Fetching Flashcards for topicId: $topicId (Page $page)");
-      final response = await ApiMethods().getMethodTwo(
-        header: headers,
-        method: url,
-        body: {},
-      );
-      CommonLoaderApi.hide(context);
-      final decoded = json.decode(response);
-      final model = FlashcardsQuestionsModel.fromJson(decoded);
+    final headers = await ApiHeaders.withStoredToken();
+    final String url =
+        "${ApiUrls.flashcardsTopicsQuetions.replaceFirst(':topicId', topicId)}?page=$page";
 
-      if (model.status == true &&
-          model.data != null &&
-          model.data!.flashcards != null &&
-          model.data!.flashcards!.isNotEmpty) {
-        if (page == 1) {
-          flashcardModel = model;
-        } else {
-          flashcardModel!.data!.flashcards!.addAll(
-            model.data!.flashcards ?? [],
-          );
-        }
+    final response = await ApiMethods().getMethodTwo(
+      header: headers,
+      method: url,
+      body: {},
+    );
 
-        currentCard = flashcardModel!.data!.flashcards!.first;
-        currentIndex = 0;
-        currentPage = model.data!.pagination?.currentPage ?? 1;
-        hasNextPage = model.data!.pagination?.hasNextPage ?? false;
-        notifyListeners();
-        debugPrint(
-          "🎯 Loaded ${flashcardModel!.data!.flashcards!.length} flashcards",
-        );
-      } else {
-        debugPrint("⚠️ No flashcards found or empty data in response.");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(model.message ?? "No flashcards found.")),
-        );
-      }
-    } catch (e, stackTrace) {
-      debugPrint("❌ Exception while fetching flashcards: $e");
-      debugPrint("🧱 Stack trace: $stackTrace");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error fetching flashcards: $e")));
+    CommonLoaderApi.hide(context);
+
+    final decoded = json.decode(response);
+    final model = FlashcardsQuestionsModel.fromJson(decoded);
+
+    // --------------------------------------------------
+    // ✅ FIX: No data → clear the old card
+    // --------------------------------------------------
+    if (model.data == null ||
+        model.data!.flashcards == null ||
+        model.data!.flashcards!.isEmpty) {
+      flashcardModel = null;
+      currentCard = null;
+      notifyListeners();
+      return;
     }
+
+    // --------------------------------------------------
+    // Normal data handling
+    // --------------------------------------------------
+    if (page == 1) {
+      flashcardModel = model;
+    } else {
+      flashcardModel!.data!.flashcards!.addAll(
+        model.data!.flashcards ?? [],
+      );
+    }
+
+    currentCard = flashcardModel!.data!.flashcards!.first;
+    currentIndex = 0;
+
+    currentPage = model.data!.pagination?.currentPage ?? 1;
+    hasNextPage = model.data!.pagination?.hasNextPage ?? false;
+
+    notifyListeners();
   }
+
 
   // ------------------ NEXT + PREV LOGIC ------------------
   Future<void> nextCard(BuildContext context, String topicId) async {

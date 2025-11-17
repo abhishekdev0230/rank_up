@@ -66,7 +66,7 @@ TextStyle mediumTextStyle({
 
 TextStyle boldTextStyle({
   required double fontSize,
-  required Color color,
+   Color? color,
   double? height,
   double? letterSpacing,
   TextOverflow? overflow,

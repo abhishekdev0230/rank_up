@@ -65,3 +65,74 @@ class CommonProfileImage extends StatelessWidget {
     );
   }
 }
+
+class CommonNetworkImage extends StatelessWidget {
+  final String? imageUrl;
+  final double width;
+  final double height;
+  final double borderRadius;
+  final BoxFit fit;
+  final String? placeholderAsset;
+
+  const CommonNetworkImage({
+    Key? key,
+    this.imageUrl,
+    required this.width,
+    required this.height,
+    this.borderRadius = 8,
+    this.fit = BoxFit.cover,
+    this.placeholderAsset,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // ✅ If URL is empty or null, show placeholder immediately
+    if (imageUrl == null || imageUrl!.isEmpty) {
+      return _placeholder();
+    }
+
+    // ✅ Cached Network Image with shimmer loader
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius),
+      child: CachedNetworkImage(
+        imageUrl: imageUrl!,
+        width: width,
+        height: height,
+        fit: fit,
+        placeholder: (context, url) => Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Container(
+            width: width,
+            height: height,
+            color: Colors.white,
+          ),
+        ),
+        errorWidget: (context, url, error) => _placeholder(),
+      ),
+    );
+  }
+
+  Widget _placeholder() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius),
+      child: Container(
+        width: width,
+        height: height,
+        color: Colors.grey.shade200,
+        child: placeholderAsset != null
+            ? Image.asset(
+          placeholderAsset!,
+          width: width,
+          height: height,
+          fit: BoxFit.cover,
+        )
+            : const Icon(
+          Icons.image_not_supported,
+          color: Colors.grey,
+          size: 30,
+        ),
+      ),
+    );
+  }
+}

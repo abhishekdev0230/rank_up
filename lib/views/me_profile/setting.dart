@@ -75,7 +75,10 @@ class SettingsSheet {
                     Navigator.pop(context);
                     CustomNavigator.pushNavigate(
                       context,
-                      const StaticPageScreen(title: "Terms & Conditions", slug: "terms"),
+                      const StaticPageScreen(
+                        title: "Terms & Conditions",
+                        slug: "terms",
+                      ),
                     );
                   },
                 ),
@@ -86,7 +89,10 @@ class SettingsSheet {
                     Navigator.pop(context);
                     CustomNavigator.pushNavigate(
                       context,
-                      const StaticPageScreen(title: "Privacy Policy", slug: "privacy"),
+                      const StaticPageScreen(
+                        title: "Privacy Policy",
+                        slug: "privacy",
+                      ),
                     );
                   },
                 ),
@@ -97,7 +103,39 @@ class SettingsSheet {
                     Navigator.pop(context);
                     CustomNavigator.pushNavigate(
                       context,
-                      const StaticPageScreen(title: "Refund Policy", slug: "refund"),
+                      const StaticPageScreen(
+                        title: "Refund Policy",
+                        slug: "refund",
+                      ),
+                    );
+                  },
+                ),
+                _menuContainer(
+                  "Contact Us",
+                  Icons.contact_mail_outlined,   // ✔️ Best icon for Contact Us
+                  onTap: () {
+                    Navigator.pop(context);
+                    CustomNavigator.pushNavigate(
+                      context,
+                      const StaticPageScreen(
+                        title: "Contact Us",
+                        slug: "ContactUS",
+                      ),
+                    );
+                  },
+                ),
+
+                _menuContainer(
+                  "Pricing",
+                  Icons.attach_money,            // ✔️ Best icon for Pricing / Plans
+                  onTap: () {
+                    Navigator.pop(context);
+                    CustomNavigator.pushNavigate(
+                      context,
+                      const StaticPageScreen(
+                        title: "Pricing",
+                        slug: "Pricing",
+                      ),
                     );
                   },
                 ),
@@ -107,7 +145,6 @@ class SettingsSheet {
                   "Log out",
                   Icons.logout_outlined,
                   onTap: () async {
-                    print("ddddddddddddd");
                     final result = await ConfirmDialog.show(
                       context,
                       title: "Logout Confirmation",

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rank_up/constraints/my_colors.dart';
+import 'package:rank_up/constraints/my_fonts_style.dart';
 
 class OptionTileWidget extends StatelessWidget {
   final String text;
@@ -26,6 +27,7 @@ class OptionTileWidget extends StatelessWidget {
     return Stack(
       children: [
         Container(
+          height: 100,
           alignment: Alignment.center,
           width: double.infinity,
           margin: const EdgeInsets.symmetric(vertical: 6),
@@ -36,18 +38,22 @@ class OptionTileWidget extends StatelessWidget {
             border: Border.all(color: borderColor, width: 1),
           ),
           child: Text(
+            maxLines: 3,
             text,
-            style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
+            style: mediumTextStyle(
+              fontSize: 14,
+              color: textColor,
+            ),
           ),
         ),
         if (isSelected && isCorrect)
           const Positioned(
             top: 0,
-            right: 4,
+            right: 0,
             child: Icon(
               Icons.check_circle,
               color: MyColors.color19B287,
-              size: 20,
+              size: 22,
             ),
           ),
       ],

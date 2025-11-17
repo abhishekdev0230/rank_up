@@ -46,7 +46,7 @@ class _FlashcardCompletionScreenState extends State<FlashcardCompletionScreen> {
             pushScreen(
               context,
               screen: const BottomNavController(initialIndex: 0),
-              withNavBar: false, // keeps same bottom nav controller alive
+              withNavBar: false,
             );
 
           },
@@ -170,6 +170,9 @@ class _FlashcardCompletionScreenState extends State<FlashcardCompletionScreen> {
                       pushScreen(
                         context,
                         screen: DimensionalAnalysis(
+                          title: data?.topicName.toString()  ?? "",
+                          totalQuestions: data!.quizQuestionsCount.toString(),
+                          totalQuizzes: data.totalQuizzes.toString(),
                           type: "TackQuiz",
                           totalFlashcards:
                               data?.totalFlashcards.toString() ?? "",
