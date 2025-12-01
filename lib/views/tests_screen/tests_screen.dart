@@ -13,10 +13,12 @@ import 'package:rank_up/provider/provider_classes/TestLeaderboardProvider.dart';
 import 'package:rank_up/views/Home/home_view.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
 import '../../constraints/font_family.dart';
+import '../../models/TestResumeBottomStartTestModel.dart';
 import '../../models/TestScreenModel.dart';
 import '../../Utils/helper.dart';
+import '../../provider/provider_classes/TestStartProvider.dart';
 import '../FlashcardQ/NeetPYQsFlashcardsInner.dart';
-import 'ShowStartTestDialog.dart';
+import '../me_profile/SubscriptionScreen/SubscriptionScreen.dart';
 
 class TestLeaderboardScreen extends StatefulWidget {
   const TestLeaderboardScreen({super.key});
@@ -54,37 +56,100 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
           title: "Tests",
           showBack: false,
 
-          body: RefreshIndicator(
-            color: MyColors.appTheme,
-            onRefresh: () async {
-              await provider.fetchDashboard(context, isRefresh: true);
-            },
+            body: RefreshIndicator(
+              color: MyColors.appTheme,
+              onRefresh: () async {
+                await provider.fetchDashboard(context, isRefresh: true);
+              },
 
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  hSized20,
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppPadding.horizontal,
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        hSized20,
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppPadding.horizontal,
+                          ),
+                          child: _testCardSection(model.featuredTest),
+                        ),
+                        hSized20,
+                        _bottomSection(context, model),
+                      ],
                     ),
-                    child: _testCardSection(model.featuredTest),
                   ),
-                  hSized20,
-                  _bottomSection(context, model),
                 ],
               ),
-            ),
-          ),
+            )
+
         );
+      },
+    );
+  }
+
+  Widget featuredTestButton(FeaturedTest test) {
+    final provider = Provider.of<TestLeaderboardProvider>(
+      context,
+      listen: false,
+    );
+
+    if (test.isPremium != true && test.isEnrolled == false) {
+      return provider.testActionButton(
+        buttonState: "UPGRADE",
+        onStart: null,
+        onEnroll: null,
+        onUpgrade: () {
+          CustomNavigator.pushNavigate(context, SubscriptionScreen());
+        },
+        onResume: null,
+        onViewResult: null,
+      );
+    }
+
+    // Otherwise → follow buttonState normally
+    return provider.testActionButton(
+      buttonState: test.buttonState ?? "",
+
+      onStart: () {
+        // GrandTestShowInstructionDialog.show(context);
+      },
+
+      onEnroll: () {
+        provider.testsEnroll(context, test.id ?? "");
+      },
+
+      onUpgrade: () {
+        CustomNavigator.pushNavigate(context, SubscriptionScreen());
+      },
+
+      onResume: () {
+        provider.testsEnrollStart(context, test.id ?? "", test.title ?? "");
+      },
+
+      onViewResult: () {
+        Helper.customToast("Opening Result…");
       },
     );
   }
 
   // FEATURED TEST CARD
   Widget _testCardSection(FeaturedTest? test) {
+    if (test == null) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: MyColors.color295176,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          "No Featured Test Available",
+          style: semiBoldTextStyle(fontSize: 18, color: MyColors.whiteText),
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -94,40 +159,33 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          /// ---- TITLE + DATE ----
           Text(
-            "${test?.title ?? "No Title"}\n${test?.startDate != null ? test!.startDate!.toLocal().toString().substring(0, 10) : ""}",
+            "${test.title ?? "No Title"}\n"
+                "${test.startDate != null ? test.startDate!.toLocal().toString().substring(0, 10) : ""}",
             style: semiBoldTextStyle(fontSize: 18, color: MyColors.whiteText),
           ),
+
           const SizedBox(height: 8),
+
+          /// ---- DESCRIPTION ----
           Text(
-            test?.description ?? "No Description",
+            test.description ?? "No Description",
             style: boldTextStyle(fontSize: 14, color: MyColors.whiteText),
           ),
+
           const SizedBox(height: 16),
+
+          /// ---- BUTTON + ICON ----
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              CommonButton1(
-                bgColor: Colors.white,
-                textColor: MyColors.appTheme,
-                title: test?.isPremium == true
-                    ? "Premium"
-                    : "Enroll/Start Test",
-                onPressed: () {
-                  if (test?.isPremium == true) {
-                    Helper.customToast(
-                      "This is a premium test. Please upgrade.",
-                    );
-                  } else {
-                    GrandTestShowInstructionDialog.show(context);
-                  }
-                },
-              ),
+              featuredTestButton(test),
+
+              const Spacer(),
 
               Icon(
-                test?.isPremium == true ? Icons.lock : Icons.check_circle,
+                test.isPremium == true ? Icons.lock : Icons.check_circle,
                 color: Colors.white,
-                size: 28,
               ),
             ],
           ),
@@ -135,6 +193,7 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
       ),
     );
   }
+
 
   Widget _bottomSection(BuildContext context, TestScreenData model) {
     return Container(
@@ -348,7 +407,10 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
               Expanded(
                 child: Text(
                   "${test.duration} Mins  |  ${test.totalQuestions} Q's",
-                  style: boldTextStyle(fontSize: 12, color: MyColors.color949494),
+                  style: boldTextStyle(
+                    fontSize: 12,
+                    color: MyColors.color949494,
+                  ),
                 ),
               ),
               Expanded(
@@ -357,32 +419,60 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
                   buttonState: test.buttonState ?? "",
 
                   onStart: () {
-                    GrandTestShowInstructionDialog.show(context);
+                    print("mslkdklsklds");
+                    // GrandTestShowInstructionDialog.show(context);
                   },
 
-                  onEnroll: () {
-                    Helper.customToast("Enrolled Successfully!");
+                  onEnroll: () async {
+                    await Provider.of<TestLeaderboardProvider>(
+                      context,
+                      listen: false,
+                    ).testsEnroll(context, test.id.toString());
                   },
 
                   onUpgrade: () {
-                    Helper.customToast("Upgrade to access premium tests");
+                    CustomNavigator.pushNavigate(context, SubscriptionScreen());
                   },
 
                   onResume: () {
-                    GrandTestShowInstructionDialog.show(context);
+                    Provider.of<TestLeaderboardProvider>(
+                      context,
+                      listen: false,
+                    ).testsEnrollStart(
+                      context,
+                      test.id.toString(),
+                      test.title ?? "",
+                    );
                   },
 
                   onViewResult: () {
+                    final startTestProvider = Provider.of<StartTestProvider>(context, listen: false);
+
+                    // Ensure nested objects exist
+                    startTestProvider.startModel ??= TestResumeBottomStartTestModel();
+                    startTestProvider.startModel!.data ??= TestData();
+                    startTestProvider.startModel!.data!.attempt ??= Attempt();
+
+                    // Directly set the attempt id
+                    startTestProvider.startModel!.data!.attempt!.id = test.attemptId.toString();
+
+                    // Call fetchResult with the same attemptId
+                    startTestProvider.fetchResult(
+                      context,
+                      attemptId: test.attemptId.toString(),
+                    );
+
                     Helper.customToast("Opening Result…");
                   },
+
+
+
                 ),
               ),
             ],
           ),
 
           // hSized10,
-
-
         ],
       ),
     );
@@ -393,7 +483,6 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: MyColors.whiteText,
-
         borderRadius: BorderRadius.all(Radius.circular(20)),
       ),
       child: LeaderboardChart(

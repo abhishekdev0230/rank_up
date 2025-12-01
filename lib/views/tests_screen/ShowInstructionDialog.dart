@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rank_up/constraints/font_family.dart';
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
 import 'package:rank_up/constraints/sizedbox_height.dart';
 import 'package:rank_up/custom_classes/custom_navigator.dart';
+import 'package:rank_up/provider/provider_classes/TestStartProvider.dart';
 import 'package:rank_up/views/FlashcardQ/DimensionalAnalysis/dimensional_analysis.dart';
 import 'package:rank_up/views/Home/home_view.dart';
 
 import 'DimensionalAnalysis.dart';
 
 class ShowInstructionDialog {
-  static void showDetailedInstructions(BuildContext context) {
+  static void showDetailedInstructions(
+    BuildContext context,
+    String? testId,
+    String title,
+    bool? isLiveTest, {
+    int? totalQuetion,
+  }) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -82,48 +90,54 @@ class ShowInstructionDialog {
                         ),
                         actionsAlignment: MainAxisAlignment.center,
                         actions: [
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment
+                                .center, // center horizontally
+                            children: [
+                              CommonButton1(
+                                width: 206,
+                                height: 45,
+                                borderRadius: 30,
+                                bgColor: MyColors.appTheme,
+                                textColor: Colors.white,
+                                title: "Yes",
+                                onPressed: () async {
+                                  await Provider.of<StartTestProvider>(
+                                    context,
+                                    listen: false,
+                                  ).startTest(
+                                    context,
+                                    testId ?? "",
+                                    title,
+                                    isLiveTest: isLiveTest ?? false,
+                                      totalQuetion: totalQuetion,
+                                  );
+                                },
+                              ),
+                              CommonButton1(
+                                width: 206,
+                                height: 45,
+                                borderRadius: 30,
+                                title: "No, Maybe Later",
+                                bgColor: MyColors.whiteText,
+                                textColor: MyColors.appTheme,
+                                onPressed: () {
+                                  Navigator.pop(context, true);
+                                },
+                              ),
+                            ],
+                          ),
 
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center, // center horizontally
-                              children: [
-                                CommonButton1(
-                                  width: 206,
-                                  height: 45,
-                                  borderRadius: 30,
-                                  bgColor: MyColors.appTheme,
-                                  textColor: Colors.white,
-                                  title: "Yes",
-                                  onPressed: () {
-                                    // Navigator.pop(context);
-                                    CustomNavigator.pushNavigate(context, DimensionAlanalysisTest());
-                                    // Navigate to Test Screen here
-                                  },
-                                ),
-                                CommonButton1(
-                                  width: 206,
-                                  height: 45,
-                                  borderRadius: 30,
-                                  title: "No, Maybe Later",
-                                  bgColor: MyColors.whiteText,
-                                  textColor: MyColors.appTheme,
-                                  onPressed: () {
-                                    Navigator.pop(context,true);
-                                  },
-                                ),
-                              ],
-                            ),
-
-                          const SizedBox(height: 10), // optional spacing below buttons
+                          const SizedBox(height: 10),
                         ],
                       );
-
                     },
                   ).then((value) {
-                    if(value){
+                    if (value == true) {
                       Navigator.pop(context);
                     }
-                  },);
+                  });
                 },
               ),
 

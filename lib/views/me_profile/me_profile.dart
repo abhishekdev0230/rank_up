@@ -15,6 +15,8 @@ import 'package:rank_up/provider/provider_classes/ProfileSetupProvider.dart';
 import 'package:rank_up/views/me_profile/ProfileScreen.dart';
 import 'package:rank_up/views/me_profile/bookmarked_cards.dart';
 import 'package:rank_up/views/me_profile/setting.dart';
+import 'LeaderboardScreen.dart';
+import 'SubscriptionScreen/SubscriptionScreen.dart';
 import 'blog/BlogScreen.dart';
 import 'FaqScreen.dart';
 import 'MyQueries/MyQueriesScreen.dart';
@@ -145,37 +147,42 @@ class _MeProfileState extends State<MeProfile> {
               hSized20,
 
               // ---------- Subscription ----------
-              Container(
-                decoration: BoxDecoration(
-                  color: MyColors.whiteText,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 14,
-                ),
-                child: Row(
-                  children: [
-                    SvgPicture.asset(IconsPath.premiumSubscription),
-                    wSized5,
-                    Text(
-                      "Premium Subscription",
-                      style: mediumTextStyle(
-                        fontSize: 14,
-                        color: MyColors.blackColor,
+              GestureDetector(
+                onTap: () {
+                  CustomNavigator.pushNavigate(context, SubscriptionScreen());
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: MyColors.whiteText,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(IconsPath.premiumSubscription),
+                      wSized5,
+                      Text(
+                        "Premium Subscription",
+                        style: mediumTextStyle(
+                          fontSize: 14,
+                          color: MyColors.blackColor,
+                        ),
                       ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      "Inactive",
-                      style: mediumTextStyle(
-                        fontSize: 14,
-                        color: MyColors.blackColor,
+                      const Spacer(),
+                      Text(
+                        "Inactive",
+                        style: mediumTextStyle(
+                          fontSize: 14,
+                          color: MyColors.blackColor,
+                        ),
                       ),
-                    ),
-                    wSized7,
-                    const Icon(Icons.arrow_forward_ios_sharp, size: 13),
-                  ],
+                      wSized7,
+                      const Icon(Icons.arrow_forward_ios_sharp, size: 13),
+                    ],
+                  ),
                 ),
               ),
 
@@ -215,9 +222,16 @@ class _MeProfileState extends State<MeProfile> {
               // ---------- Menu options ----------
               Column(
                 children: [
-                  _menuContainer("Leaderboard", Icons.leaderboard_outlined),
-                  hSized10,
-                  _menuContainer("Deck Setting", Icons.layers_outlined),
+                  _menuContainer(
+                    "Leaderboard",
+                    Icons.leaderboard_outlined,
+                    onTap: () {
+                      CustomNavigator.pushNavigate(context, const LeaderboardScreen());
+                    },
+                  ),
+
+                  // hSized10,
+                  // _menuContainer("Deck Setting", Icons.layers_outlined),
                   hSized10,
                   _menuContainer(
                     "My Queries",

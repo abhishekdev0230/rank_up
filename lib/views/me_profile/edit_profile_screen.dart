@@ -94,6 +94,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               /// ✅ Email
               CommonTextField(
                 controller: emailController,
+                readOnly: true,
                 label: "Email",
                 hintText: "Enter your email",
                 validator: (val) => CommonValidators.validateEmail(val),

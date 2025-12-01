@@ -91,7 +91,6 @@ class _BlogScreenState extends State<BlogScreen> {
                         width: 80,
                         height: 80,
                         borderRadius: 8,
-                        placeholderAsset: 'assets/images/blog_placeholder.png',
                       ),
 
                       const SizedBox(width: 12),

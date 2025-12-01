@@ -62,16 +62,34 @@ class _StaticPageScreenState extends State<StaticPageScreen> {
             pageContent = decodeHtmlString(rawContent);
           });
         } else {
-          Helper.customToast(jsonData['message'] ?? "Failed to load content");
+          /// ❗ Error message received → UI में दिखाओ
+          final msg = jsonData['message'] ?? "Failed to load content";
+
+          setState(() {
+            pageContent = "<p><b>$msg</b></p>";
+          });
+
+          Helper.customToast(msg);
         }
       } else {
+        /// ❗ Empty response → UI में भी message
+        setState(() {
+          pageContent = "<p><b>Empty response from server</b></p>";
+        });
+
         Helper.customToast("Empty response from server");
       }
     } catch (e) {
       CommonLoaderApi.hide(context);
+
+      setState(() {
+        pageContent = "<p><b>Error: $e</b></p>";
+      });
+
       Helper.customToast("Error: $e");
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

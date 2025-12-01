@@ -13,6 +13,12 @@ import 'package:rank_up/custom_classes/loder.dart';
 import 'package:rank_up/custom_classes/my_textfield.dart';
 import 'package:rank_up/provider/provider_classes/otp_provider.dart';
 
+import '../../custom_classes/custom_navigator.dart';
+import '../../provider/provider_classes/LoginOptionContainer.dart';
+import '../../services/local_storage.dart';
+import '../bottom_navigation_bar.dart';
+import 'ProfileSetupContainer.dart';
+
 class PhoneNumberContainer extends StatefulWidget {
   final dynamic lang;
   final Function(String phone, String countryCode, bool rememberMe)? onSignInTap;
@@ -204,8 +210,43 @@ class _PhoneNumberContainerState extends State<PhoneNumberContainer> {
                     ),
                     textColor: MyColors.whiteText,
                     backgroundColor: MyColors.appTheme,
-                    onTap: () {
-                      // TODO: Add Google login logic here
+                    onTap: () async {
+                      final authProvider = Provider.of<AuthProvider>(
+                        context,
+                        listen: false,
+                      );
+
+                      final result = await authProvider.login(context);
+
+                      if (result != null && result["success"] == true) {
+                        final data = result["data"];
+                        final profileComplete = data != null
+                            ? (data["profileComplete"] ?? false)
+                            : false;
+
+                        if (profileComplete.toString().toLowerCase() == "true") {
+                          await StorageManager.savingData(StorageManager.isLogin, true);
+                          if (!context.mounted) return;
+                          CustomNavigator.pushRemoveUntil(
+                            context,
+                            BottomNavController(initialIndex: 0),
+                          );
+                        } else {
+                          if (!context.mounted) return;
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (_) => ProfileSetupContainer(lang: lang),
+                          );
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Google Sign-In canceled or failed.'),
+                          ),
+                        );
+                      }
                     },
                   ),
                 ],

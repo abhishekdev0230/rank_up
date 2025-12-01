@@ -125,7 +125,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                                     ? "11"
                                     : provider.selectedTab == 1
                                     ? "12"
-                                    : "13";
+                                    : "Achiever";
 
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 12.0),
@@ -139,7 +139,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                                 );
                               }).toList(),
                             ),
-                      const SizedBox(height: 28),
+                      hSized28,
 
                       /// ---------------- Recently Viewed ----------------
                       Text(
@@ -165,13 +165,14 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                                     .map(
                                       (item) => _recentCard(
                                         item.topicName ?? "Untitled",
-                                        onTab:(){
-
+                                        onTab: () {
                                           CustomNavigator.pushNavigate(
                                             context,
-                                            NeetPYQsFlashcardsInner(topicId:  item.topicId.toString()),
+                                            NeetPYQsFlashcardsInner(
+                                              topicId: item.topicId.toString(),
+                                            ),
                                           );
-                                        }
+                                        },
                                       ),
                                     )
                                     .toList(),
@@ -216,14 +217,18 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
               children: [
                 const Icon(Icons.book_rounded, color: Colors.white, size: 28),
                 wSized5,
-                Text(
-                  title,
-                  style: semiBoldTextStyle(color: Colors.white, fontSize: 18),
+                Expanded(
+                  child: Text(
+                    maxLines: 1,
+                    title,
+                    style: semiBoldTextStyle(color: Colors.white, fontSize: 18),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 6),
             Text(
+              maxLines: 2,
               subtitle,
               style: regularTextStyle(
                 color: Colors.white.withOpacity(0.8),
@@ -243,7 +248,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
         height: 93,
         width: 117,
         margin: const EdgeInsets.only(right: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         decoration: BoxDecoration(
           color: MyColors.color295176,
           borderRadius: BorderRadius.circular(12),
@@ -255,6 +260,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
             SvgPicture.asset(IconsPath.flashQ),
             hSized10,
             Text(
+              maxLines: 2,
               title,
               style: regularTextStyle(color: Colors.white, fontSize: 12),
             ),

@@ -4,13 +4,16 @@ class ApiUrls {
   /// --------------------->>>>>  Google Map Keys  <<<<<----------------------------
   static const String googleApiKey = 'AIzaSyBCi-I8dhVghsr20HVVyCfkxBpsXVe2O60';
 
+
+  static const String razorPayKey = 'rzp_live_RD7ANv3U5M0VDg';
+
   static const String googlePlaceBaseUrl =
       'https://maps.googleapis.com/maps/api/place/autocomplete/json?';
   static const String googlePlaceDetailBaseUrl =
       'https://maps.googleapis.com/maps/api/place/details/json?';
 
   /// --------------------->>>>>  Base URL (Production)  <<<<<----------------------------
-  static const String baseUrl = "https://rankup-backend-production.up.railway.app/api/v1/";
+  static const String baseUrl = "https://rankup-api-temp.onrender.com/api/v1/";
 
   /// --------------------->>>>>  Auth APIs  <<<<<----------------------------
   static const String sendOtp = "${baseUrl}auth/send-otp";
@@ -18,6 +21,7 @@ class ApiUrls {
   static const String completeProfile = "${baseUrl}auth/complete-profile";
   static const String profile = "${baseUrl}auth/profile";
   static const String profileUpdate = "${baseUrl}auth/profile-update";
+  static const String googleLogin = "${baseUrl}auth/google-login";
 
 
   /// --------------------->>>>>  Flashcards APIs  <<<<<----------------------------
@@ -64,8 +68,31 @@ class ApiUrls {
 
   ///..............test..............................
   static const String testsDashboard = "${baseUrl}tests/dashboard";
+  static const String testsEnroll = "${baseUrl}tests/:id/enroll";
+  static const String testsEnrollStart = "${baseUrl}tests/:id";
+  static const String testsEnrollStartTest = "${baseUrl}tests/:id/start";
+  static const String testsEnrollStartTestNextQue = "${baseUrl}tests/attempt/:attemptId/question/:questionNumber";
+  static const String testsTestNextSaveAns = "${baseUrl}tests/attempt/{attemptId}/answer";
+  static const String testsAttemptStatus = "${baseUrl}tests/attempt/:attemptId/status";
+  static const String testsAttemptReview = "${baseUrl}tests/attempt/:attemptId/review";
+  static const String testsFinelSubmit = "${baseUrl}tests/attempt/:attemptId/submit";
+  static const String testsFinelAnalytics = "${baseUrl}tests/attempt/:attemptId/analytics";
+
+
+///..............................leaderboard............................
+  static const String leaderboard = "${baseUrl}leaderboard/?filter=all";
+
+  ///..............................subscription............................
+
+  static const String subscriptionList = "${baseUrl}subscription/plans";
+  static const String activateSubscription = "${baseUrl}subscription/activate";
+
+  ///................notification.........................
+
+  static const String notificationList = "${baseUrl}notifications";
 
   /// --------------------->>>>>  home APIs  <<<<<----------------------------
   static const String homeDashboard = "${baseUrl}home/dashboard";
+  static const String importantTopicsList = "${baseUrl}home/topics/important";
 
 }

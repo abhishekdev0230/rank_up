@@ -8,8 +8,9 @@ import 'package:rank_up/constraints/sizdebox_width.dart';
 import 'package:rank_up/constraints/sizedbox_height.dart';
 import 'package:rank_up/models/StartQuizModel.dart';
 import 'package:rank_up/provider/provider_classes/QuizAnswerProvider.dart';
-import 'OptionTileWidget.dart';
 import 'package:rank_up/views/Home/home_view.dart';
+import '../../../Utils/helper.dart';
+import 'OptionTileWidget.dart';
 
 class QuizQuestionWidget extends StatefulWidget {
   final Question question;
@@ -45,14 +46,13 @@ class QuizQuestionWidget extends StatefulWidget {
 
 class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
   late Timer _timer;
-  late int _remainingSeconds; // dynamically from API
+  late int _remainingSeconds;
+  bool _previousPressed = false;
 
   @override
   void initState() {
     super.initState();
-
-    /// Convert duration (minutes) → seconds
-    _remainingSeconds = (widget.duration * 60);
+    _remainingSeconds = widget.duration * 60;
     _startTimer();
   }
 
@@ -62,12 +62,10 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
         setState(() => _remainingSeconds--);
       } else {
         timer.cancel();
-        // ⏰ Time up — you can auto-submit quiz or show alert
       }
     });
   }
 
-  /// Format time as MM:SS
   String get formattedTime {
     int minutes = _remainingSeconds ~/ 60;
     int seconds = _remainingSeconds % 60;
@@ -82,12 +80,16 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final quizAnswerProvider = Provider.of<QuizAnswerProvider>(context);
+    final selectedAnswer = quizAnswerProvider.getSelectedAnswer(
+      widget.question.id ?? "",
+    );
+
     return SingleChildScrollView(
       child: Column(
         children: [
           hSized20,
-
-          /// 🔹 Progress Bar
+          // 🔹 Progress Bar
           Container(
             width: double.infinity,
             height: 6,
@@ -106,10 +108,8 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
               ),
             ),
           ),
-
           hSized10,
-
-          /// 🔹 Question info with dynamic timer
+          // 🔹 Question info with timer
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -122,108 +122,104 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                   const Icon(Icons.timer, color: Colors.white, size: 18),
                   const SizedBox(width: 5),
                   Text(
-                    formattedTime, // ✅ dynamic countdown
+                    formattedTime,
                     style: regularTextStyle(color: Colors.white),
                   ),
                 ],
               ),
             ],
           ),
-
           hSized30,
-
-          /// 🔹 Question Card
-          Container(
-            padding: const EdgeInsets.all(16),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    widget.question.questionText ?? "No question text",
-                    textAlign: TextAlign.center,
-                    style: semiBoldTextStyle(fontSize: 18, color: Colors.black),
-                  ),
-                ),
-                hSized20,
-
-                /// 🔹 Options
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    for (var opt in widget.question.options ?? [])
-                      GestureDetector(
-                        onTap: () async {
-                          final selectedId = opt.id ?? '';
-                          widget.onSelectOption(selectedId);
-
-                          // 🔹 Call API to submit answer
-                          final quizAnswerProvider =
-                              Provider.of<QuizAnswerProvider>(
-                                context,
-                                listen: false,
-                              );
-
-                          await quizAnswerProvider.submitAnswer(
-                            context: context,
-                            attemptId: widget.attemptId.toString() ?? "",
-                            questionId: widget.question.id ?? "",
-                            selectedAnswer: opt.optionLabel ?? "",
-                            timeTaken: widget.duration * 60 - _remainingSeconds,
-                          );
-
-                          // 🔹 Show explanation
-                          final result = quizAnswerProvider.quizAnsModel?.data;
-                          if (result != null) {
-                            setState(() {
-                              // Set isCorrect & explanation dynamically
-                              widget.isCorrect == result.isCorrect;
-                            });
-                          }
-                        },
-
-                        child: Container(
-
-                          width: (MediaQuery.of(context).size.width - 64) / 2,
-                          constraints: const BoxConstraints(
-                            minHeight: 55,
-                          ), // Equal height
-                          child: OptionTileWidget(
-                            "${opt.optionLabel}. ${opt.optionText}",
-                            isSelected: widget.selectedOptionId == opt.id,
-
-                            // Ye tab TRUE hoga jab ye wala option selected ho
-                            // aur server response me isCorrect == true ho
-                            isCorrect: widget.selectedOptionId == opt.id &&
-                                Provider.of<QuizAnswerProvider>(
-                                  context,
-                                  listen: false,
-                                ).quizAnsModel?.data?.isCorrect ==
-                                    true,
-                          ),
-
-                        ),
+          // 🔹 Question Card
+          GestureDetector(
+            onHorizontalDragEnd: (details) {
+              if (details.primaryVelocity! < 0) {
+                widget.onNext();
+                setState(() => _previousPressed = false);
+              } else if (details.primaryVelocity! > 0) {
+                if (!_previousPressed) {
+                  widget.onPrevious();
+                  setState(() => _previousPressed = true);
+                }
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      widget.question.questionText ?? "No question text",
+                      textAlign: TextAlign.center,
+                      style: semiBoldTextStyle(
+                        fontSize: 18,
+                        color: Colors.black,
                       ),
-                  ],
-                ),
-              ],
+                    ),
+                  ),
+                  hSized20,
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      for (var opt in widget.question.options ?? [])
+                        GestureDetector(
+                          onTap: () async {
+                            final selectedId = opt.id ?? '';
+                            if (selectedAnswer == null) {
+                              widget.onSelectOption(selectedId);
+                              await quizAnswerProvider.submitAnswer(
+                                context: context,
+                                attemptId: widget.attemptId,
+                                questionId: widget.question.id ?? "",
+                                optionId: selectedId,
+                                selectedAnswer: opt.optionLabel ?? "",
+                                timeTaken:
+                                    widget.duration * 60 - _remainingSeconds,
+                              );
+                              setState(() {});
+                            } else {
+                              Helper.customToast(
+                                "You cannot change your answer",
+                              );
+                            }
+                          },
+                          child: Container(
+                            width: (MediaQuery.of(context).size.width - 64) / 2,
+                            constraints: const BoxConstraints(minHeight: 55),
+                            child: OptionTileWidget(
+                              "${opt.optionLabel}. ${opt.optionText}",
+                              isSelected: selectedAnswer == opt.id,
+                              isCorrect:
+                                  selectedAnswer == opt.id &&
+                                  quizAnswerProvider
+                                          .quizAnsModel
+                                          ?.data
+                                          ?.isCorrect ==
+                                      true,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-
-          /// 🔹 Explanation Section (optional)
-          if (widget.selectedOptionId != null) ...[
+          if (selectedAnswer != null) ...[
             hSized20,
             Consumer<QuizAnswerProvider>(
               builder: (context, ansProvider, _) {
                 final ansData = ansProvider.quizAnsModel?.data;
-                if (ansData == null) return SizedBox.shrink();
+                if (ansData == null || _previousPressed == true)
+                  return SizedBox.shrink();
 
                 return Column(
                   children: [
@@ -243,9 +239,9 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                           ),
                           hSized10,
                           Text(
-                            "Correct Answer: ${ansData.correctAnswer ?? ''}",
+                            "Correct Answers: ${ansData?.correctAnswer ?? ''}",
                             style: semiBoldTextStyle(
-                              color: ansData.isCorrect == true
+                              color: ansData?.isCorrect == true
                                   ? MyColors.color19B287
                                   : MyColors.colorFF0000,
                               fontSize: 14,
@@ -253,7 +249,7 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                           ),
                           hSized10,
                           Text(
-                            ansData.explanation ?? "",
+                            ansData?.explanation ?? "",
                             style: regularTextStyle(color: Colors.black),
                           ),
                         ],
@@ -265,13 +261,13 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        color: ansData.isCorrect == true
+                        color: ansData?.isCorrect == true
                             ? MyColors.color19B287
                             : MyColors.colorFF0000,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        ansData.isCorrect == true
+                        ansData?.isCorrect == true
                             ? "Correct Answer"
                             : "Incorrect Answer",
                         style: semiBoldTextStyle(
@@ -285,10 +281,8 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
               },
             ),
           ],
-
           SizedBox(height: context.wp(1 / 4.7)),
-
-          /// 🔹 Navigation Buttons
+          // 🔹 Navigation Buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -298,7 +292,12 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                     height: 47,
                     bgColor: MyColors.color295176,
                     title: "Previous",
-                    onPressed: widget.onPrevious,
+                    onPressed: _previousPressed
+                        ? null
+                        : () {
+                            widget.onPrevious();
+                            setState(() => _previousPressed = true);
+                          },
                   ),
                 ),
               if (widget.currentIndex > 0) wSized10,
@@ -306,12 +305,14 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                 child: CommonButton1(
                   height: 47,
                   title: widget.isLastQuestion ? "Finish" : "Next",
-                  onPressed: widget.onNext,
+                  onPressed: () {
+                    widget.onNext();
+                    setState(() => _previousPressed = false);
+                  },
                 ),
               ),
             ],
           ),
-
           hSized15,
         ],
       ),

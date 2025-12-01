@@ -15,7 +15,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBack;
   final bool showBack;
   final List<Widget>? actions;
-
+  final Color? backgroundColor;
   const CustomAppBar({
     super.key,
     this.title,
@@ -25,35 +25,43 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.showBack = true,
     this.img,
+    this.backgroundColor,
+
   });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       actions: actions,
-      backgroundColor: MyColors.appTheme,
+      backgroundColor: backgroundColor ?? MyColors.appTheme,
       elevation: 0,
       scrolledUnderElevation: 0,
+      automaticallyImplyLeading: false,
       leading: showBack
           ? GestureDetector(
-              onTap: onBack ?? () => Navigator.pop(context),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: SvgPicture.asset(
-                  IconsPath.backArow,
-                  width: 20,
-                  height: 20,
-                ),
-              ),
-            )
+        onTap: onBack ?? () => Navigator.pop(context),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: SvgPicture.asset(
+            IconsPath.backArow,
+            width: 20,
+            height: 20,
+          ),
+        ),
+      )
           : null,
+
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (title != null)
-            Text(
-              title!,
-              style: boldTextStyle(fontSize: 18.0, color: MyColors.whiteText),
+            Flexible(
+              child: Text(
+                title!,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: boldTextStyle(fontSize: 18.0, color: MyColors.whiteText),
+              ),
             ),
           if (title2 != null) ...[wSized5, title2!],
           if (img != null) SvgPicture.asset(img.toString(), height: 35),
@@ -78,6 +86,7 @@ class CommonScaffold extends StatelessWidget {
   final List<Widget>? actions;
   final Widget? bottom;
   final Color? backgroundColor;
+  final Color? appBarBackgroundColor;
   final bool appBarVisible;
   final bool useSafeArea;
   final bool padding;
@@ -97,6 +106,7 @@ class CommonScaffold extends StatelessWidget {
     this.actions,
     this.bottom,
     this.backgroundColor,
+    this.appBarBackgroundColor,
     this.appBarVisible = true,
     this.useSafeArea = true,
     this.img,
@@ -126,27 +136,28 @@ class CommonScaffold extends StatelessWidget {
       /// NEW: FAB added here ⬇️
       floatingActionButton: floatingActionButton,
       floatingActionButtonLocation:
-      floatingActionButtonLocation ?? FloatingActionButtonLocation.endFloat,
+          floatingActionButtonLocation ?? FloatingActionButtonLocation.endFloat,
 
       bottomNavigationBar: bottom == null
           ? null
           : Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppPaddings.symmetricHorizontal,
-        ),
-        child: bottom,
-      ),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppPaddings.symmetricHorizontal,
+              ),
+              child: bottom,
+            ),
 
       appBar: appBarVisible
           ? CustomAppBar(
-        actions: actions,
-        img: img,
-        title: title,
-        title2: title2,
-        centerTitle: centerTitle,
-        showBack: showBack,
-        onBack: onBack,
-      )
+              actions: actions,
+              img: img,
+              title: title,
+              title2: title2,
+              centerTitle: centerTitle,
+              showBack: showBack,
+              onBack: onBack,
+        backgroundColor: appBarBackgroundColor,
+            )
           : null,
 
       body: content,
@@ -155,15 +166,10 @@ class CommonScaffold extends StatelessWidget {
     if (useSafeArea) {
       return Container(
         color: MyColors.appTheme,
-        child: SafeArea(
-          top: true,
-          bottom: true,
-          child: scaffold,
-        ),
+        child: SafeArea(top: true, bottom: true, child: scaffold),
       );
     }
 
     return scaffold;
   }
 }
-

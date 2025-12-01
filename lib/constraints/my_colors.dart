@@ -1,4 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:rank_up/constraints/my_fonts_style.dart';
+import 'package:rank_up/models/HomeDataModel.dart';
+import 'package:rank_up/provider/provider_classes/HomeProvider.dart';
 
 class MyColors {
   static const Color bgBackgroundColor = Color(0xFFFEFEFE);
@@ -78,7 +83,7 @@ class MyColors {
   static const Color colorF7F7F7 = Color(0xFFF7F7F7);
   static const Color colorEEEBE8 = Color(0xFFEEEBE8);
   static const Color colorDCDDDF = Color(0xFFDCDDDF);
-  static const Color colorFF0000 = Color(0xFFFF0000);
+  static const Color colorFF0000 = Color(0xFFE05B5B);
   static const Color color797C82 = Color(0xFF797C82);
   static const Color colorE1445E = Color(0xFFE1445E);
   static const Color colorB3B0B0 = Color(0xFFB3B0B0);
@@ -120,10 +125,24 @@ class MyColors {
   static const Color color32B790 = Color(0xFF32B790);
   static const Color colore9ECEC6 = Color(0xFF9ECEC6);
   static const Color colorE4EAF0 = Color(0xFFE4EAF0);
+  static const Color color7358BC = Color(0xFF7358BC);
 
 
   ///..........
   static const Color darkBlue = Color(0xFF0A2C54);
   static const Color green = Color(0xFF19B287);
+
+
+
+
+
+
+
+
+
+
+  /// ---------------- Featured Decks with Random Colors ----------------
+
+
 
 }

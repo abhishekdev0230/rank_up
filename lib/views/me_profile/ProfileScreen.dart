@@ -111,7 +111,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _infoRow("Class", profileProvider.selectedClass ?? "—"),
                       _infoRow("State", profileProvider.selectedState ?? "—"),
                       _infoRow("City", profileProvider.selectedCity ?? "—"),
-                      _infoRow("Phone Number", profileProvider.phoneNumber ?? "—"),
+                     if(profileProvider.phoneNumber?.isNotEmpty ?? false) _infoRow("Phone Number", profileProvider.phoneNumber ?? "—"),
                     ],
                   ),
                 ),

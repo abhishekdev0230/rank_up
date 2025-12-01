@@ -12,5 +12,8 @@ class ApiKeyWord {
   static const String confidenceLevel = "confidenceLevel";
   static const String contentId = "contentId";
   static const String contentType = "contentType";
+  static const String deviceId = "device_id";
+  static const String deviceType = "device_type";
+  static const String fcmToken = "fcm_token";
 
 }

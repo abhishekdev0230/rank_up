@@ -5,12 +5,13 @@ import 'package:rank_up/constraints/icon_path.dart';
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
 import 'package:rank_up/constraints/sizedbox_height.dart';
+import 'package:rank_up/models/TestResumeBottomModel.dart';
 
 import '../Home/home_view.dart';
 import 'ShowInstructionDialog.dart';
 
 class GrandTestShowInstructionDialog {
-  static void show(BuildContext context) {
+  static void show(BuildContext context, TestResumeBottom test,String testId,String title) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -28,29 +29,45 @@ class GrandTestShowInstructionDialog {
               hSized30,
               SvgPicture.asset(IconsPath.grandTestImage),
               hSized24,
-              // Title
+
+              // 🔥 API Title
               Text(
-                "Grand Test 1 - INICET PATTERN",
+                test.title ?? "Test",
                 textAlign: TextAlign.center,
                 style: semiBoldTextStyle(
                   fontSize: 18,
                   color: MyColors.blackColor,
                 ),
               ),
+
               hSized15,
-              // Small line under title
               Container(width: 50, height: 2, color: MyColors.color949494),
               hSized15,
-              // Description
+
+              // 🔥 API Description
               Text(
-                "This Grand test contains 10 MCQ from various subjects with a duration of 20 minutes",
+                test.description ??
+                    "No description available.",
                 textAlign: TextAlign.center,
                 style: regularTextStyle(
                   fontSize: 14,
                   color: MyColors.color949494,
                 ),
               ),
+
+              hSized15,
+
+              // 🔥 Questions + Duration
+              Text(
+                "${test.totalQuestions ?? 0} MCQs • ${test.duration ?? 0} minutes",
+                style: regularTextStyle(
+                  fontSize: 14,
+                  color: MyColors.color949494,
+                ),
+              ),
+
               hSized24,
+
               // START TEST button
               SizedBox(
                 width: double.infinity,
@@ -62,17 +79,16 @@ class GrandTestShowInstructionDialog {
                   borderRadius: 25,
                   onPressed: () {
                     Navigator.pop(context);
-                    ShowInstructionDialog.showDetailedInstructions(context);
-                    // Navigate to test screen if needed
-                    // Navigator.push(context, MaterialPageRoute(builder: (_) => TestScreen()));
+                    ShowInstructionDialog.showDetailedInstructions(context,testId,title,false);
                   },
                 ),
               ),
+
               const SizedBox(height: 20),
 
-              // Note Description
+              // Note
               Text(
-                "Note: Answer of the questions marked for review at the time of submission will not be considered in the final evaluation. This rule is based on the current INICET guidelines.",
+                test.instructions ?? "",
                 textAlign: TextAlign.center,
                 style: regularTextStyle(
                   fontSize: 12,
@@ -86,3 +102,4 @@ class GrandTestShowInstructionDialog {
     );
   }
 }
+

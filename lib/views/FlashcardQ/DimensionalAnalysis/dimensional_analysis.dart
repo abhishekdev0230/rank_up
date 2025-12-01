@@ -11,6 +11,7 @@ import 'package:rank_up/provider/provider_classes/StartQuizProvider.dart';
 import 'package:rank_up/views/FlashcardQ/DimensionalAnalysis/quiz_completed!.dart';
 
 import '../../../constraints/icon_path.dart';
+import '../../../provider/provider_classes/QuizAnswerProvider.dart';
 import '../NeetPYQsFlashcardsInner.dart';
 import 'FlashcardOrQuizTile.dart';
 import 'QuizCardWidget.dart';
@@ -58,192 +59,224 @@ class _DimensionalAnalysisState extends State<DimensionalAnalysis> {
 
   @override
   Widget build(BuildContext context) {
-    final quizProvider = Provider.of<QuizTopicOptionProvider>(context);
-
-    return  CommonScaffold(
+    final quizAnswerProvider = Provider.of<QuizAnswerProvider>(context, listen: false);
+    // final questions = startQuizProvider.startQuizModel?.data?.questions ?? [];
+    // final currentQuestion = questions[currentQuestionIndex];
+    return CommonScaffold(
       backgroundColor: MyColors.appTheme,
       title: widget.title,
       body: widget.type == "TackQuiz"
           ? Consumer<QuizTopicOptionProvider>(
-        builder: (context, quizProvider, _) {
-          final startQuizProvider = Provider.of<QuizStartProvider>(context, listen: false);
-          if (startQuiz) {
-            if (showCompleted) {
-              return  QuizCompletedWidget(attemptId:startQuizProvider.startQuizModel?.data!.questions?.first.attemptId.toString() ?? "",);
-            }
+              builder: (context, quizProvider, _) {
+                final startQuizProvider = Provider.of<QuizStartProvider>(
+                  context,
+                  listen: false,
+                );
+                if (startQuiz) {
+                  if (showCompleted) {
+                    return QuizCompletedWidget(
+                      attemptId:
+                          startQuizProvider
+                              .startQuizModel
+                              ?.data!
+                              .questions
+                              ?.first
+                              .attemptId
+                              .toString() ??
+                          "",
+                    );
+                  }
 
+                  final questions =
+                      startQuizProvider.startQuizModel?.data?.questions ?? [];
 
+                  if (questions.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "No questions available",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }
 
-            final questions = startQuizProvider.startQuizModel?.data?.questions ?? [];
+                  final currentQuestion = questions[currentQuestionIndex];
 
-            if (questions.isEmpty) {
-              return const Center(
-                child: Text("No questions available",
-                    style: TextStyle(color: Colors.white)),
-              );
-            }
+                  return QuizQuestionWidget(
+                    attemptId: currentQuestion.attemptId.toString(),
+                    question: currentQuestion,
+                    currentIndex: currentQuestionIndex,
+                    totalQuestions: questions.length,
+                    duration: startQuizProvider.startQuizModel?.data?.duration ?? 15,
+                    selectedOptionId: quizAnswerProvider.getSelectedAnswer(currentQuestion.id ?? ""), // ✅ get from provider
+                    onSelectOption: (id) {
+                      final selected = quizAnswerProvider.getSelectedAnswer(currentQuestion.id ?? "");
+                      if (selected == null) {
+                        setState(() {
+                          selectedOptionId = id;
+                        });
+                      } else {
+                        Helper.customToast("You cannot change your answer");
+                      }
+                    },
+                    onNext: () {
+                      final selected = quizAnswerProvider.getSelectedAnswer(currentQuestion.id ?? "");
+                      if (selected == null) {
+                        Helper.customToast("Please select an option to proceed");
+                        return;
+                      }
 
-            final currentQuestion = questions[currentQuestionIndex];
-
-            return QuizQuestionWidget(
-              attemptId: currentQuestion.attemptId.toString(),
-              question: currentQuestion,
-              currentIndex: currentQuestionIndex,
-              totalQuestions: questions.length,
-              duration: startQuizProvider.startQuizModel?.data?.duration ?? 15,
-              selectedOptionId: selectedOptionId,
-              onSelectOption: (id) {
-                setState(() {
-                  selectedOptionId = id;
-                });
-              },
-              onNext: () {
-                if (currentQuestionIndex < questions.length - 1) {
-                  setState(() {
-                    currentQuestionIndex++;
-                    selectedOptionId = null;
-                  });
-                } else {
-                  setState(() {
-                    showCompleted = true;
-                  });
+                      if (currentQuestionIndex < questions.length - 1) {
+                        setState(() {
+                          currentQuestionIndex++;
+                          selectedOptionId = null; // reset local for next question
+                        });
+                      } else {
+                        setState(() {
+                          showCompleted = true;
+                        });
+                      }
+                    },
+                    onPrevious: () {
+                      if (currentQuestionIndex > 0) {
+                        setState(() {
+                          currentQuestionIndex--;
+                          selectedOptionId = null;
+                        });
+                      }
+                    },
+                  );
                 }
-              },
-              onPrevious: () {
-                if (currentQuestionIndex > 0) {
-                  setState(() {
-                    currentQuestionIndex--;
-                    selectedOptionId = null;
-                  });
+
+                if (quizProvider.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
                 }
-              },
-            );
 
-          }
-
-          // 🔹 Loading state
-          if (quizProvider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          // 🔹 No quiz data
-          if (quizProvider.quizModel?.data == null ||
-              quizProvider.quizModel!.data!.isEmpty) {
-            return const Center(
-              child: Text(
-                "No quizzes available",
-                style: TextStyle(color: Colors.white),
-              ),
-            );
-          }
-
-          final quizData = quizProvider.quizModel!.data!;
-
-          // 🔹 Quiz list before starting
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                for (var quiz in quizData)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: QuizCardWidget(
-                      title: quiz.title ?? "Untitled Quiz",
-                      subtitle:
-                      "${quiz.totalQuestions ?? 0} Questions | ${quiz.duration ?? 0} mins | ${quiz.attemptCount ?? 0} Attempts",
-                      iconPath: IconsPath.quizIcon,
-                      onTap: () async {
-                        final quizStartProvider =
-                        Provider.of<QuizStartProvider>(context, listen: false);
-
-                        // 🔹 Start quiz API call
-                        await quizStartProvider.startQuiz(context, quiz.id ?? "");
-
-                        // 🔹 Check for valid quiz data or already started case
-                        final startQuizData = quizStartProvider.startQuizModel?.data;
-
-                        if (startQuizData == null) {
-                          Helper.customToast("Something went wrong. Please try again.");
-                          return;
-                        }
-
-                        // 🔹 If no questions were returned, handle accordingly
-                        final questions = startQuizData.questions ?? [];
-
-                        if (questions.isNotEmpty) {
-                          setState(() {
-                            startQuiz = true;
-                            currentQuestionIndex = 0;
-                            selectedOptionId = null;
-                          });
-                        } else {
-                          // 🔹 Handle "Quiz already started" gracefully
-                          if (quizStartProvider.startQuizModel?.message ==
-                              "Quiz has already been started") {
-                            // Optional: You can fetch existing quiz attempt/questions here
-                            Helper.customToast("Resuming your previous quiz...");
-                            setState(() {
-                              startQuiz = true;
-                              currentQuestionIndex = 0;
-                              selectedOptionId = null;
-                            });
-                          } else {
-                            Helper.customToast("No questions found for this quiz");
-                          }
-                        }
-                      },
+                if (quizProvider.quizModel?.data == null ||
+                    quizProvider.quizModel!.data!.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "No quizzes available",
+                      style: TextStyle(color: Colors.white),
                     ),
-                  ),
+                  );
+                }
 
+                final quizData = quizProvider.quizModel!.data!;
+
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      for (var quiz in quizData)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: QuizCardWidget(
+                            title: quiz.title ?? "Untitled Quiz",
+                            subtitle:
+                                "${quiz.totalQuestions ?? 0} Questions | ${quiz.duration ?? 0} mins | ${quiz.attemptCount ?? 0} Attempts",
+                            iconPath: IconsPath.quizIcon,
+                            onTap: () async {
+                              final quizStartProvider =
+                                  Provider.of<QuizStartProvider>(
+                                    context,
+                                    listen: false,
+                                  );
+
+                              // 🔹 Start quiz API call
+                              await quizStartProvider.startQuiz(
+                                context,
+                                quiz.id ?? "",
+                              );
+
+                              final startQuizData =
+                                  quizStartProvider.startQuizModel?.data;
+
+                              if (startQuizData == null) {
+                                Helper.customToast(
+                                  "Something went wrong. Please try again.",
+                                );
+                                return;
+                              }
+
+                              final questions = startQuizData.questions ?? [];
+
+                              if (questions.isNotEmpty) {
+                                setState(() {
+                                  startQuiz = true;
+                                  currentQuestionIndex = 0;
+                                  selectedOptionId = null;
+                                });
+                              } else {
+                                // 🔹 Handle "Quiz already started" gracefully
+                                if (quizStartProvider.startQuizModel?.message ==
+                                    "Quiz has already been started") {
+                                  Helper.customToast(
+                                    "Resuming your previous quiz...",
+                                  );
+                                  setState(() {
+                                    startQuiz = true;
+                                    currentQuestionIndex = 0;
+                                    selectedOptionId = null;
+                                  });
+                                } else {
+                                  Helper.customToast(
+                                    "No questions found for this quiz",
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
+            )
+          : Column(
+              children: [
+                hSized20,
+                GestureDetector(
+                  onTap: () {
+                    pushScreen(
+                      context,
+                      screen: NeetPYQsFlashcardsInner(topicId: widget.topicId),
+                      withNavBar: true,
+                      pageTransitionAnimation:
+                          PageTransitionAnimation.cupertino,
+                    );
+                  },
+                  child: FlashcardOrQuizTile(
+                    title: "Flashcards",
+                    subtitle: "${widget.totalFlashcards} Total Flashcards",
+                    iconPath: IconsPath.flashcardsIcon,
+                  ),
+                ),
+                hSized20,
+                GestureDetector(
+                  onTap: () {
+                    pushScreen(
+                      context,
+                      screen: DimensionalAnalysis(
+                        title: widget.title,
+                        type: "TackQuiz",
+                        totalFlashcards: widget.totalFlashcards,
+                        totalQuizzes: widget.totalQuizzes,
+                        totalQuestions: widget.totalQuestions,
+                        topicId: widget.topicId,
+                      ),
+                      withNavBar: true,
+                      pageTransitionAnimation:
+                          PageTransitionAnimation.cupertino,
+                    );
+                  },
+                  child: FlashcardOrQuizTile(
+                    title: "Quiz",
+                    subtitle:
+                        "${widget.totalQuizzes} Quizzes | ${widget.totalQuestions} Total Questions",
+                    iconPath: IconsPath.quizIcon,
+                  ),
+                ),
               ],
             ),
-          );
-        },
-      )
-          : Column(
-        children: [
-          hSized20,
-          GestureDetector(
-            onTap: () {
-              pushScreen(
-                context,
-                screen: NeetPYQsFlashcardsInner(topicId: widget.topicId),
-                withNavBar: true,
-                pageTransitionAnimation: PageTransitionAnimation.cupertino,
-              );
-            },
-            child: FlashcardOrQuizTile(
-              title: "Flashcards",
-              subtitle: "${widget.totalFlashcards} Total Flashcards",
-              iconPath: IconsPath.flashcardsIcon,
-            ),
-          ),
-          hSized20,
-          GestureDetector(
-            onTap: () {
-              pushScreen(
-                context,
-                screen: DimensionalAnalysis(
-                  title:widget.title,
-                  type: "TackQuiz",
-                  totalFlashcards: widget.totalFlashcards,
-                  totalQuizzes: widget.totalQuizzes,
-                  totalQuestions: widget.totalQuestions,
-                  topicId: widget.topicId,
-                ),
-                withNavBar: true,
-                pageTransitionAnimation: PageTransitionAnimation.cupertino,
-              );
-            },
-            child: FlashcardOrQuizTile(
-              title: "Quiz",
-              subtitle:
-              "${widget.totalQuizzes} Quizzes | ${widget.totalQuestions} Total Questions",
-              iconPath: IconsPath.quizIcon,
-            ),
-          ),
-        ],
-      ),
     );
-
   }
 }

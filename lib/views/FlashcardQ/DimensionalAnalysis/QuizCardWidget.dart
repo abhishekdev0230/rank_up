@@ -30,9 +30,11 @@ class QuizCardWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SvgPicture.asset(iconPath),
           Text(
+            textAlign: TextAlign.center,
             title,
             style: semiBoldTextStyle(color: MyColors.whiteText, fontSize: 32),
           ),

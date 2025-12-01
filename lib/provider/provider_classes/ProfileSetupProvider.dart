@@ -13,6 +13,14 @@ import 'package:rank_up/views/bottom_navigation_bar.dart';
 import '../../models/ProfileGetModel.dart';
 
 class ProfileSetupProvider extends ChangeNotifier {
+
+  bool loggedInViaGoogle = false;
+
+  void setLoggedInViaGoogle(bool val) {
+    loggedInViaGoogle = val;
+    notifyListeners();
+  }
+
   String fullName = '';
   String bookmarkedCount = '';
   String suspendedCardCount = '';

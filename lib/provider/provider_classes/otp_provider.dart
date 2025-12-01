@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rank_up/main.dart';
 import 'package:rank_up/services/api_key_word.dart';
 import 'package:rank_up/services/api_methods.dart';
 import 'package:rank_up/services/api_urls.dart';
@@ -66,6 +67,9 @@ class OtpProvider extends ChangeNotifier {
         ApiKeyWord.phoneNumber: phoneNumber,
         ApiKeyWord.otp: otpCode,
         ApiKeyWord.rememberMe: rememberMe,
+        ApiKeyWord.deviceId: deviceId ?? "ewdewww",
+        ApiKeyWord.deviceType: deviceType ?? "android",
+        ApiKeyWord.fcmToken: fcmToken ?? "djksjkksdjksjkds",
       },
     );
 
@@ -86,7 +90,7 @@ class OtpProvider extends ChangeNotifier {
       return {
         "success": true,
         "isNewUser": res?.isNewUser ?? false,
-        "data": res?.data, // ✅ FIX ADDED
+        "data": res?.data,
       };
     }
 

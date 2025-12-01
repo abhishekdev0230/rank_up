@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 // CommonTextField(hintText: "example@gmail.com",controller: emailController,)
 //  TextEditingController emailController = TextEditingController();
 
@@ -38,7 +40,7 @@ class CapitalizeWordsFormatter extends TextInputFormatter {
 ///...........CommonButton..............
 class CommonButton extends StatelessWidget {
   final String text;
-  final VoidCallback? onTap; // ✅ made nullable
+  final VoidCallback? onTap;
   final double height;
   final double borderRadius;
   final Color backgroundColor;
@@ -49,7 +51,7 @@ class CommonButton extends StatelessWidget {
   const CommonButton({
     super.key,
     required this.text,
-    this.onTap, // ✅ nullable now
+    this.onTap,
     this.height = 56.0,
     this.borderRadius = 15.0,
     this.backgroundColor = MyColors.appTheme,
@@ -60,12 +62,12 @@ class CommonButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDisabled = onTap == null; // ✅ detect disabled state
+    final isDisabled = onTap == null;
 
     return GestureDetector(
       onTap: onTap,
       child: Opacity(
-        opacity: isDisabled ? 0.6 : 1.0, // ✅ show disabled style
+        opacity: isDisabled ? 0.6 : 1.0,
         child: Container(
           margin: const EdgeInsets.only(bottom: 8),
           width: double.infinity,
@@ -387,6 +389,7 @@ class _AccountEditTextFieldState extends State<AccountEditTextField> {
 }
 
 ///............customDropdown
+
 Widget customDropdown({
   required String label,
   required String hint,
@@ -394,9 +397,10 @@ Widget customDropdown({
   required List<String> items,
   required ValueChanged<String?> onChanged,
 }) {
-  return DropdownButtonFormField<String>(
+  return DropdownButtonFormField2<String>(
     value: value,
     isExpanded: true,
+
     decoration: InputDecoration(
       labelText: label,
       labelStyle: boldTextStyle(fontSize: 14, color: MyColors.blackColor),
@@ -425,10 +429,25 @@ Widget customDropdown({
       style: regularTextStyle(fontSize: 15, color: MyColors.color949494),
     ),
 
-    icon: Padding(
-      padding: const EdgeInsets.only(right: 10.0),
-      child: const Icon(Icons.keyboard_arrow_down_rounded),
+    iconStyleData: const IconStyleData(
+      icon: Icon(Icons.keyboard_arrow_down_rounded),
+      iconSize: 24,
     ),
+
+    dropdownStyleData: DropdownStyleData(
+      maxHeight: 300,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+    ),
+
+    menuItemStyleData: const MenuItemStyleData(
+      height: 35,
+      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+    ),
+
     items: items.map((String item) {
       return DropdownMenuItem<String>(
         value: item,
@@ -438,50 +457,6 @@ Widget customDropdown({
         ),
       );
     }).toList(),
-    onChanged: onChanged,
-  );
-}
-
-Widget customDropdownApi({
-  required String label,
-  required String hint,
-  required String? value,
-  required List<DropdownMenuItem<String>> items,
-  required ValueChanged<String?> onChanged,
-}) {
-  return DropdownButtonFormField<String>(
-    menuMaxHeight: 400,
-    value: value,
-    itemHeight: 35,
-    isExpanded: false,
-    decoration: InputDecoration(
-      labelText: label,
-      labelStyle: boldTextStyle(fontSize: 18, color: MyColors.color0E0F0F),
-      floatingLabelBehavior: FloatingLabelBehavior.always,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: MyColors.colorD5D5D5, width: 1.0),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: MyColors.appTheme, width: 1.2),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.red, width: 1.2),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.red, width: 1.2),
-      ),
-    ),
-    hint: Text(
-      hint,
-      style: regularTextStyle(fontSize: 15, color: MyColors.color7C7C7C),
-    ),
-    icon: const Icon(Icons.keyboard_arrow_down_rounded),
-    items: items,
 
     onChanged: onChanged,
   );

@@ -187,5 +187,36 @@ class CommonValidators {
     return null; // valid
   }
 
+
+
+  /// ---------------- Time Formatter ----------------
+  static String formatTime(int totalSeconds) {
+    final hours = (totalSeconds ~/ 3600).toString().padLeft(2, '0');
+    final minutes = ((totalSeconds % 3600) ~/ 60).toString().padLeft(2, '0');
+    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
+
+    if (hours != "00") {
+      return "$hours:$minutes:$seconds"; // show HH:MM:SS if > 1 hour
+    } else {
+      return "$minutes:$seconds"; // show MM:SS if less than 1 hour
+    }
+  }
+
+  static String formatDate(String isoDate) {
+    DateTime date = DateTime.parse(isoDate);
+
+    // Months list
+    const months = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    String day = date.day.toString();
+    String month = months[date.month - 1];
+    String year = date.year.toString();
+
+    return "$day $month $year";
+  }
+
 }
 

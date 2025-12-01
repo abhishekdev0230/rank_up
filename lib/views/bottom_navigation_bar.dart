@@ -37,28 +37,25 @@ class _BottomNavControllerState extends State<BottomNavController> {
     _controller.addListener(() {
       if (_suppressMeTap) return;
 
+      setState(() {}); // 👈 UI अब हर index change पर rebuild होगा
+
       final idx = _controller.index;
 
       if (idx == 3) {
-        // user tapped "Me"
         _suppressMeTap = true;
 
-        // immediately jump back to previous tab so UI doesn't show empty screen
         _controller.jumpToTab(_lastIndex);
 
-        // show bottom sheet and wait for it to close
         _openMeProfileBottomSheet().whenComplete(() {
-          // re-enable listener after bottom sheet is dismissed
-          // small delay ensures nav state settled before we accept further taps
           Future.delayed(const Duration(milliseconds: 200), () {
             _suppressMeTap = false;
           });
         });
       } else {
-        // store last non-Me index
         _lastIndex = idx;
       }
     });
+
   }
 
   /// Returns the Future from showModalBottomSheet so caller can await it
@@ -109,7 +106,7 @@ class _BottomNavControllerState extends State<BottomNavController> {
             ),
           ],
         ),
-        height: 60,
+        height: 65,
       ),
     );
   }
@@ -118,35 +115,44 @@ class _BottomNavControllerState extends State<BottomNavController> {
     return [
       PersistentTabConfig(
         screen: const HomeScreen(),
-        item: _buildNavItem(IconsPath.homeBottomIcon, "Home"),
+        item: _buildNavItem(IconsPath.homeBottomIcon, "Home", 0),
       ),
       PersistentTabConfig(
         screen: const FlashcardScreen(),
-        item: _buildNavItem(IconsPath.bookBottomIcon, "FlashQ"),
+        item: _buildNavItem(IconsPath.bookBottomIcon, "FlashQ", 1),
       ),
       PersistentTabConfig(
         screen: TestLeaderboardScreen(),
-        item: _buildNavItem(IconsPath.noteBooksBottomIcon, "Test"),
+        item: _buildNavItem(IconsPath.noteBooksBottomIcon, "Test", 2),
       ),
-
-      // "Me" tab — placeholder screen; actual UI shown via bottom sheet listener
       PersistentTabConfig(
         screen: Container(),
-        item: _buildNavItem(IconsPath.profileBottomIcon, "Me"),
+        item: _buildNavItem(IconsPath.profileBottomIcon, "Me", 3),
       ),
     ];
   }
 
-  ItemConfig _buildNavItem(String iconPath, String title) {
+  ItemConfig _buildNavItem(String iconPath, String title, int index) {
+    bool isActive = _controller.index == index;
+
     return ItemConfig(
-      icon: SvgPicture.asset(iconPath, height: 24, width: 24, color: MyColors.color668BAD),
-      inactiveIcon: SvgPicture.asset(iconPath, height: 24, width: 24, color: MyColors.whiteText),
+      icon: Container(
+        padding: isActive ? const EdgeInsets.all(6) : EdgeInsets.zero,
+        decoration: isActive
+            ? const BoxDecoration(color: Colors.white, shape: BoxShape.circle)
+            : null,
+        child: SvgPicture.asset(
+          iconPath,
+          height: isActive ? 20 : 24,
+          width: isActive ? 20 : 24,
+          color: isActive ? MyColors.color668BAD : MyColors.whiteText,
+        ),
+      ),
       title: title,
-      activeForegroundColor: MyColors.color668BAD,
+      activeForegroundColor: Colors.white,
       inactiveForegroundColor: MyColors.whiteText,
-      activeColorSecondary: MyColors.color668BAD,
+      activeColorSecondary: Colors.white,
       textStyle: semiBoldTextStyle(fontSize: 13),
-      iconSize: 26.0,
     );
   }
 

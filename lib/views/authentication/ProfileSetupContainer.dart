@@ -16,7 +16,6 @@ import 'package:rank_up/provider/provider_classes/ProfileSetupProvider.dart';
 
 class ProfileSetupContainer extends StatefulWidget {
   final dynamic lang;
-
   const ProfileSetupContainer({super.key, required this.lang});
 
   @override
@@ -131,8 +130,18 @@ class _ProfileSetupContainerState extends State<ProfileSetupContainer> {
                 controller: emailController,
                 label: lang.emailLabel,
                 hintText: lang.emailHint,
+
+                readOnly: profileProvider.loggedInViaGoogle,
+
+                enableInteractiveSelection: !profileProvider.loggedInViaGoogle,
+
                 validator: (val) => CommonValidators.validateEmail(val),
+                colorBg: profileProvider.loggedInViaGoogle
+                    ? MyColors.color949494.withOpacity(0.15)
+                    : null,
               ),
+
+
               hSized10,
 
               /// ✅ Phone

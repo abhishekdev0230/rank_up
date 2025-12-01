@@ -302,6 +302,7 @@ class Major {
   bool? isPublished;
   bool? isEnrolled;
   String? buttonState;
+  String? attemptId;
 
   Major({
     this.id,
@@ -316,11 +317,13 @@ class Major {
     this.isPublished,
     this.isEnrolled,
     this.buttonState,
+    this.attemptId,
   });
 
   factory Major.fromJson(Map<String, dynamic> json) => Major(
     id: json["id"],
     title: json["title"],
+    attemptId: json["attemptId"],
     totalQuestions: json["totalQuestions"],
     duration: json["duration"],
     type: json["type"],
@@ -348,6 +351,7 @@ class Major {
     "endDate": endDate?.toIso8601String(),
     "icon": icon,
     "isPublished": isPublished,
+    "attemptId": attemptId,
     "isEnrolled": isEnrolled,
     "buttonState": buttonState,
   };

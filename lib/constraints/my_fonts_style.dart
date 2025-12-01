@@ -20,7 +20,7 @@ TextStyle lightTextStyle({
 
   TextStyle regularTextStyle({
    double? fontSize,
-  required Color color,
+   Color? color,
   double? height,
   double? wordSpacing,
   TextOverflow? overflow,

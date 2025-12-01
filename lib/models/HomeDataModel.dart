@@ -11,7 +11,7 @@ String homeDataModelToJson(HomeDataModel data) => json.encode(data.toJson());
 class HomeDataModel {
   bool? status;
   int? code;
-  Data? data;
+  HomeData? data;
 
   HomeDataModel({
     this.status,
@@ -22,7 +22,7 @@ class HomeDataModel {
   factory HomeDataModel.fromJson(Map<String, dynamic> json) => HomeDataModel(
     status: json["status"],
     code: json["code"],
-    data: json["data"] == null ? null : Data.fromJson(json["data"]),
+    data: json["data"] == null ? null : HomeData.fromJson(json["data"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -32,7 +32,7 @@ class HomeDataModel {
   };
 }
 
-class Data {
+class HomeData {
   User? user;
   ModuleProgress? moduleProgress;
   DailyQuestion? dailyQuestion;
@@ -42,7 +42,7 @@ class Data {
   SolveNext? solveNext;
   List<ImportantTopic>? importantTopics;
 
-  Data({
+  HomeData({
     this.user,
     this.moduleProgress,
     this.dailyQuestion,
@@ -53,7 +53,7 @@ class Data {
     this.importantTopics,
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
+  factory HomeData.fromJson(Map<String, dynamic> json) => HomeData(
     user: json["user"] == null ? null : User.fromJson(json["user"]),
     moduleProgress: json["moduleProgress"] == null ? null : ModuleProgress.fromJson(json["moduleProgress"]),
     dailyQuestion: json["dailyQuestion"] == null ? null : DailyQuestion.fromJson(json["dailyQuestion"]),
@@ -80,6 +80,7 @@ class DailyQuestion {
   String? id;
   String? questionText;
   dynamic questionImage;
+  String? icon;
   DailyQuestionSubject? subject;
   Chapter? chapter;
   Chapter? topic;
@@ -88,6 +89,7 @@ class DailyQuestion {
     this.id,
     this.questionText,
     this.questionImage,
+    this.icon,
     this.subject,
     this.chapter,
     this.topic,
@@ -97,6 +99,7 @@ class DailyQuestion {
     id: json["id"],
     questionText: json["questionText"],
     questionImage: json["questionImage"],
+    icon: json["icon"],
     subject: json["subject"] == null ? null : DailyQuestionSubject.fromJson(json["subject"]),
     chapter: json["chapter"] == null ? null : Chapter.fromJson(json["chapter"]),
     topic: json["topic"] == null ? null : Chapter.fromJson(json["topic"]),
@@ -106,6 +109,7 @@ class DailyQuestion {
     "id": id,
     "questionText": questionText,
     "questionImage": questionImage,
+    "icon": icon,
     "subject": subject?.toJson(),
     "chapter": chapter?.toJson(),
     "topic": topic?.toJson(),
@@ -135,7 +139,7 @@ class Chapter {
 class DailyQuestionSubject {
   String? id;
   String? name;
-  String? colorCode;
+  dynamic colorCode;
 
   DailyQuestionSubject({
     this.id,
@@ -281,10 +285,10 @@ class LiveTest {
   int? duration;
   int? totalQuestions;
   int? totalMarks;
-  String? thumbnailImage;
-  DailyQuestionSubject? subject;
+  dynamic thumbnailImage;
+  dynamic subject;
   bool? isLive;
-  int? timeRemaining;
+  int? timeToStart;
 
   LiveTest({
     this.id,
@@ -298,7 +302,7 @@ class LiveTest {
     this.thumbnailImage,
     this.subject,
     this.isLive,
-    this.timeRemaining,
+    this.timeToStart,
   });
 
   factory LiveTest.fromJson(Map<String, dynamic> json) => LiveTest(
@@ -311,9 +315,9 @@ class LiveTest {
     totalQuestions: json["totalQuestions"],
     totalMarks: json["totalMarks"],
     thumbnailImage: json["thumbnailImage"],
-    subject: json["subject"] == null ? null : DailyQuestionSubject.fromJson(json["subject"]),
+    subject: json["subject"],
     isLive: json["isLive"],
-    timeRemaining: json["timeRemaining"],
+    timeToStart: json["timeToStart"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -326,9 +330,9 @@ class LiveTest {
     "totalQuestions": totalQuestions,
     "totalMarks": totalMarks,
     "thumbnailImage": thumbnailImage,
-    "subject": subject?.toJson(),
+    "subject": subject,
     "isLive": isLive,
-    "timeRemaining": timeRemaining,
+    "timeToStart": timeToStart,
   };
 }
 
@@ -336,23 +340,59 @@ class ModuleProgress {
   int? totalModules;
   int? completedModules;
   int? progressPercentage;
+  CurrentModule? currentModule;
 
   ModuleProgress({
     this.totalModules,
     this.completedModules,
     this.progressPercentage,
+    this.currentModule,
   });
 
   factory ModuleProgress.fromJson(Map<String, dynamic> json) => ModuleProgress(
     totalModules: json["totalModules"],
     completedModules: json["completedModules"],
     progressPercentage: json["progressPercentage"],
+    currentModule: json["currentModule"] == null ? null : CurrentModule.fromJson(json["currentModule"]),
   );
 
   Map<String, dynamic> toJson() => {
     "totalModules": totalModules,
     "completedModules": completedModules,
     "progressPercentage": progressPercentage,
+    "currentModule": currentModule?.toJson(),
+  };
+}
+
+class CurrentModule {
+  String? id;
+  String? name;
+  String? topic;
+  String? chapter;
+  String? subject;
+
+  CurrentModule({
+    this.id,
+    this.name,
+    this.topic,
+    this.chapter,
+    this.subject,
+  });
+
+  factory CurrentModule.fromJson(Map<String, dynamic> json) => CurrentModule(
+    id: json["id"],
+    name: json["name"],
+    topic: json["topic"],
+    chapter: json["chapter"],
+    subject: json["subject"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "name": name,
+    "topic": topic,
+    "chapter": chapter,
+    "subject": subject,
   };
 }
 
@@ -361,6 +401,9 @@ class PausedModule {
   String? topicId;
   String? topicName;
   String? chapterName;
+  String? subjectName;
+  dynamic subjectIcon;
+  dynamic subjectColor;
   int? flashcardsCompleted;
   int? totalFlashcards;
   int? progressPercentage;
@@ -371,6 +414,9 @@ class PausedModule {
     this.topicId,
     this.topicName,
     this.chapterName,
+    this.subjectName,
+    this.subjectIcon,
+    this.subjectColor,
     this.flashcardsCompleted,
     this.totalFlashcards,
     this.progressPercentage,
@@ -382,6 +428,9 @@ class PausedModule {
     topicId: json["topicId"],
     topicName: json["topicName"],
     chapterName: json["chapterName"],
+    subjectName: json["subjectName"],
+    subjectIcon: json["subjectIcon"],
+    subjectColor: json["subjectColor"],
     flashcardsCompleted: json["flashcardsCompleted"],
     totalFlashcards: json["totalFlashcards"],
     progressPercentage: json["progressPercentage"],
@@ -393,6 +442,9 @@ class PausedModule {
     "topicId": topicId,
     "topicName": topicName,
     "chapterName": chapterName,
+    "subjectName": subjectName,
+    "subjectIcon": subjectIcon,
+    "subjectColor": subjectColor,
     "flashcardsCompleted": flashcardsCompleted,
     "totalFlashcards": totalFlashcards,
     "progressPercentage": progressPercentage,
@@ -402,41 +454,69 @@ class PausedModule {
 
 class SolveNext {
   String? id;
+  String? quizId;
+  String? quizAttemptId;
   String? topicId;
   String? topicName;
   String? chapterName;
-  int? quizzesCompleted;
-  int? totalQuizzes;
+  String? subjectName;
+  dynamic subjectIcon;
+  dynamic subjectColor;
+  int? questionsCompleted;
+  int? totalQuestions;
   int? progressPercentage;
+  DateTime? startedAt;
+  bool? isIncompleteAttempt;
 
   SolveNext({
     this.id,
+    this.quizId,
+    this.quizAttemptId,
     this.topicId,
     this.topicName,
     this.chapterName,
-    this.quizzesCompleted,
-    this.totalQuizzes,
+    this.subjectName,
+    this.subjectIcon,
+    this.subjectColor,
+    this.questionsCompleted,
+    this.totalQuestions,
     this.progressPercentage,
+    this.startedAt,
+    this.isIncompleteAttempt,
   });
 
   factory SolveNext.fromJson(Map<String, dynamic> json) => SolveNext(
     id: json["id"],
+    quizId: json["quizId"],
+    quizAttemptId: json["quizAttemptId"],
     topicId: json["topicId"],
     topicName: json["topicName"],
     chapterName: json["chapterName"],
-    quizzesCompleted: json["quizzesCompleted"],
-    totalQuizzes: json["totalQuizzes"],
+    subjectName: json["subjectName"],
+    subjectIcon: json["subjectIcon"],
+    subjectColor: json["subjectColor"],
+    questionsCompleted: json["questionsCompleted"],
+    totalQuestions: json["totalQuestions"],
     progressPercentage: json["progressPercentage"],
+    startedAt: json["startedAt"] == null ? null : DateTime.parse(json["startedAt"]),
+    isIncompleteAttempt: json["isIncompleteAttempt"],
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
+    "quizId": quizId,
+    "quizAttemptId": quizAttemptId,
     "topicId": topicId,
     "topicName": topicName,
     "chapterName": chapterName,
-    "quizzesCompleted": quizzesCompleted,
-    "totalQuizzes": totalQuizzes,
+    "subjectName": subjectName,
+    "subjectIcon": subjectIcon,
+    "subjectColor": subjectColor,
+    "questionsCompleted": questionsCompleted,
+    "totalQuestions": totalQuestions,
     "progressPercentage": progressPercentage,
+    "startedAt": startedAt?.toIso8601String(),
+    "isIncompleteAttempt": isIncompleteAttempt,
   };
 }
 

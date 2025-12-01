@@ -49,6 +49,7 @@ class IconsPath {
   static const String bookmarktrueCards = "$commonPathIcon/SuspendedCards.svg";
   static const String premiumSubscription = "$commonPathIcon/PremiumSubscription.svg";
   static const String grandTestImage = "$commonPathIcon/GrandTestImage.svg";
+  static const String liderbordBg = "$commonPathIcon/liderbordBg.svg";
 
 
   ///.........................

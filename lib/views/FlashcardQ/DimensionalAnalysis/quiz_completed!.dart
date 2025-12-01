@@ -252,23 +252,23 @@ class _QuizCompletedWidgetState extends State<QuizCompletedWidget> {
               hSized15,
 
               /// BACK BUTTON
-              Center(
-                child: CommonButton1(
-                  width: 150,
-                  title: "<<< Back to Home",
-                  height: 35,
-                  textColor: Colors.black,
-                  bgColor: MyColors.rankBg,
-                  onPressed: () {
-                    pushScreen(
-                      context,
-                      screen: const BottomNavController(initialIndex: 0),
-                      withNavBar: false,
-                    );
-                  },
-                ),
-              ),
-              hSized24,
+              // Center(
+              //   child: CommonButton1(
+              //     width: 150,
+              //     title: "<<< Back to Home",
+              //     height: 35,
+              //     textColor: Colors.black,
+              //     bgColor: MyColors.rankBg,
+              //     onPressed: () {
+              //       pushScreen(
+              //         context,
+              //         screen: const BottomNavController(initialIndex: 0),
+              //         withNavBar: false,
+              //       );
+              //     },
+              //   ),
+              // ),
+              // hSized24,
             ],
           ),
         );

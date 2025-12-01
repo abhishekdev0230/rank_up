@@ -86,12 +86,10 @@ class CommonNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ If URL is empty or null, show placeholder immediately
     if (imageUrl == null || imageUrl!.isEmpty) {
       return _placeholder();
     }
 
-    // ✅ Cached Network Image with shimmer loader
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
       child: CachedNetworkImage(
