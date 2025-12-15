@@ -6,8 +6,8 @@ import 'package:rank_up/services/api_methods.dart';
 import 'package:rank_up/services/api_urls.dart';
 
 class FlashcardProvider extends ChangeNotifier {
-  bool isLoading = false; // For first screen load
-  bool isTabLoading = false; // For switching between tabs
+  bool isLoading = false;
+  bool isTabLoading = false;
   int selectedTab = 0;
 
   FlashcardSubjectModel? flashcardData;
@@ -41,6 +41,9 @@ class FlashcardProvider extends ChangeNotifier {
 
   /// Main API call
   Future<void> flashcardsClassesGetApi(BuildContext context) async {
+    print("jdksjfjkskfkkfskfjkhjjfhh");
+    flashcardData?.data?.recentlyViewed?.clear();
+    notifyListeners();
     try {
       final headers = await ApiHeaders.withStoredToken();
 
@@ -62,7 +65,7 @@ class FlashcardProvider extends ChangeNotifier {
         final data = jsonDecode(response);
 
         flashcardData = FlashcardSubjectModel.fromJson(data);
-
+        notifyListeners();
         if (flashcardData?.status == true) {
           debugPrint("✅ Flashcards fetched successfully for class $classCode");
         } else {

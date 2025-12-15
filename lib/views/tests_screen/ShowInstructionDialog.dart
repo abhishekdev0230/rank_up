@@ -67,70 +67,73 @@ class ShowInstructionDialog {
                   showDialog(
                     context: context,
                     builder: (context) {
-                      return AlertDialog(
-                        insetPadding: EdgeInsets.zero,
-                        backgroundColor: MyColors.whiteText,
-                        alignment: Alignment.center,
-                        title: Center(
-                          child: Text(
-                            "Confirmation",
-                            style: semiBoldTextStyle(
-                              fontSize: 20,
-                              color: MyColors.appTheme,
+                      return Padding(
+                        padding: EdgeInsets.symmetric(horizontal: AppPadding.horizontal,),
+                        child: AlertDialog(
+                          insetPadding: EdgeInsets.zero,
+                          backgroundColor: MyColors.whiteText,
+                          alignment: Alignment.center,
+                          title: Center(
+                            child: Text(
+                              "Confirmation",
+                              style: semiBoldTextStyle(
+                                fontSize: 20,
+                                color: MyColors.appTheme,
+                              ),
                             ),
                           ),
-                        ),
-                        content: Text(
-                          "Once you start, the test timer cannot\nbe paused. Continue?",
-                          textAlign: TextAlign.center,
-                          style: regularTextStyle(
-                            fontSize: 19,
-                            color: MyColors.color949494,
+                          content: Text(
+                            "Once you start, the test timer cannot\nbe paused. Continue?",
+                            textAlign: TextAlign.center,
+                            style: regularTextStyle(
+                              fontSize: 19,
+                              color: MyColors.color949494,
+                            ),
                           ),
-                        ),
-                        actionsAlignment: MainAxisAlignment.center,
-                        actions: [
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment
-                                .center, // center horizontally
-                            children: [
-                              CommonButton1(
-                                width: 206,
-                                height: 45,
-                                borderRadius: 30,
-                                bgColor: MyColors.appTheme,
-                                textColor: Colors.white,
-                                title: "Yes",
-                                onPressed: () async {
-                                  await Provider.of<StartTestProvider>(
-                                    context,
-                                    listen: false,
-                                  ).startTest(
-                                    context,
-                                    testId ?? "",
-                                    title,
-                                    isLiveTest: isLiveTest ?? false,
-                                      totalQuetion: totalQuetion,
-                                  );
-                                },
-                              ),
-                              CommonButton1(
-                                width: 206,
-                                height: 45,
-                                borderRadius: 30,
-                                title: "No, Maybe Later",
-                                bgColor: MyColors.whiteText,
-                                textColor: MyColors.appTheme,
-                                onPressed: () {
-                                  Navigator.pop(context, true);
-                                },
-                              ),
-                            ],
-                          ),
+                          actionsAlignment: MainAxisAlignment.center,
+                          actions: [
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment
+                                  .center, // center horizontally
+                              children: [
+                                CommonButton1(
+                                  width: 206,
+                                  height: 45,
+                                  borderRadius: 30,
+                                  bgColor: MyColors.appTheme,
+                                  textColor: Colors.white,
+                                  title: "Yes",
+                                  onPressed: () async {
+                                    await Provider.of<StartTestProvider>(
+                                      context,
+                                      listen: false,
+                                    ).startTest(
+                                      context,
+                                      testId ?? "",
+                                      title,
+                                      isLiveTest: isLiveTest ?? false,
+                                        totalQuetion: totalQuetion,
+                                    );
+                                  },
+                                ),
+                                CommonButton1(
+                                  width: 206,
+                                  height: 45,
+                                  borderRadius: 30,
+                                  title: "No, Maybe Later",
+                                  bgColor: MyColors.whiteText,
+                                  textColor: MyColors.appTheme,
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                ),
+                              ],
+                            ),
 
-                          const SizedBox(height: 10),
-                        ],
+                            const SizedBox(height: 10),
+                          ],
+                        ),
                       );
                     },
                   ).then((value) {

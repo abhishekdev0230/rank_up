@@ -156,7 +156,6 @@ class _ProfileSetupContainerState extends State<ProfileSetupContainer> {
               // hSized10,
 
               /// ✅ Class Dropdown
-              /// ✅ Class Dropdown
               customDropdown(
                 label: lang.classLabel,
                 hint: lang.classHint,
@@ -176,14 +175,17 @@ class _ProfileSetupContainerState extends State<ProfileSetupContainer> {
               ),
               hSized10,
 
+              hSized10,
+
               /// ✅ City Dropdown
               customDropdown(
                 label: lang.cityLabel,
                 hint: lang.cityHint,
                 value: profileProvider.selectedCity,
-                items: profileProvider.cityList,
+                items: profileProvider.getCitiesForSelectedState(),
                 onChanged: profileProvider.setSelectedCity,
               ),
+
               hSized20,
 
               /// ✅ Continue Button

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +21,8 @@ import 'FaqScreen.dart';
 import 'MyQueries/MyQueriesScreen.dart';
 import 'NotificationScreen.dart';
 
+
+
 class MeProfile extends StatefulWidget {
   const MeProfile({super.key});
 
@@ -30,7 +31,6 @@ class MeProfile extends StatefulWidget {
 }
 
 class _MeProfileState extends State<MeProfile> {
-
 
   @override
   void initState() {
@@ -57,7 +57,6 @@ class _MeProfileState extends State<MeProfile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ---------- Header ----------
               Padding(
                 padding: const EdgeInsets.only(top: 18.0),
                 child: Stack(
@@ -350,5 +349,4 @@ class _MeProfileState extends State<MeProfile> {
       ),
     );
   }
-
 }

@@ -435,7 +435,7 @@ Widget customDropdown({
     ),
 
     dropdownStyleData: DropdownStyleData(
-      maxHeight: 300,
+      maxHeight: 500,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: Colors.white,

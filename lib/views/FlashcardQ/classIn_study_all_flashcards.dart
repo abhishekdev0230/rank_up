@@ -90,7 +90,7 @@ class _ClassStudyFlashcardsScreenState
                           children: [
                             hSized20,
                             Text(
-                              "Study All ${_getTotalFlashcards(topics)} Flashcards",
+                              "Topics",
                               style: semiBoldTextStyle(
                                 color: Colors.white,
                                 fontSize: 19,
@@ -146,10 +146,12 @@ class _ClassStudyFlashcardsScreenState
   num _getTotalFlashcards(List topics) {
     num total = 0;
     for (var t in topics) {
-      total += (t.totalFlashcards ?? 0);
+      // fallback to totalQuizzes if flashcards is missing
+      total += (t.totalFlashcards ?? t.totalQuizzes ?? 0);
     }
     return total;
   }
+
 
   Widget _topicCard({
     required String title,

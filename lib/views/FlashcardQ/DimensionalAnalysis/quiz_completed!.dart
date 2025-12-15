@@ -167,9 +167,10 @@ class _QuizCompletedWidgetState extends State<QuizCompletedWidget> {
                           style: regularTextStyle(color: Colors.black, fontSize: 13),
                         ),
                         Text(
-                          "${data.timeTaken} sec",
+                          formatTime(data.timeTaken ?? 0),
                           style: regularTextStyle(color: Colors.black, fontSize: 13),
                         ),
+
                         Spacer(),
                         Text(
                           "Attempted:",
@@ -275,5 +276,19 @@ class _QuizCompletedWidgetState extends State<QuizCompletedWidget> {
       },
     );
   }
+  String formatTime(int seconds) {
+    final int hours = seconds ~/ 3600;
+    final int minutes = (seconds % 3600) ~/ 60;
+    final int secs = seconds % 60;
+
+    if (hours > 0) {
+      return "${hours}h ${minutes}m ${secs}s";
+    } else if (minutes > 0) {
+      return "${minutes}m ${secs}s";
+    } else {
+      return "${secs}s";
+    }
+  }
+
 }
 

@@ -56,7 +56,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     await sp.activatePremium(
       response.paymentId ?? "",
       plan.id ?? "",
-      raw, // RAW PAYLOAD
+      raw,
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -197,8 +197,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           color: MyColors.color295176,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? Colors.white : Colors.transparent,
-            width: isSelected ? 2 : 1,
+            color: isSelected ? MyColors.circularProgressBackgroundColor : Colors.transparent,
+            width: isSelected ? 3 : 1,
           ),
         ),
         child: Column(

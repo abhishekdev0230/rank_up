@@ -37,6 +37,58 @@ class _NeetPYQsFlashcardsInnerState extends State<NeetPYQsFlashcardsInner> {
       );
     });
   }
+  Widget _buildNoDataView() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Example: an illustration or icon
+            Icon(
+              Icons.folder_open,
+              size: 80,
+              color: Colors.grey.shade400,
+            ),
+            SizedBox(height: 20),
+            Text(
+              "No flashcards found 😕",
+              style: regularTextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 18,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 12),
+            Text(
+              "Try again later or select a different topic.",
+              style: regularTextStyle(
+                color: Colors.grey.shade500,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                context.read<FlashcardsQuestionsProvider>().fetchTopics(
+                  context,
+                  widget.topicId,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: MyColors.color1BB287,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text("Retry", style: semiBoldTextStyle(color: Colors.white, fontSize: 16)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +98,7 @@ class _NeetPYQsFlashcardsInnerState extends State<NeetPYQsFlashcardsInner> {
           backgroundColor: MyColors.appTheme,
           title: provider.flashcardModel?.data?.topicName ?? "Neet PYQs",
           body: provider.currentCard == null
-              ? const Center(child: Text("No flashcard data found"))
+              ? _buildNoDataView()
               : SingleChildScrollView(
                   child: Column(
                     children: [

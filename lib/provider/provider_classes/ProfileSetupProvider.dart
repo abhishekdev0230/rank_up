@@ -27,7 +27,6 @@ class ProfileSetupProvider extends ChangeNotifier {
   String email = '';
   String? phoneNumber;
 
-  // 🧩 Dropdown Selections
   String? selectedClass;
   String? selectedState;
   String? selectedCity;
@@ -37,6 +36,7 @@ class ProfileSetupProvider extends ChangeNotifier {
   final ImagePicker _picker = ImagePicker();
 
   final List<String> classList = ["Class 11", "Class 12", "Dropper"];
+
 
   final List<String> stateList = [
     "Andhra Pradesh",
@@ -67,7 +67,6 @@ class ProfileSetupProvider extends ChangeNotifier {
     "Uttar Pradesh",
     "Uttarakhand",
     "West Bengal",
-    // 🟪 Union Territories
     "Andaman and Nicobar Islands",
     "Chandigarh",
     "Dadra and Nagar Haveli and Daman and Diu",
@@ -78,68 +77,331 @@ class ProfileSetupProvider extends ChangeNotifier {
     "Puducherry",
   ];
 
-  // ✅ City List
-  final List<String> cityList = [
-    "Ahmedabad",
-    "Amritsar",
-    "Aurangabad",
-    "Bengaluru",
-    "Bhopal",
-    "Bhubaneswar",
-    "Chandigarh",
-    "Chennai",
-    "Coimbatore",
-    "Dehradun",
-    "Delhi",
-    "Dhanbad",
-    "Dispur",
-    "Ernakulam",
-    "Faridabad",
-    "Gandhinagar",
-    "Ghaziabad",
-    "Guwahati",
-    "Gwalior",
-    "Hyderabad",
-    "Indore",
-    "Jaipur",
-    "Jammu",
-    "Jamshedpur",
-    "Jodhpur",
-    "Kanpur",
-    "Kochi",
-    "Kolkata",
-    "Kota",
-    "Lucknow",
-    "Ludhiana",
-    "Madurai",
-    "Mangaluru",
-    "Meerut",
-    "Mumbai",
-    "Mysuru",
-    "Nagpur",
-    "Nashik",
-    "Noida",
-    "Panaji",
-    "Patna",
-    "Pune",
-    "Raipur",
-    "Rajkot",
-    "Ranchi",
-    "Shillong",
-    "Shimla",
-    "Srinagar",
-    "Surat",
-    "Thane",
-    "Thiruvananthapuram",
-    "Tiruchirappalli",
-    "Udaipur",
-    "Vadodara",
-    "Varanasi",
-    "Vijayawada",
-    "Visakhapatnam",
-  ];
+  final Map<String, List<String>> stateCityMap = {
+    "Andhra Pradesh": [
+      "Visakhapatnam",
+      "Vijayawada",
+      "Guntur",
+      "Nellore",
+      "Kurnool",
+      "Tirupati",
+      "Kadapa",
+    ],
 
-  // ✅ Setters
+    "Arunachal Pradesh": [
+      "Itanagar",
+      "Tawang",
+      "Pasighat",
+      "Ziro",
+      "Bomdila",
+    ],
+
+    "Assam": [
+      "Guwahati",
+      "Silchar",
+      "Dibrugarh",
+      "Jorhat",
+      "Tezpur",
+    ],
+
+    "Bihar": [
+      "Patna",
+      "Gaya",
+      "Bhagalpur",
+      "Purnea",
+      "Muzaffarpur",
+    ],
+
+    "Chhattisgarh": [
+      "Raipur",
+      "Bhilai",
+      "Bilaspur",
+      "Durg",
+      "Korba",
+    ],
+
+    "Goa": [
+      "Panaji",
+      "Margao",
+      "Vasco da Gama",
+      "Mapusa",
+    ],
+
+    "Gujarat": [
+      "Ahmedabad",
+      "Surat",
+      "Vadodara",
+      "Rajkot",
+      "Bhavnagar",
+    ],
+
+    "Haryana": [
+      "Faridabad",
+      "Gurugram",
+      "Panipat",
+      "Hisar",
+      "Ambala",
+    ],
+
+    "Himachal Pradesh": [
+      "Shimla",
+      "Manali",
+      "Dharamshala",
+      "Solan",
+      "Mandi",
+    ],
+
+    "Jharkhand": [
+      "Ranchi",
+      "Jamshedpur",
+      "Dhanbad",
+      "Hazaribagh",
+      "Bokaro",
+    ],
+
+    "Karnataka": [
+      "Bengaluru",
+      "Mysuru",
+      "Mangaluru",
+      "Hubballi",
+      "Belagavi",
+    ],
+
+    "Kerala": [
+      "Thiruvananthapuram",
+      "Kochi",
+      "Kozhikode",
+      "Thrissur",
+      "Kollam",
+    ],
+
+    "Madhya Pradesh": [
+      "Indore",
+      "Bhopal",
+      "Gwalior",
+      "Jabalpur",
+      "Ujjain",
+      "Sagar",
+      "Ratlam",
+      "Rewa",
+      "Satna",
+      "Dewas",
+      "Chhindwara",
+      "Morena",
+      "Khargone",
+      "Bhind",
+      "Shivpuri",
+      "Vidisha",
+      "Guna",
+      "Hoshangabad",
+      "Betul",
+      "Sehore",
+      "Khandwa",
+      "Burhanpur",
+      "Mandsaur",
+      "Neemuch",
+      "Singrauli",
+      "Seoni",
+      "Damoh",
+      "Datia",
+      "Shajapur",
+      "Raisen",
+      "Rajgarh",
+      "Itarsi",
+      "Mhow",
+      "Sendhwa",
+      "Nagda",
+      "Harda",
+      "Ashok Nagar",
+      "Chhatarpur",
+      "Panna",
+      "Tikamgarh",
+      "Anuppur",
+      "Umaria",
+      "Dindori",
+      "Mandla",
+    ],
+
+
+    "Maharashtra": [
+      "Mumbai",
+      "Pune",
+      "Nagpur",
+      "Nashik",
+      "Thane",
+      "Aurangabad",
+      "Kolhapur",
+    ],
+
+    "Manipur": [
+      "Imphal",
+      "Bishnupur",
+      "Churachandpur",
+      "Thoubal",
+    ],
+
+    "Meghalaya": [
+      "Shillong",
+      "Tura",
+      "Nongpoh",
+    ],
+
+    "Mizoram": [
+      "Aizawl",
+      "Lunglei",
+      "Serchhip",
+    ],
+
+    "Nagaland": [
+      "Kohima",
+      "Dimapur",
+      "Mokokchung",
+    ],
+
+    "Odisha": [
+      "Bhubaneswar",
+      "Cuttack",
+      "Rourkela",
+      "Berhampur",
+      "Sambalpur",
+    ],
+
+    "Punjab": [
+      "Amritsar",
+      "Ludhiana",
+      "Jalandhar",
+      "Patiala",
+      "Bathinda",
+    ],
+
+    "Rajasthan": [
+      "Jaipur",
+      "Jodhpur",
+      "Udaipur",
+      "Kota",
+      "Ajmer",
+    ],
+
+    "Sikkim": [
+      "Gangtok",
+      "Namchi",
+      "Gyalshing",
+    ],
+
+    "Tamil Nadu": [
+      "Chennai",
+      "Coimbatore",
+      "Madurai",
+      "Salem",
+      "Tiruchirappalli",
+    ],
+
+    "Telangana": [
+      "Hyderabad",
+      "Warangal",
+      "Karimnagar",
+      "Nizamabad",
+    ],
+
+    "Tripura": [
+      "Agartala",
+      "Dharmanagar",
+      "Udaipur",
+    ],
+
+    "Uttar Pradesh": [
+      "Lucknow",
+      "Kanpur",
+      "Varanasi",
+      "Noida",
+      "Agra",
+      "Prayagraj",
+      "Ghaziabad",
+    ],
+
+    "Uttarakhand": [
+      "Dehradun",
+      "Haridwar",
+      "Rishikesh",
+      "Haldwani",
+      "Roorkee",
+    ],
+
+    "West Bengal": [
+      "Kolkata",
+      "Howrah",
+      "Durgapur",
+      "Siliguri",
+      "Asansol",
+    ],
+
+    // ===========================
+    //        UNION TERRITORIES
+    // ===========================
+
+    "Andaman and Nicobar Islands": [
+      "Port Blair",
+      "Diglipur",
+      "Mayabunder",
+    ],
+
+    "Chandigarh": [
+      "Chandigarh",
+    ],
+
+    "Dadra and Nagar Haveli and Daman and Diu": [
+      "Silvassa",
+      "Daman",
+      "Diu",
+    ],
+
+    "Delhi": [
+      "New Delhi",
+      "Dwarka",
+      "Saket",
+      "Rohini",
+      "Laxmi Nagar",
+    ],
+
+    "Jammu and Kashmir": [
+      "Srinagar",
+      "Jammu",
+      "Anantnag",
+      "Baramulla",
+    ],
+
+    "Ladakh": [
+      "Leh",
+      "Kargil",
+    ],
+
+    "Lakshadweep": [
+      "Kavaratti",
+      "Agatti",
+      "Minicoy",
+    ],
+
+    "Puducherry": [
+      "Puducherry",
+      "Karaikal",
+      "Mahe",
+      "Yanam",
+    ],
+  };
+
+
+
+  List<String> getCitiesForSelectedState() {
+    if (selectedState == null) return [];
+    return stateCityMap[selectedState] ?? [];
+  }
+  void setSelectedState(String? value) {
+    selectedState = value;
+    selectedCity = null;
+    notifyListeners();
+  }
+
+
   void setFullName(String value) {
     fullName = value;
     notifyListeners();
@@ -155,10 +417,7 @@ class ProfileSetupProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setSelectedState(String? value) {
-    selectedState = value;
-    notifyListeners();
-  }
+
 
   void setSelectedCity(String? value) {
     selectedCity = value;
@@ -170,7 +429,6 @@ class ProfileSetupProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ Pick image
   Future<void> pickImage(ImageSource source) async {
     final XFile? pickedImage = await _picker.pickImage(source: source);
     if (pickedImage != null) {
@@ -178,7 +436,6 @@ class ProfileSetupProvider extends ChangeNotifier {
     }
   }
 
-  // ✅ Clear all
   void clearProfile() {
     fullName = '';
     email = '';
@@ -189,7 +446,6 @@ class ProfileSetupProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ API Call: Complete Profile
   static Future<CommonResponse?> completeProfileApi({
     required BuildContext context,
     required String fullName,
@@ -202,7 +458,6 @@ class ProfileSetupProvider extends ChangeNotifier {
     try {
       CommonLoaderApi.show(context);
 
-      // 🔹 Read token
       Map<String, String> headers = await ApiHeaders.withStoredToken();
 
       // 🔹 Format class value (remove "Class ")
@@ -210,7 +465,6 @@ class ProfileSetupProvider extends ChangeNotifier {
           ? selectedClass.replaceAll("Class ", "").trim()
           : selectedClass;
 
-      // 🔹 API Call
       final response = await ApiMethods().postMethodCM(
         header: headers,
         method: ApiUrls.completeProfile,
@@ -230,7 +484,6 @@ class ProfileSetupProvider extends ChangeNotifier {
         Helper.customToast(response!.message!);
       }
 
-      // ✅ Success handling
       if (response?.status == true) {
         await StorageManager.savingData(StorageManager.isLogin, true);
         CustomNavigator.pushRemoveUntil(
@@ -246,14 +499,11 @@ class ProfileSetupProvider extends ChangeNotifier {
     }
   }
 
-  // ✅ API Call: Get Profile
   Future<ProfileGetModel?> getProfileApi(BuildContext context) async {
     CommonLoaderApi.show(context);
 
-    // 🔹 Read token
     Map<String, String> headers = await ApiHeaders.withStoredToken();
 
-    // 🔹 API Call
     final response = await ApiMethods().getMethodTwo(
       header: headers,
       method: ApiUrls.profile,
@@ -262,7 +512,6 @@ class ProfileSetupProvider extends ChangeNotifier {
 
     if (response.isNotEmpty) {
       final Map<String, dynamic> json = jsonDecode(response);
-      // 🔹 Parse to ProfileGetModel
       final profileData = ProfileGetModel.fromJson(json);
       CommonLoaderApi.hide(context);
 
@@ -303,23 +552,20 @@ class ProfileSetupProvider extends ChangeNotifier {
     try {
       CommonLoaderApi.show(context);
 
-      // 🔹 Format class (remove "Class " prefix)
       String formattedClass = (selectedClass ?? "").startsWith("Class ")
           ? selectedClass!.replaceAll("Class ", "").trim()
           : (selectedClass ?? "");
 
-      // 🔹 Build request fields
       Map<String, String> fields = {
         "fullName": fullName,
         "email": email,
         "state": selectedState ?? "",
         "city": selectedCity ?? "",
-        "class": formattedClass, // Always send only 11, 12, or Dropper
+        "class": formattedClass,
       };
 
       final headers = await ApiHeaders.withStoredToken();
 
-      // 🔹 API Call (PATCH method)
       final res = await ApiMethods().patchMultipartMethodCM(
         method: ApiUrls.profileUpdate,
         file: profileImage != null ? File(profileImage!.path) : null,

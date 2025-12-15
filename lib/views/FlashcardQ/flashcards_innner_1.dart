@@ -32,9 +32,7 @@ class _FlashcardInnerPhysicsScreenState
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<FlashcardChapterProvider>();
-      if (provider.chapterModel == null && !provider.isLoading) {
         provider.fetchChapters(context, widget.selectIndexId);
-      }
     });
   }
 
@@ -66,7 +64,7 @@ class _FlashcardInnerPhysicsScreenState
                   children: [
                     hSized15,
                     Text(
-                      "${widget.selectClass} Topics",
+                      "${widget.selectClass} Chapter",
                       style: semiBoldTextStyle(
                         color: Colors.white,
                         fontSize: 19,

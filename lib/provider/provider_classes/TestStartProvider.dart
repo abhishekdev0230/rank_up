@@ -14,6 +14,7 @@ import 'package:rank_up/views/tests_screen/DimensionalAnalysis.dart';
 
 import '../../models/FetchedGridStatus.dart';
 import '../../models/TestReviewAnswerModel.dart';
+import '../../views/me_profile/SubscriptionScreen/SubscriptionScreen.dart';
 import '../../views/tests_screen/TestResultScreen.dart';
 
 class StartTestProvider extends ChangeNotifier {
@@ -59,6 +60,7 @@ class StartTestProvider extends ChangeNotifier {
     int? totalQuetion,
   }) async {
     try {
+      print("🔥 Start Test Error:");
       CommonLoaderApi.show(context);
 
       String url = ApiUrls.testsEnrollStartTest.replaceFirst(":id", testId);
@@ -75,9 +77,10 @@ class StartTestProvider extends ChangeNotifier {
         header: headers,
         body: body,
       );
-
       CommonLoaderApi.hide(context);
-
+      if (response?.message == "Upgrade to Premium to join Live Tests") {
+        CustomNavigator.pushNavigate(context, SubscriptionScreen());
+      }
       if (response == null || response.data == null) {
         return;
       }
@@ -89,16 +92,14 @@ class StartTestProvider extends ChangeNotifier {
       });
 
       if (!isLiveTest) {
-        totalQuestion = startModel?.data?.attempt?.totalQuestions
-            ?? startModel?.data?.test?.totalQuestions
-            ?? 0;
+        totalQuestion =
+            startModel?.data?.attempt?.totalQuestions ??
+            startModel?.data?.test?.totalQuestions ??
+            0;
 
         printFull("FULL API RESPONSE: ${response?.data}");
-
-        print("sksssjlsfjlksfj$totalQuestion");
       } else {
         totalQuestion = totalQuetion!;
-
       }
       duration = startModel?.data?.test?.duration ?? 0;
 
@@ -112,12 +113,12 @@ class StartTestProvider extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      print("🔥 Start Test Error: $e");
       CommonLoaderApi.hide(context);
     }
   }
+
   void printFull(String text) {
-    final pattern = RegExp('.{1,900}'); // हर 900 chars में print करेगा
+    final pattern = RegExp('.{1,900}');
     pattern.allMatches(text).forEach((match) => print(match.group(0)));
   }
 
@@ -223,11 +224,12 @@ class StartTestProvider extends ChangeNotifier {
     } catch (e) {
       print("🔥 Next Question Error: $e");
     } finally {
-      CommonLoaderApi.hide(context); // ✅ always hide
+      CommonLoaderApi.hide(context);
     }
   }
 
   int? selectedOptionIndex;
+
   void selectOption(int index) {
     selectedOptionIndex = index;
     notifyListeners();
@@ -407,9 +409,15 @@ class StartTestProvider extends ChangeNotifier {
 
   /// .................... RESULT PROVIDER ............................
   TestReviewAnswerModel? reviewModel;
-  Future<void> fetchResult(BuildContext context, {String? attemptId, bool route = false}) async {
+
+  Future<void> fetchResult(
+    BuildContext context, {
+    String? attemptId,
+    bool route = false,
+  }) async {
     try {
-      final idToUse = startModel?.data?.attempt?.id.toString()??  attemptId?.toString();
+      final idToUse =
+          startModel?.data?.attempt?.id.toString() ?? attemptId?.toString();
       if (idToUse!.isEmpty) {
         Helper.customToast("Attempt ID missing");
         return;
@@ -448,12 +456,10 @@ class StartTestProvider extends ChangeNotifier {
           ),
         );
       });
-
     } catch (e) {
       CommonLoaderApi.hide(context);
       print("🔥 Result API Error: $e");
       Helper.customToast("Failed to fetch result");
     }
   }
-
 }

@@ -23,6 +23,12 @@ class ApiUrls {
   static const String profileUpdate = "${baseUrl}auth/profile-update";
   static const String googleLogin = "${baseUrl}auth/google-login";
 
+  /// --------------------->>>>>  delete/logout  <<<<<----------------------------
+  static const String logout = "${baseUrl}auth/logout";
+  static const String deleteAccount = "${baseUrl}auth/account";
+  static const String resetAccount = "${baseUrl}auth/reset-account";
+
+
 
   /// --------------------->>>>>  Flashcards APIs  <<<<<----------------------------
   static const String flashcardsClasses = "${baseUrl}flashcards/classes/:classCode/subjects";
@@ -56,6 +62,7 @@ class ApiUrls {
   static const String supportMyTickets = "${baseUrl}support/my-tickets";
   static const String supportMyTicketsCreat = "${baseUrl}support/tickets";
   static const String supportMyTicketsReplies = "${baseUrl}support/tickets/:id/replies";
+  static const String supportMyTicketsRepliesById = "${baseUrl}support/tickets/:id";
 
 
   ///...............quiz..............
@@ -94,5 +101,6 @@ class ApiUrls {
   /// --------------------->>>>>  home APIs  <<<<<----------------------------
   static const String homeDashboard = "${baseUrl}home/dashboard";
   static const String importantTopicsList = "${baseUrl}home/topics/important";
+  static const String featureDecksQuestions = "${baseUrl}feature-decks/:id/questions";
 
 }

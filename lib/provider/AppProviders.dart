@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rank_up/models/review_provider.dart';
+import 'package:rank_up/provider/provider_classes/AuthActionsProvider.dart';
 import 'package:rank_up/provider/provider_classes/FlashcardCompletionProvider.dart';
 import 'package:rank_up/provider/provider_classes/FlashcardsQuestionsProvider.dart';
 import 'package:rank_up/provider/provider_classes/HomeProvider.dart';
@@ -12,6 +13,7 @@ import 'package:rank_up/provider/provider_classes/QuizTopicOptionProvider.dart';
 import 'package:rank_up/provider/provider_classes/StartQuizProvider.dart';
 import 'package:rank_up/provider/provider_classes/TestLeaderboardProvider.dart';
 import 'package:rank_up/provider/provider_classes/TestStartProvider.dart';
+import 'package:rank_up/provider/provider_classes/featured_deck_questions_provider.dart';
 import 'package:rank_up/provider/provider_classes/flashcard_chapter_provider.dart';
 import 'package:rank_up/provider/provider_classes/flashcard_provider.dart';
 import 'package:rank_up/provider/provider_classes/flashcard_topics_provider.dart';
@@ -47,6 +49,8 @@ class AppProviders {
         ChangeNotifierProvider(create: (_) => SubscriptionProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ImportantTopicsProvider()),
+        ChangeNotifierProvider(create: (_) => AuthActionsProvider()),
+        ChangeNotifierProvider(create: (_) => FeaturedDeckQuestionsProvider()),
       ],
       child: child,
     );

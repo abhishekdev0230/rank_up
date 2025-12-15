@@ -65,6 +65,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                             onTap: () => provider.changeTab(index, context),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
+                              margin: EdgeInsets.symmetric(horizontal: 5),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 24,
                                 vertical: 10,
@@ -254,7 +255,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SvgPicture.asset(IconsPath.flashQ),

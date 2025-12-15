@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:rank_up/Utils/ConfirmDialog.dart';
 import 'package:rank_up/constraints/icon_path.dart';
 import 'package:rank_up/constraints/my_colors.dart';
@@ -8,7 +9,10 @@ import 'package:rank_up/constraints/sizedbox_height.dart';
 import 'package:rank_up/custom_classes/custom_navigator.dart';
 import 'package:rank_up/services/local_storage.dart';
 import 'package:rank_up/views/authentication/RankUpLoginScreen.dart';
+import 'package:share_plus/share_plus.dart';
 
+import '../../Utils/helper.dart';
+import '../../provider/provider_classes/AuthActionsProvider.dart';
 import 'StaticPageScreenPriTermAbout.dart';
 
 class SettingsSheet {
@@ -55,8 +59,20 @@ class SettingsSheet {
 
                 hSized20,
 
-                // ---------- Options ----------
-                _menuContainer("Share", Icons.share_outlined),
+                /// ---------- Share ----------
+                _menuContainer(
+                  "Share",
+                  Icons.share_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+
+                    Share.share(
+                      'Check out this amazing app:\nhttps://play.google.com/store/apps/details?id=com.yourapp',
+                      subject: 'RankUp App',
+                    );
+                  },
+                 ),
+
                 _menuContainer(
                   "About App",
                   Icons.info_outline,
@@ -112,7 +128,7 @@ class SettingsSheet {
                 ),
                 _menuContainer(
                   "Contact Us",
-                  Icons.contact_mail_outlined,   // ✔️ Best icon for Contact Us
+                  Icons.contact_mail_outlined,
                   onTap: () {
                     Navigator.pop(context);
                     CustomNavigator.pushNavigate(
@@ -140,11 +156,24 @@ class SettingsSheet {
                   },
                 ),
 
-                _menuContainer("Reset Account", Icons.restart_alt_outlined),
+                _menuContainer(
+                  "Reset Account",
+                  Icons.restart_alt_outlined,
+                  onTap: () async {
+                    final auth = context.read<AuthActionsProvider>();
+
+                    bool ok = await auth.resetAccount(context);
+                    if (ok) {
+                      Helper.customToast("Account reset successfully");
+                      CustomNavigator.popNavigate(context);
+                    }
+                  },
+                ),
+
                 _menuContainer(
                   "Log out",
                   Icons.logout_outlined,
-                  onTap: () async {
+                 /* onTap: () async {
                     final result = await ConfirmDialog.show(
                       context,
                       title: "Logout Confirmation",
@@ -166,7 +195,24 @@ class SettingsSheet {
                         RankUpLoginScreen(),
                       );
                     }
+                  },*/
+                  onTap: () async {
+                    final result = await ConfirmDialog.show(
+                      context,
+                      title: "Logout Confirmation",
+                      message: "Are you sure you want to logout?",
+                    );
+
+                    if (result == true) {
+                      final auth = context.read<AuthActionsProvider>();
+                      bool ok = await auth.logout(context);
+
+                      if (ok) {
+                        CustomNavigator.pushRemoveUntil(context, RankUpLoginScreen());
+                      }
+                    }
                   },
+
                 ),
 
                 hSized35,
@@ -179,13 +225,18 @@ class SettingsSheet {
                       title: "",
                       message: "Do you really want to\n delete your account?",
                       confirmText: "Yes, delete",
-                      confirmColor: MyColors.color19B287,
                     );
 
                     if (result == true) {
-                      print("Account Deleted");
+                      final auth = context.read<AuthActionsProvider>();
+                      bool ok = await auth.deleteAccount(context);
+
+                      if (ok) {
+                        CustomNavigator.pushRemoveUntil(context, RankUpLoginScreen());
+                      }
                     }
                   },
+
                   child: Text(
                     "Delete Account",
                     style: mediumTextStyle(

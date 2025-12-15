@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart'; // <-- For time formatting
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/custom_classes/app_bar.dart';
 import 'package:rank_up/provider/provider_classes/MyQueriesProvider.dart';
@@ -24,6 +25,23 @@ class _TicketRepliesScreenState extends State<TicketRepliesScreen> {
   List<File> attachments = [];
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      context.read<MyQueriesProvider>().fetchTicketReplies(widget.ticketId);
+    });
+  }
+
+  String formatTime(String rawTime) {
+    try {
+      DateTime dt = DateTime.parse(rawTime);
+      return DateFormat('dd MMM yyyy, hh:mm a').format(dt);
+    } catch (e) {
+      return "Just now";
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<MyQueriesProvider>(
       builder: (context, provider, child) {
@@ -35,7 +53,16 @@ class _TicketRepliesScreenState extends State<TicketRepliesScreen> {
               /// CHAT LIST
               /// ***********************
               Expanded(
-                child: ListView.builder(
+                child: provider.isRepliesLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : provider.replies.isEmpty
+                    ? Center(
+                  child: Text(
+                    "No replies yet.",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                )
+                    : ListView.builder(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
                     vertical: 10,
@@ -46,13 +73,19 @@ class _TicketRepliesScreenState extends State<TicketRepliesScreen> {
                     bool isMe = msg["sender"] == "user";
 
                     return Column(
-                      crossAxisAlignment:
-                      isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                      crossAxisAlignment: isMe
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
                       children: [
                         Container(
-                          margin: const EdgeInsets.symmetric(vertical: 6),
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 6),
                           padding: const EdgeInsets.all(12),
-                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+                          constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context)
+                                  .size
+                                  .width *
+                                  0.75),
                           decoration: BoxDecoration(
                             color: isMe
                                 ? MyColors.appTheme
@@ -60,15 +93,19 @@ class _TicketRepliesScreenState extends State<TicketRepliesScreen> {
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(12),
                               topRight: Radius.circular(12),
-                              bottomLeft:
-                              Radius.circular(isMe ? 12 : 0),
-                              bottomRight:
-                              Radius.circular(isMe ? 0 : 12),
+                              bottomLeft: Radius.circular(
+                                  isMe ? 12 : 0),
+                              bottomRight: Radius.circular(
+                                  isMe ? 0 : 12),
                             ),
                           ),
                           child: Text(
                             msg["message"] ?? "",
-                            style: TextStyle(fontSize: 14,color: Colors.white),
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: isMe
+                                    ? Colors.white
+                                    : Colors.black),
                           ),
                         ),
 
@@ -76,7 +113,7 @@ class _TicketRepliesScreenState extends State<TicketRepliesScreen> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Text(
-                            msg["time"] ?? "Just now",
+                            formatTime(msg["time"] ?? ""),
                             style: TextStyle(
                               fontSize: 10,
                               color: Colors.grey.shade500,
@@ -138,11 +175,8 @@ class _TicketRepliesScreenState extends State<TicketRepliesScreen> {
               /// ***********************
               Container(
                 padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-
                 child: Row(
                   children: [
-                    /// ATTACH BUTTON
-
                     /// TEXTFIELD
                     Expanded(
                       child: TextField(
@@ -161,15 +195,13 @@ class _TicketRepliesScreenState extends State<TicketRepliesScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 8),
 
                     /// SEND BUTTON
                     GestureDetector(
                       onTap: () async {
-                        if (messageCtrl.text.isEmpty && attachments.isEmpty) {
-                          return;
-                        }
+                        if (messageCtrl.text.isEmpty &&
+                            attachments.isEmpty) return;
 
                         await provider.sendReply(
                           ticketId: widget.ticketId,

@@ -122,13 +122,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               hSized10,
 
               /// ✅ City Dropdown
+
               customDropdown(
                 label: "City",
                 hint: "Select your city",
-                value: profileProvider.selectedCity,
-                items: profileProvider.cityList,
+                value: profileProvider.selectedCity != null &&
+                    profileProvider.getCitiesForSelectedState().contains(profileProvider.selectedCity)
+                    ? profileProvider.selectedCity
+                    : null,
+                items: profileProvider.getCitiesForSelectedState(),
                 onChanged: profileProvider.setSelectedCity,
               ),
+
               hSized25,
 
               /// ✅ Update Button

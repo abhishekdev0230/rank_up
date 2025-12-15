@@ -96,7 +96,7 @@ class MyQueriesProvider extends ChangeNotifier {
       isRepliesLoading = true;
       notifyListeners();
 
-      final url = ApiUrls.supportMyTicketsReplies.replaceAll(":id", ticketId);
+      final url = ApiUrls.supportMyTicketsRepliesById.replaceAll(":id", ticketId);
 
       final res = await ApiMethods().getMethod(
         method: url,
@@ -107,6 +107,19 @@ class MyQueriesProvider extends ChangeNotifier {
       final jsonData = jsonDecode(res);
 
       if (jsonData["status"] == true) {
+
+        replies = [];
+
+        List replyList = jsonData["data"]["replies"] ?? [];
+
+        for (var r in replyList) {
+          replies.add({
+            "sender": r["isAdmin"] == true ? "admin" : "user",
+            "message": r["message"] ?? "",
+            "time": r["createdAt"] ?? "",
+          });
+        }
+
       } else {
         Helper.customToast("Failed to load replies");
       }
@@ -117,6 +130,7 @@ class MyQueriesProvider extends ChangeNotifier {
     isRepliesLoading = false;
     notifyListeners();
   }
+
 
   /// =======================================================
   ///  SEND REPLY

@@ -25,6 +25,7 @@ import '../me_profile/NotificationScreen.dart';
 import '../me_profile/ProfileScreen.dart';
 import '../me_profile/SubscriptionScreen/SubscriptionScreen.dart';
 import '../tests_screen/ShowInstructionDialog.dart';
+import 'feature_deck_questions.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -122,38 +123,38 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            GestureDetector(
-              onTap: () {
+        GestureDetector(
+          onTap: () {
 
-                CustomNavigator.pushNavigate(context, ProfileScreen());
-              },
-              child: CommonProfileImage(
+            CustomNavigator.pushNavigate(context, ProfileScreen());
+          },
+          child: Row(
+            children: [
+              CommonProfileImage(
                 imageUrl: user?.profilePicture ?? "",
                 placeholderAsset: IconsPath.defultImage,
                 radius: 24,
               ),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Hello,",
-                  style: TextStyle(fontSize: 14, color: Colors.white70),
-                ),
-                Text(
-                  user?.name ?? "",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Hello,",
+                    style: TextStyle(fontSize: 14, color: Colors.white70),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  Text(
+                    user?.name ?? "",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
          GestureDetector(
 
@@ -344,7 +345,7 @@ class _HomeScreenState extends State<HomeScreen> {
               if (deck != null) {
                 CustomNavigator.pushNavigate(
                   context,
-                  NeetPYQsFlashcardsInner(topicId: deck.id.toString()),
+                  FeaturedDeckFlashcardsScreen(deckId:deck.id.toString(), deckName: deck.name.toString(),),
                 );
               }
             },
