@@ -21,24 +21,19 @@ class AuthProvider extends ChangeNotifier {
   Future<void> initGoogle() async {
     final signIn = GoogleSignIn.instance;
 
-    await signIn.initialize(
-      clientId: null,
-      serverClientId:
-      "276170592360-lluu5r51haa96vqtr1jpatvb4bgll5r1.apps.googleusercontent.com",
-    );
+    await signIn.initialize();
 
-    /// Listen for login/logout events
     signIn.authenticationEvents.listen(
           (event) => _handleEvent(event),
       onError: (err) => debugPrint("Auth Error: $err"),
     );
 
-    // Try silent login
     signIn.attemptLightweightAuthentication();
 
     isInitialized = true;
     notifyListeners();
   }
+
 
   /// ---------------------------------------------------------
   /// HANDLE GOOGLE AUTH EVENTS

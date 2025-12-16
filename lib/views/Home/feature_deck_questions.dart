@@ -152,7 +152,7 @@ class _FeaturedDeckFlashcardsScreenState
                                       crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          "Ans ",
+                                          "Ans :- ",
                                           style: const TextStyle(
                                             fontSize: 17,
                                             fontWeight: FontWeight.w500,

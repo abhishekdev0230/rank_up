@@ -5,10 +5,9 @@ class ApiUrls {
   static const String googleApiKey = 'AIzaSyBCi-I8dhVghsr20HVVyCfkxBpsXVe2O60';
 
 
-  static const String razorPayKey = 'rzp_live_RD7ANv3U5M0VDg';
+  static const String razorPayKey = 'rzp_live_RqH4FL7Vqs3wMf';
 
-  static const String googlePlaceBaseUrl =
-      'https://maps.googleapis.com/maps/api/place/autocomplete/json?';
+  static const String googlePlaceBaseUrl = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?';
   static const String googlePlaceDetailBaseUrl =
       'https://maps.googleapis.com/maps/api/place/details/json?';
 

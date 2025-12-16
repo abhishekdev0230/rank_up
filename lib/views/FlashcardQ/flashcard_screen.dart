@@ -45,7 +45,6 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
             : RefreshIndicator(
                 color: MyColors.appTheme,
                 onRefresh: () async {
-                  // Pull-to-refresh: refresh without showing full-page loader
                   await provider.init(context, showLoader: false);
                 },
                 child: SingleChildScrollView(
@@ -172,7 +171,11 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                                             NeetPYQsFlashcardsInner(
                                               topicId: item.topicId.toString(),
                                             ),
-                                          );
+                                          ).then((value) {
+                                            print("sdfkdsklfsdfjhskf");
+                                            final provider = Provider.of<FlashcardProvider>(context, listen: false);
+                                            provider.init(context,showLoader: false);
+                                          },);
                                         },
                                       ),
                                     )
@@ -203,7 +206,11 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
           selectIndexId: subjectId,
           selectClass: selectedClassCode,
         ),
-      ),
+      ).then((value) {
+        print("sdfkdsklfsdfjhskf");
+        final provider = Provider.of<FlashcardProvider>(context, listen: false);
+        provider.init(context,showLoader: false);
+      },),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
@@ -261,6 +268,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
             SvgPicture.asset(IconsPath.flashQ),
             hSized10,
             Text(
+              textAlign: TextAlign.center,
               maxLines: 2,
               title,
               style: regularTextStyle(color: Colors.white, fontSize: 12),

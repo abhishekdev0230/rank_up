@@ -46,7 +46,7 @@ class _NeetPYQsFlashcardsInnerState extends State<NeetPYQsFlashcardsInner> {
           children: [
             // Example: an illustration or icon
             Icon(
-              Icons.folder_open,
+              Icons.search,
               size: 80,
               color: Colors.grey.shade400,
             ),

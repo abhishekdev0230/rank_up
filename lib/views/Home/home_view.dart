@@ -111,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _headerTop(user),
+          _headerTop(user,provider),
           const SizedBox(height: 24),
           _progressSection(progress, completedModules),
         ],
@@ -119,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _headerTop(User? user) {
+  Widget _headerTop(User? user,provider) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -139,10 +139,14 @@ class _HomeScreenState extends State<HomeScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Hello,",
-                    style: TextStyle(fontSize: 14, color: Colors.white70),
+                  Text(
+                    "${provider.getGreeting()},",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white70,
+                    ),
                   ),
+
                   Text(
                     user?.name ?? "",
                     style: const TextStyle(
@@ -607,9 +611,6 @@ class _HomeScreenState extends State<HomeScreen> {
               margin: const EdgeInsets.only(right: 12),
               child: _importantTopicCard(
                 topic.name ?? "",
-                (topic.description == null || topic.description!.isEmpty)
-                    ? "----"
-                    : topic.description!,
               ),
             ),
           );
@@ -619,33 +620,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// ---------------- Important Topic Card ----------------
-  Widget _importantTopicCard(String title, String description) {
+  Widget _importantTopicCard(String title, ) {
     return Container(
+      alignment: Alignment.center,
       padding: const EdgeInsets.all(12),
-      height: 100,
+      height: 80,
       width: 180,
       decoration: BoxDecoration(
         color: MyColors.whiteText,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: MyColors.colorCBCBCB),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            maxLines: 1,
-            style: semiBoldTextStyle(fontSize: 18, color: MyColors.blackColor),
-          ),
-          const SizedBox(height: 6),
-          Flexible(
-            child: Text(
-              description ?? "----",
-              maxLines: 2,
-              style: mediumTextStyle(fontSize: 14, color: MyColors.blackColor),
-            ),
-          ),
-        ],
+      child: Text(
+        textAlign: TextAlign.center,
+        title,
+        maxLines: 1,
+        style: semiBoldTextStyle(fontSize: 18, color: MyColors.blackColor),
       ),
     );
   }

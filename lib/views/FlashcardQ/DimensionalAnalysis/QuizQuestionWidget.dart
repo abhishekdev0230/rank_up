@@ -48,12 +48,24 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
   late Timer _timer;
   late int _remainingSeconds;
   bool _previousPressed = false;
+  late DateTime _questionStartTime;
 
   @override
   void initState() {
     super.initState();
-    _remainingSeconds = widget.duration * 60;
+    _remainingSeconds = widget.duration * 60; // UI timer
+    _questionStartTime = DateTime.now();      // Internal timer for API
     _startTimer();
+  }
+
+  @override
+  void didUpdateWidget(covariant QuizQuestionWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.question.id != widget.question.id) {
+      // Reset internal timer for API only
+      _questionStartTime = DateTime.now();
+      // Do NOT reset _remainingSeconds -> UI countdown continues
+    }
   }
 
   void _startTimer() {
@@ -89,7 +101,7 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
       child: Column(
         children: [
           hSized20,
-          // 🔹 Progress Bar
+          // Progress Bar
           Container(
             width: double.infinity,
             height: 6,
@@ -109,7 +121,7 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
             ),
           ),
           hSized10,
-          // 🔹 Question info with timer
+          // Question info with timer
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -122,7 +134,7 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                   const Icon(Icons.timer, color: Colors.white, size: 18),
                   const SizedBox(width: 5),
                   Text(
-                    formattedTime,
+                    formattedTime, // UI timer continues, never resets
                     style: regularTextStyle(color: Colors.white),
                   ),
                 ],
@@ -130,7 +142,7 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
             ],
           ),
           hSized30,
-          // 🔹 Question Card
+          // Question Card
           GestureDetector(
             onHorizontalDragEnd: (details) {
               if (details.primaryVelocity! < 0) {
@@ -175,20 +187,23 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                             final selectedId = opt.id ?? '';
                             if (selectedAnswer == null) {
                               widget.onSelectOption(selectedId);
+
+                              // Calculate time taken for API
+                              final timeTakenSeconds =
+                                  DateTime.now().difference(_questionStartTime).inSeconds;
+
                               await quizAnswerProvider.submitAnswer(
                                 context: context,
                                 attemptId: widget.attemptId,
                                 questionId: widget.question.id ?? "",
                                 optionId: selectedId,
                                 selectedAnswer: opt.optionLabel ?? "",
-                                timeTaken:
-                                    widget.duration * 60 - _remainingSeconds,
+                                timeTaken: timeTakenSeconds, // API per-question time
                               );
+
                               setState(() {});
                             } else {
-                              Helper.customToast(
-                                "You cannot change your answer",
-                              );
+                              Helper.customToast("You cannot change your answer");
                             }
                           },
                           child: Container(
@@ -197,12 +212,8 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                             child: OptionTileWidget(
                               "${opt.optionLabel}. ${opt.optionText}",
                               isSelected: selectedAnswer == opt.id,
-                              isCorrect:
-                                  selectedAnswer == opt.id &&
-                                  quizAnswerProvider
-                                          .quizAnsModel
-                                          ?.data
-                                          ?.isCorrect ==
+                              isCorrect: selectedAnswer == opt.id &&
+                                  quizAnswerProvider.quizAnsModel?.data?.isCorrect ==
                                       true,
                             ),
                           ),
@@ -218,8 +229,7 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
             Consumer<QuizAnswerProvider>(
               builder: (context, ansProvider, _) {
                 final ansData = ansProvider.quizAnsModel?.data;
-                if (ansData == null || _previousPressed == true)
-                  return SizedBox.shrink();
+                if (ansData == null || _previousPressed) return SizedBox.shrink();
 
                 return Column(
                   children: [
@@ -282,7 +292,7 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
             ),
           ],
           SizedBox(height: context.wp(1 / 4.7)),
-          // 🔹 Navigation Buttons
+          // Navigation Buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -295,9 +305,9 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                     onPressed: _previousPressed
                         ? null
                         : () {
-                            widget.onPrevious();
-                            setState(() => _previousPressed = true);
-                          },
+                      widget.onPrevious();
+                      setState(() => _previousPressed = true);
+                    },
                   ),
                 ),
               if (widget.currentIndex > 0) wSized10,

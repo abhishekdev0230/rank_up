@@ -32,15 +32,13 @@ class _FlashcardInnerPhysicsScreenState
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<FlashcardChapterProvider>();
-        provider.fetchChapters(context, widget.selectIndexId);
+      provider.fetchChapters(context, widget.selectIndexId);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<FlashcardChapterProvider>(context);
-    final chapters = provider.chapterModel?.data ?? [];
-
     return CommonScaffold(
       title: "Flashcards",
       showBack: true,
@@ -95,7 +93,6 @@ class _FlashcardInnerPhysicsScreenState
                           final topic = provider.chapterModel!.data![index];
                           return GestureDetector(
                             onTap: () {
-
                               CustomNavigator.pushNavigate(
                                 context,
                                 ClassStudyFlashcardsScreen(
@@ -140,14 +137,14 @@ class _FlashcardInnerPhysicsScreenState
             title,
             style: semiBoldTextStyle(color: Colors.white, fontSize: 18),
           ),
-          const SizedBox(height: 8),
-          Text(
-            "$flashcards Flashcards | $quizzes Quizzes",
-            style: regularTextStyle(
-              color: Colors.white.withOpacity(0.85),
-              fontSize: 14,
-            ),
-          ),
+          // const SizedBox(height: 8),
+          // Text(
+          //   "$flashcards Flashcards | $quizzes Quizzes",
+          //   style: regularTextStyle(
+          //     color: Colors.white.withOpacity(0.85),
+          //     fontSize: 14,
+          //   ),
+          // ),
         ],
       ),
     );

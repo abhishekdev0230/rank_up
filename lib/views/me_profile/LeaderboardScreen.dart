@@ -169,14 +169,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                   "Players around you",
                   style: semiBoldTextStyle(fontSize: 16),
                 ),
-                const Spacer(),
-                Text(
-                  "View all",
-                  style: mediumTextStyle(
-                    fontSize: 14,
-                    color: MyColors.appTheme,
-                  ),
-                ),
+                // const Spacer(),
+                // Text(
+                //   "View all",
+                //   style: mediumTextStyle(
+                //     fontSize: 14,
+                //     color: MyColors.appTheme,
+                //   ),
+                // ),
               ],
             ),
           ),
