@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:rank_up/constraints/icon_path.dart';
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
@@ -11,6 +12,8 @@ import 'package:rank_up/custom_classes/loder.dart';
 import 'package:rank_up/models/LeaderboardModel.dart';
 import 'package:rank_up/services/api_methods.dart';
 import 'package:rank_up/services/api_urls.dart';
+
+import '../../provider/provider_classes/leaderboard_provider.dart';
 
 class LeaderboardScreen extends StatefulWidget {
   const LeaderboardScreen({super.key});
@@ -25,85 +28,70 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   bool isLoading = true;
 
   List<List<LeaderboardUser>> leaderboardData = [[], [], []];
-
   final filters = ["all", "30", "7"];
 
   @override
   void initState() {
     super.initState();
     tabController = TabController(length: 3, vsync: this);
-    _fetchLeaderboard();
+
+    Future.microtask(() {
+      context.read<LeaderboardProvider>().fetchLeaderboard();
+    });
   }
 
-  Future<void> _fetchLeaderboard() async {
-    setState(() => isLoading = true);
-
-    for (int i = 0; i < filters.length; i++) {
-      final url = "${ApiUrls.baseUrl}leaderboard/?filter=${filters[i]}";
-      final res = await ApiMethods().getMethod(
-        method: url,
-        body: {},
-        header: ApiHeaders.defaultHeaders,
-      );
-
-      if (res.isNotEmpty) {
-        final jsonData = jsonDecode(res);
-        final list = jsonData['data'] as List;
-        leaderboardData[i] = list
-            .map((e) => LeaderboardUser.fromJson(e))
-            .toList();
-      }
-    }
-
-    setState(() => isLoading = false);
-  }
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      appBarBackgroundColor: MyColors.darkBlue,
-      padding: false,
-      title: "Leaderboard",
-      backgroundColor: MyColors.darkBlue,
-      body: isLoading
-          ? const Center(child: CommonLoader(color: Colors.white))
-          : Column(
-              children: [
-                const SizedBox(height: 20),
+    return Consumer<LeaderboardProvider>(
+      builder: (context, provider, _) {
+        return CommonScaffold(
+          appBarBackgroundColor: MyColors.darkBlue,
+          padding: false,
+          title: "Leaderboard",
+          backgroundColor: MyColors.darkBlue,
+          body: provider.isLoading
+              ? const Center(
+            child: CommonLoader(color: Colors.white),
+          )
+              : Column(
+            children: [
+              const SizedBox(height: 20),
+              SvgPicture.asset(IconsPath.appLogoWhite, height: 90),
+              const SizedBox(height: 20),
 
-                SvgPicture.asset(IconsPath.appLogoWhite, height: 90),
-                const SizedBox(height: 20),
-
-                Expanded(
-                  child: Container(
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(30),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        _tabs(),
-                        const SizedBox(height: 10),
-
-                        Expanded(
-                          child: TabBarView(
-                            controller: tabController,
-                            children: [
-                              ui(leaderboardData[0]),
-                              ui(leaderboardData[1]),
-                              ui(leaderboardData[2]),
-                            ],
-                          ),
-                        ),
-                      ],
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(30),
                     ),
                   ),
+                  child: Column(
+                    children: [
+                      _tabs(),
+                      const SizedBox(height: 10),
+
+                      Expanded(
+                        child: TabBarView(
+                          controller: tabController,
+                          children: [
+                            ui(provider.leaderboardData[0]),
+                            ui(provider.leaderboardData[1]),
+                            ui(provider.leaderboardData[2]),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -169,21 +157,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                   "Players around you",
                   style: semiBoldTextStyle(fontSize: 16),
                 ),
-                // const Spacer(),
-                // Text(
-                //   "View all",
-                //   style: mediumTextStyle(
-                //     fontSize: 14,
-                //     color: MyColors.appTheme,
-                //   ),
-                // ),
+
               ],
             ),
           ),
-
           const SizedBox(height: 10),
-
-          // LIST
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -200,7 +178,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
     );
   }
 
-  // SMALL PODIUM USER
   Widget podiumSmall(LeaderboardUser user, Color ringColor) {
     return Column(
       children: [
@@ -320,7 +297,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
       ),
     );
   }
-
   ImageProvider _loadImage(LeaderboardUser u) {
     return (u.profilePicture != null && u.profilePicture!.isNotEmpty)
         ? NetworkImage(u.profilePicture!)

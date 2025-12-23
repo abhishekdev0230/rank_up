@@ -17,6 +17,7 @@ import 'package:rank_up/provider/provider_classes/featured_deck_questions_provid
 import 'package:rank_up/provider/provider_classes/flashcard_chapter_provider.dart';
 import 'package:rank_up/provider/provider_classes/flashcard_provider.dart';
 import 'package:rank_up/provider/provider_classes/flashcard_topics_provider.dart';
+import 'package:rank_up/provider/provider_classes/leaderboard_provider.dart';
 import 'package:rank_up/provider/provider_classes/otp_provider.dart';
 import 'package:rank_up/provider/provider_classes/quiz_complete_provider.dart';
 import 'package:rank_up/provider/provider_classes/subscription_provider.dart';
@@ -51,6 +52,7 @@ class AppProviders {
         ChangeNotifierProvider(create: (_) => ImportantTopicsProvider()),
         ChangeNotifierProvider(create: (_) => AuthActionsProvider()),
         ChangeNotifierProvider(create: (_) => FeaturedDeckQuestionsProvider()),
+        ChangeNotifierProvider(create: (_) => LeaderboardProvider()),
       ],
       child: child,
     );

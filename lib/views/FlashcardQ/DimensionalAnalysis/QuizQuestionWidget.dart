@@ -53,8 +53,15 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
   @override
   void initState() {
     super.initState();
-    _remainingSeconds = widget.duration * 60; // UI timer
-    _questionStartTime = DateTime.now();      // Internal timer for API
+    _remainingSeconds = widget.duration * 60;
+    _questionStartTime = DateTime.now();
+    final quizProvider = Provider.of<QuizAnswerProvider>(
+      context,
+      listen: false,
+    );
+    if (quizProvider.totalTimeUsed == 0) {
+      quizProvider.startQuizTimer();
+    }
     _startTimer();
   }
 
@@ -62,9 +69,7 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
   void didUpdateWidget(covariant QuizQuestionWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.question.id != widget.question.id) {
-      // Reset internal timer for API only
       _questionStartTime = DateTime.now();
-      // Do NOT reset _remainingSeconds -> UI countdown continues
     }
   }
 
@@ -134,7 +139,7 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                   const Icon(Icons.timer, color: Colors.white, size: 18),
                   const SizedBox(width: 5),
                   Text(
-                    formattedTime, // UI timer continues, never resets
+                    formattedTime,
                     style: regularTextStyle(color: Colors.white),
                   ),
                 ],
@@ -142,9 +147,19 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
             ],
           ),
           hSized30,
-          // Question Card
           GestureDetector(
             onHorizontalDragEnd: (details) {
+              final quizProvider = Provider.of<QuizAnswerProvider>(context, listen: false);
+
+              // 🔹 Calculate time spent on this question
+              final timeSpent = DateTime.now().difference(_questionStartTime).inSeconds;
+
+              // 🔹 Add to total quiz time
+              quizProvider.addTime(timeSpent);
+
+              // 🔹 Reset question start time for next question
+              _questionStartTime = DateTime.now();
+
               if (details.primaryVelocity! < 0) {
                 widget.onNext();
                 setState(() => _previousPressed = false);
@@ -189,8 +204,9 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                               widget.onSelectOption(selectedId);
 
                               // Calculate time taken for API
-                              final timeTakenSeconds =
-                                  DateTime.now().difference(_questionStartTime).inSeconds;
+                              final timeTakenSeconds = DateTime.now()
+                                  .difference(_questionStartTime)
+                                  .inSeconds;
 
                               await quizAnswerProvider.submitAnswer(
                                 context: context,
@@ -198,12 +214,15 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                                 questionId: widget.question.id ?? "",
                                 optionId: selectedId,
                                 selectedAnswer: opt.optionLabel ?? "",
-                                timeTaken: timeTakenSeconds, // API per-question time
+                                timeTaken:
+                                    timeTakenSeconds, // API per-question time
                               );
 
                               setState(() {});
                             } else {
-                              Helper.customToast("You cannot change your answer");
+                              Helper.customToast(
+                                "You cannot change your answer",
+                              );
                             }
                           },
                           child: Container(
@@ -212,8 +231,12 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                             child: OptionTileWidget(
                               "${opt.optionLabel}. ${opt.optionText}",
                               isSelected: selectedAnswer == opt.id,
-                              isCorrect: selectedAnswer == opt.id &&
-                                  quizAnswerProvider.quizAnsModel?.data?.isCorrect ==
+                              isCorrect:
+                                  selectedAnswer == opt.id &&
+                                  quizAnswerProvider
+                                          .quizAnsModel
+                                          ?.data
+                                          ?.isCorrect ==
                                       true,
                             ),
                           ),
@@ -229,7 +252,8 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
             Consumer<QuizAnswerProvider>(
               builder: (context, ansProvider, _) {
                 final ansData = ansProvider.quizAnsModel?.data;
-                if (ansData == null || _previousPressed) return SizedBox.shrink();
+                if (ansData == null || _previousPressed)
+                  return SizedBox.shrink();
 
                 return Column(
                   children: [
@@ -305,9 +329,9 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                     onPressed: _previousPressed
                         ? null
                         : () {
-                      widget.onPrevious();
-                      setState(() => _previousPressed = true);
-                    },
+                            widget.onPrevious();
+                            setState(() => _previousPressed = true);
+                          },
                   ),
                 ),
               if (widget.currentIndex > 0) wSized10,
@@ -316,6 +340,11 @@ class _QuizQuestionWidgetState extends State<QuizQuestionWidget> {
                   height: 47,
                   title: widget.isLastQuestion ? "Finish" : "Next",
                   onPressed: () {
+                    final quizProvider = Provider.of<QuizAnswerProvider>(
+                      context,
+                      listen: false,
+                    );
+                    quizProvider.setTotalTime();
                     widget.onNext();
                     setState(() => _previousPressed = false);
                   },

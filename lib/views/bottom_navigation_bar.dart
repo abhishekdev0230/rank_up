@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
+import 'package:provider/provider.dart';
 import 'package:rank_up/constraints/icon_path.dart';
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
 import 'package:rank_up/views/tests_screen/tests_screen.dart';
+import '../provider/provider_classes/HomeProvider.dart';
+import '../provider/provider_classes/leaderboard_provider.dart';
 import 'FlashcardQ/flashcard_screen.dart';
 import 'Home/home_view.dart';
 import 'me_profile/me_profile.dart';
@@ -37,13 +40,26 @@ class _BottomNavControllerState extends State<BottomNavController> {
     _controller.addListener(() {
       if (_suppressMeTap) return;
 
-      setState(() {}); // 👈 UI अब हर index change पर rebuild होगा
-
       final idx = _controller.index;
+
+      if (idx == 0) {
+        // Home tab
+        context.read<HomeProvider>().fetchHomeData(context);
+        context.read<LeaderboardProvider>().fetchLeaderboard();
+      }
+
+      if (idx == 1) {
+        // Flashcard tab
+        // context.read<FlashcardProvider>().fetchFlashcards();
+      }
+
+      if (idx == 2) {
+        // Test tab
+        // context.read<TestProvider>().fetchTests();
+      }
 
       if (idx == 3) {
         _suppressMeTap = true;
-
         _controller.jumpToTab(_lastIndex);
 
         _openMeProfileBottomSheet().whenComplete(() {
@@ -54,7 +70,10 @@ class _BottomNavControllerState extends State<BottomNavController> {
       } else {
         _lastIndex = idx;
       }
+
+      setState(() {});
     });
+
 
   }
 

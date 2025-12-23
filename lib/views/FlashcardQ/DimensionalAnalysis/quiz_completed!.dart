@@ -17,8 +17,9 @@ import '../../onboarding_screen/onboarding_screen.dart';
 
 class QuizCompletedWidget extends StatefulWidget {
   final String attemptId;
+  final String timeTaken;
 
-  const QuizCompletedWidget({super.key, required this.attemptId});
+  const QuizCompletedWidget({super.key, required this.attemptId, required this.timeTaken});
 
   @override
   State<QuizCompletedWidget> createState() => _QuizCompletedWidgetState();
@@ -32,7 +33,7 @@ class _QuizCompletedWidgetState extends State<QuizCompletedWidget> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<QuizCompleteProvider>(context, listen: false)
-          .fetchQuizComplete(context, widget.attemptId);
+          .fetchQuizComplete(context, widget.attemptId, int.parse(widget.timeTaken));
     });
   }
 

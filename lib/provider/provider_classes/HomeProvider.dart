@@ -66,14 +66,19 @@ class HomeProvider with ChangeNotifier {
       );
 
       if (showLoader && context.mounted) CommonLoaderApi.hide(context);
+
+
       if (response.isNotEmpty) {
+
         homeData = homeDataModelFromJson(response);
+
         if (homeData?.data?.liveTest?.timeToStart != null) {
           startLiveTestTimer(homeData!.data!.liveTest!.timeToStart!);
         }
 
         notifyListeners();
       }
+
     } catch (e, st) {
       debugPrint("Exception in fetchHomeData: $e\n$st");
       errorMessage = "Something went wrong: $e";

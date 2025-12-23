@@ -126,7 +126,7 @@ class ApiMethods {
 
   ///--------------Get Method-----------------------
 
-  Future<String> getMethodTwo(
+  Future<String>  getMethodTwo(
       {required String method,
       required Map<String, dynamic> body,
       Map<String, String>? header}) async {

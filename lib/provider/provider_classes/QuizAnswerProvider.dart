@@ -8,9 +8,31 @@ import 'package:rank_up/services/common_response.dart';
 
 class QuizAnswerProvider extends ChangeNotifier {
   QuizAnsModel? quizAnsModel;
+  static int totalTimeUsed1 = 0;
+  DateTime? _quizStartTime;
 
+
+  void setTotalTime() {
+    if (_quizStartTime != null) {
+      totalTimeUsed1 = DateTime.now().difference(_quizStartTime!).inSeconds;
+      notifyListeners();
+    }
+  }
+  void startQuizTimer() {
+    _quizStartTime = DateTime.now();
+    totalTimeUsed1 = 0;
+  }
+
+  /// Add timeSpent to totalTimeUsed1
+  void addTime(int timeSpent) {
+    totalTimeUsed1 += timeSpent;
+    notifyListeners();
+  }
+
+
+  int get totalTimeUsed => totalTimeUsed1;
   /// Store selected answer per question
-  final Map<String, String> _selectedAnswers = {}; // key: questionId, value: optionId
+  final Map<String, String> _selectedAnswers = {};
 
   /// Get selected answer for a question
   String? getSelectedAnswer(String questionId) {
@@ -26,7 +48,7 @@ class QuizAnswerProvider extends ChangeNotifier {
     if (_selectedAnswers.containsKey(questionId)) {
       return _selectedAnswers[questionId];
     }
-    // fallback: use submitted answer from API if available
+
     return quizAnsModel?.data?.questionId == questionId
         ? quizAnsModel?.data?.selectedAnswer
         : null;
@@ -41,8 +63,8 @@ class QuizAnswerProvider extends ChangeNotifier {
     required BuildContext context,
     required String attemptId,
     required String questionId,
-    required String optionId, // pass optionId instead of optionLabel
-    required String selectedAnswer, // the text of the option
+    required String optionId,
+    required String selectedAnswer,
     required int timeTaken,
   }) async {
     CommonLoaderApi.show(context);
@@ -52,7 +74,7 @@ class QuizAnswerProvider extends ChangeNotifier {
 
       final body = {
         "questionId": questionId,
-        "selectedAnswer": selectedAnswer, // still send text to API
+        "selectedAnswer": selectedAnswer,
         "timeTaken": timeTaken,
       };
 
@@ -68,12 +90,11 @@ class QuizAnswerProvider extends ChangeNotifier {
       if (decoded.status == true) {
         quizAnsModel = quizAnsModelFromJson(res);
 
-        // Save selected optionId locally
         setAnswer(questionId, optionId);
       } else {
         Helper.customToast(decoded.message ?? "Something went wrong");
       }
-    } catch (e) {
+    }  catch (e) {
       CommonLoaderApi.hide(context);
       Helper.customToast("Error submitting answer");
     }

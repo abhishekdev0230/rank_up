@@ -75,6 +75,7 @@ class _DimensionalAnalysisState extends State<DimensionalAnalysis> {
                 if (startQuiz) {
                   if (showCompleted) {
                     return QuizCompletedWidget(
+                      timeTaken: QuizAnswerProvider.totalTimeUsed1.toString(),
                       attemptId:
                           startQuizProvider
                               .startQuizModel
@@ -107,7 +108,7 @@ class _DimensionalAnalysisState extends State<DimensionalAnalysis> {
                     currentIndex: currentQuestionIndex,
                     totalQuestions: questions.length,
                     duration: startQuizProvider.startQuizModel?.data?.duration ?? 15,
-                    selectedOptionId: quizAnswerProvider.getSelectedAnswer(currentQuestion.id ?? ""), // ✅ get from provider
+                    selectedOptionId: quizAnswerProvider.getSelectedAnswer(currentQuestion.id ?? ""),
                     onSelectOption: (id) {
                       final selected = quizAnswerProvider.getSelectedAnswer(currentQuestion.id ?? "");
                       if (selected == null) {
@@ -128,7 +129,7 @@ class _DimensionalAnalysisState extends State<DimensionalAnalysis> {
                       if (currentQuestionIndex < questions.length - 1) {
                         setState(() {
                           currentQuestionIndex++;
-                          selectedOptionId = null; // reset local for next question
+                          selectedOptionId = null;
                         });
                       } else {
                         setState(() {

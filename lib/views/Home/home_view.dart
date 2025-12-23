@@ -1,7 +1,5 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:provider/provider.dart';
 import 'package:rank_up/constraints/font_family.dart';
@@ -17,10 +15,11 @@ import 'package:rank_up/custom_classes/validators.dart';
 import 'package:rank_up/models/HomeDataModel.dart';
 import 'package:rank_up/provider/provider_classes/HomeProvider.dart';
 import 'package:rank_up/views/FlashcardQ/NeetPYQsFlashcardsInner.dart';
-import 'package:rank_up/views/FlashcardQ/flashcards_innner_1.dart';
 import 'package:rank_up/views/Home/ImportantTopicsScreen.dart';
-
+import '../../models/LeaderboardModel.dart';
+import '../../provider/provider_classes/leaderboard_provider.dart';
 import '../FlashcardQ/DimensionalAnalysis/dimensional_analysis.dart';
+import '../me_profile/LeaderboardScreen.dart';
 import '../me_profile/NotificationScreen.dart';
 import '../me_profile/ProfileScreen.dart';
 import '../me_profile/SubscriptionScreen/SubscriptionScreen.dart';
@@ -39,6 +38,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.microtask(() {
+        context.read<LeaderboardProvider>().fetchLeaderboard();
+      });
       Provider.of<HomeProvider>(
         context,
         listen: false,
@@ -91,12 +93,113 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               _headerSection(data, provider),
               _mainBody(data, provider),
+
             ],
           ),
         ),
       ),
     );
   }
+  ///,..............Leaderboard................
+
+  Widget _homeLeaderboardSection() {
+    return Consumer<LeaderboardProvider>(
+      builder: (context, lbProvider, _) {
+        final users = lbProvider.leaderboardData[0]; // All time
+        if (users.isEmpty) return const SizedBox();
+
+        final top3 = users.take(3).toList();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                _sectionTitle("Leaderboard", 140),
+                const Spacer(),
+                TextButton(
+                  onPressed: () {
+                    CustomNavigator.pushNavigate(
+                      context,
+                      const LeaderboardScreen(),
+                    );
+                  },
+                  child: Text(
+                    "See more",
+                    style: TextStyle(color: MyColors.darkBlue),
+                  ),
+                ),
+              ],
+            ),
+
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                color: MyColors.whiteText,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: MyColors.colorCBCBCB),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(
+                  top3.length,
+                      (index) => _leaderboardUser(top3[index]),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  Widget _leaderboardUser(LeaderboardUser user) {
+    return Column(
+      children: [
+        Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            CircleAvatar(
+              radius: 26,
+              backgroundImage: (user.profilePicture != null &&
+                  user.profilePicture!.isNotEmpty)
+                  ? NetworkImage(user.profilePicture!)
+                  : const AssetImage("assets/images/defultImage.png")
+              as ImageProvider,
+            ),
+
+            /// Rank Badge
+            Positioned(
+              bottom: -6, // ✅ allowed here
+              child: Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: MyColors.color19B287,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  "#${user.rank}",
+                  style: semiBoldTextStyle(
+                    fontSize: 10,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Text(
+          user.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: mediumTextStyle(fontSize: 12),
+        ),
+      ],
+    );
+  }
+
 
   /// ---------------- Header Section ----------------
   Widget _headerSection(HomeData? data, HomeProvider provider) {
@@ -257,10 +360,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
             ],
           ),
-          hSized10,
           if (data?.importantTopics?.isNotEmpty == true)
             _importantTopicsSection(data!.importantTopics!),
           hSized20,
+          _homeLeaderboardSection(),
+          hSized20,
+
           _subscriptionButton(),
           hSized20,
         ],
@@ -665,6 +770,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+
+
+
+
+
+
+
+
+
+
   /// ---------------- Common Container ----------------
   Widget commonContainer(Widget child, {Color? containerBgColor}) {
     return Container(
@@ -788,7 +903,7 @@ class CommonButton1 extends StatelessWidget {
   final Color? borderColor;
   final double? height;
   final double? width;
-  final EdgeInsetsGeometry? padding; // <-- ADD THIS
+  final EdgeInsetsGeometry? padding;
 
   const CommonButton1({
     super.key,
