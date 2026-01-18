@@ -13,7 +13,9 @@ import 'package:rank_up/provider/provider_classes/subscription_provider.dart';
 import '../../Home/home_view.dart';
 
 class SubscriptionScreen extends StatefulWidget {
-  const SubscriptionScreen({super.key});
+  final String? isSub;
+
+  const SubscriptionScreen({super.key, this.isSub});
 
   @override
   State<SubscriptionScreen> createState() => _SubscriptionScreenState();
@@ -43,24 +45,21 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     super.dispose();
   }
 
+  /* ---------------- PAYMENT CALLBACKS ---------------- */
+
   void _success(PaymentSuccessResponse response) async {
     final sp = Provider.of<SubscriptionProvider>(context, listen: false);
     final plan = sp.plans[selectedPlanIndex];
 
-    final raw = {
-      "paymentId": response.paymentId,
-      "orderId": response.orderId,
-      "signature": response.signature,
-    };
-
     await sp.activatePremium(
       response.paymentId ?? "",
       plan.id ?? "",
-      raw,
+      response,
+      plan.price ?? 0,
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Payment Successful ✔ Premium Activated")),
+      const SnackBar(content: Text("✅ Payment Successful | Premium Activated")),
     );
 
     Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
@@ -74,10 +73,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   void _failed(PaymentFailureResponse response) {
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text("❌ Payment Failed")));
+    ).showSnackBar(const SnackBar(content: Text("❌ Payment Failed")));
   }
 
   void _wallet(ExternalWalletResponse response) {}
+
+  /* ---------------- UI ---------------- */
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +89,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       backgroundColor: MyColors.color295176,
       appBarBackgroundColor: MyColors.color295176,
       body: sp.isLoading
-          ? Center(child: CommonLoader(color: Colors.white))
+          ? const Center(child: CommonLoader(color: Colors.white))
           : sp.plans.isEmpty
           ? const Center(
               child: Text(
@@ -105,8 +106,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          /* ---------- HEADER ---------- */
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: MyColors.whiteText,
               borderRadius: BorderRadius.circular(16),
@@ -123,26 +125,32 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 ),
                 hSized20,
 
-                Row(
-                  children: [
-                    Expanded(
-                      child: _priceBox(
-                        title: sp.plans[0].name ?? "",
-                        price: "₹${sp.plans[0].price}",
-                        isSelected: selectedPlanIndex == 0,
-                        onTap: () => setState(() => selectedPlanIndex = 0),
-                      ),
-                    ),
-                    wSized15,
-                    Expanded(
-                      child: _priceBox(
-                        title: sp.plans[1].name ?? "",
-                        price: "₹${sp.plans[1].price}",
-                        isSelected: selectedPlanIndex == 1,
-                        onTap: () => setState(() => selectedPlanIndex = 1),
-                      ),
-                    ),
-                  ],
+                /* ---------- ALL PLANS GRID ---------- */
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 1.3,
+                  ),
+                  itemCount: sp.plans.length,
+                  itemBuilder: (context, index) {
+                    final plan = sp.plans[index];
+                    return _priceBox(
+                      title: plan.name ?? "",
+                      price: "₹${plan.price}",
+                      isSelected: selectedPlanIndex == index,
+                      onTap: () {
+                        if (widget.isSub == "true") {
+                          _showAlreadySubscribedMsg();
+                          return;
+                        }
+                        setState(() => selectedPlanIndex = index);
+                      },
+                    );
+                  },
                 ),
               ],
             ),
@@ -150,30 +158,48 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
           hSized20,
 
+          /* ---------- FEATURES ---------- */
           Text(
             "Premium Plan",
             style: boldTextStyle(fontSize: 18, color: MyColors.whiteText),
           ),
           hSized10,
 
-          ...?sp.plans[selectedPlanIndex].features?.map((f) => _feature(f)),
+          ...(sp.plans[selectedPlanIndex].features != null &&
+                  sp.plans[selectedPlanIndex].features!.isNotEmpty
+              ? sp.plans[selectedPlanIndex].features!.map((f) => _feature(f))
+              : [
+                  "Unlimited Access",
+                  "Recorded Classes",
+                  "Premium Support",
+                ].map((f) => _feature(f))),
 
           hSized30,
 
+          /* ---------- PURCHASE BUTTON ---------- */
           CommonButton1(
             height: 45,
             title: "Purchase Premium Plan",
-            onPressed: () => openRazorpay(sp),
+            onPressed: () {
+              if (widget.isSub == "true") {
+                _showAlreadySubscribedMsg();
+                return;
+              }
+              openRazorpay(sp);
+            },
           ),
+          hSized12,
         ],
       ),
     );
   }
 
-  void openRazorpay(SubscriptionProvider sp) {
-    var plan = sp.plans[selectedPlanIndex];
+  /* ---------------- HELPERS ---------------- */
 
-    var options = {
+  void openRazorpay(SubscriptionProvider sp) {
+    final plan = sp.plans[selectedPlanIndex];
+
+    final options = {
       'key': ApiUrls.razorPayKey,
       'amount': (plan.price ?? 0) * 100,
       'name': plan.name ?? "Premium Plan",
@@ -197,7 +223,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           color: MyColors.color295176,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? MyColors.circularProgressBackgroundColor : Colors.transparent,
+            color: isSelected
+                ? MyColors.circularProgressBackgroundColor
+                : Colors.transparent,
             width: isSelected ? 3 : 1,
           ),
         ),
@@ -206,15 +234,25 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           children: [
             Text(
               title,
-              style: boldTextStyle(fontSize: 16, color: Colors.white),
+              maxLines: 2,
+              style: boldTextStyle(fontSize: 13, color: Colors.white),
             ),
             hSized5,
             Text(
               price,
-              style: mediumTextStyle(fontSize: 14, color: Colors.white),
+              style: boldTextStyle(fontSize: 14, color: Colors.white),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showAlreadySubscribedMsg() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("⚠️ You already have an active subscription"),
+        duration: Duration(seconds: 2),
       ),
     );
   }

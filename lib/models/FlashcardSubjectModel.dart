@@ -61,6 +61,10 @@ class RecentlyViewed {
   String? topicName;
   String? chapterId;
   String? chapterName;
+  int? totalFlashcards;
+  int? totalQuestions;
+  int? totalQuizzes;
+  int? totalQuizQuestions;
   String? subjectId;
   String? subjectName;
   DateTime? lastViewedAt;
@@ -70,6 +74,10 @@ class RecentlyViewed {
     this.topicId,
     this.topicName,
     this.chapterId,
+    this.totalFlashcards,
+    this.totalQuestions,
+    this.totalQuizQuestions,
+    this.totalQuizzes,
     this.chapterName,
     this.subjectId,
     this.subjectName,
@@ -80,6 +88,10 @@ class RecentlyViewed {
   factory RecentlyViewed.fromJson(Map<String, dynamic> json) => RecentlyViewed(
     topicId: json["topicId"],
     topicName: json["topicName"],
+    totalQuizzes: json["totalQuizzes"],
+    totalQuizQuestions: json["totalQuizQuestions"],
+    totalQuestions: json["totalQuestions"],
+    totalFlashcards: json["totalFlashcards"],
     chapterId: json["chapterId"],
     chapterName: json["chapterName"],
     subjectId: json["subjectId"],
@@ -93,6 +105,10 @@ class RecentlyViewed {
     "topicName": topicName,
     "chapterId": chapterId,
     "chapterName": chapterName,
+    "totalFlashcards": totalFlashcards,
+    "totalQuestions": totalQuestions,
+    "totalQuizQuestions": totalQuizQuestions,
+    "totalQuizzes": totalQuizzes,
     "subjectId": subjectId,
     "subjectName": subjectName,
     "lastViewedAt": lastViewedAt?.toIso8601String(),

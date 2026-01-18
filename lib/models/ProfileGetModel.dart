@@ -47,6 +47,7 @@ class Data {
   dynamic profilePicture;
   String? role;
   bool? isProfileComplete;
+  bool? isPremium;
   DateTime? createdAt;
   Stats? stats;
 
@@ -55,6 +56,7 @@ class Data {
     this.fullName,
     this.email,
     this.phoneNumber,
+    this.isPremium,
     this.dataClass,
     this.state,
     this.city,
@@ -76,6 +78,7 @@ class Data {
     profilePicture: json["profilePicture"],
     role: json["role"],
     isProfileComplete: json["isProfileComplete"],
+    isPremium: json["isPremium"],
     createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
     stats: json["stats"] == null ? null : Stats.fromJson(json["stats"]),
   );
@@ -91,6 +94,7 @@ class Data {
     "profilePicture": profilePicture,
     "role": role,
     "isProfileComplete": isProfileComplete,
+    "isPremium": isPremium,
     "createdAt": createdAt?.toIso8601String(),
     "stats": stats?.toJson(),
   };

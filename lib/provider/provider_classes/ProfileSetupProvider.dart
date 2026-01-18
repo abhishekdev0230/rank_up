@@ -31,6 +31,7 @@ class ProfileSetupProvider extends ChangeNotifier {
   String? selectedState;
   String? selectedCity;
   String? profilePictureGetApi;
+  String? isPremium;
 
   XFile? profileImage;
   final ImagePicker _picker = ImagePicker();
@@ -536,6 +537,7 @@ class ProfileSetupProvider extends ChangeNotifier {
         selectedState = profileData.data!.state;
         selectedCity = profileData.data!.city;
         phoneNumber = profileData.data!.phoneNumber;
+        isPremium = profileData.data!.isPremium.toString();
 
         notifyListeners();
       }

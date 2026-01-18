@@ -46,10 +46,14 @@ class Datum {
   int? totalQuizQuestions;
   int? totalQuizzes;
   int? totalQuestions;
+  bool? isFree;
+  bool? isLocked;
 
   Datum({
     this.id,
     this.name,
+    this.isFree,
+    this.isLocked,
     this.icon,
     this.description,
     this.displayOrder,
@@ -62,6 +66,8 @@ class Datum {
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
     id: json["id"],
     name: json["name"],
+    isFree: json["isFree"],
+    isLocked: json["isLocked"],
     totalQuizQuestions: json["totalQuizQuestions"],
     totalQuizzes: json["totalQuizzes"],
     icon: json["icon"],
@@ -74,6 +80,8 @@ class Datum {
   Map<String, dynamic> toJson() => {
     "id": id,
     "name": name,
+    "isLocked": isLocked,
+    "isFree": isFree,
     "totalQuizzes": totalQuizzes,
     "totalQuizQuestions": totalQuizQuestions,
     "icon": icon,

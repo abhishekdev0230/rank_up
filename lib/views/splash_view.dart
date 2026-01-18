@@ -24,18 +24,14 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkLoginStatus() async {
-    await Future.delayed(const Duration(seconds: 3)); // splash delay
-
+    await Future.delayed(const Duration(seconds: 3));
     final bool? isLogin = await StorageManager.getBool(StorageManager.isLogin);
-
     if (isLogin == true) {
-      // ✅ User already logged in → Go to Home
       CustomNavigator.pushRemoveUntil(
         context,
         BottomNavController(initialIndex: 0),
       );
     } else {
-      // 🚀 New user → Go to Onboarding
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => OnboardingScreen()),

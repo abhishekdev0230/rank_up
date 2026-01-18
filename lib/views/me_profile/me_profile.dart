@@ -21,8 +21,6 @@ import 'FaqScreen.dart';
 import 'MyQueries/MyQueriesScreen.dart';
 import 'NotificationScreen.dart';
 
-
-
 class MeProfile extends StatefulWidget {
   const MeProfile({super.key});
 
@@ -31,7 +29,6 @@ class MeProfile extends StatefulWidget {
 }
 
 class _MeProfileState extends State<MeProfile> {
-
   @override
   void initState() {
     super.initState();
@@ -101,11 +98,11 @@ class _MeProfileState extends State<MeProfile> {
                         localFile: profileProvider.profileImage != null
                             ? File(profileProvider.profileImage!.path)
                             : null,
-                        imageUrl: profileProvider.profilePictureGetApi?.toString(),
+                        imageUrl: profileProvider.profilePictureGetApi
+                            ?.toString(),
                         placeholderAsset: IconsPath.defultImage,
                         radius: 24,
                       ),
-
 
                       wSized10,
                       Expanded(
@@ -148,7 +145,9 @@ class _MeProfileState extends State<MeProfile> {
               // ---------- Subscription ----------
               GestureDetector(
                 onTap: () {
-                  CustomNavigator.pushNavigate(context, SubscriptionScreen());
+                  final isSub =  profileProvider.isPremium ;
+                  // profileProvider.isPremium == "true"?"Active": "Inactive",
+                  CustomNavigator.pushNavigate(context, SubscriptionScreen(isSub: isSub,));
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -172,7 +171,7 @@ class _MeProfileState extends State<MeProfile> {
                       ),
                       const Spacer(),
                       Text(
-                        "Inactive",
+                        profileProvider.isPremium == "true"?"Active": "Inactive",
                         style: mediumTextStyle(
                           fontSize: 14,
                           color: MyColors.blackColor,
@@ -192,9 +191,12 @@ class _MeProfileState extends State<MeProfile> {
                 children: [
                   Expanded(
                     child: _smallInfoCard(
-                    onTap: () {
-                      CustomNavigator.pushNavigate(context, BookmarkedCards(type:"Bookmarked Cards" ,));
-                    },
+                      onTap: () {
+                        CustomNavigator.pushNavigate(
+                          context,
+                          BookmarkedCards(type: "Bookmarked Cards"),
+                        );
+                      },
                       title: "Bookmarked Cards",
                       subtitle: "${profileProvider.bookmarkedCount} Cards",
                       icon: SvgPicture.asset(IconsPath.suspendedCards),
@@ -204,7 +206,10 @@ class _MeProfileState extends State<MeProfile> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        CustomNavigator.pushNavigate(context, BookmarkedCards(type:"Suspended Cards",));
+                        CustomNavigator.pushNavigate(
+                          context,
+                          BookmarkedCards(type: "Suspended Cards"),
+                        );
                       },
                       child: _smallInfoCard(
                         title: "Suspended Cards",
@@ -225,7 +230,10 @@ class _MeProfileState extends State<MeProfile> {
                     "Leaderboard",
                     Icons.leaderboard_outlined,
                     onTap: () {
-                      CustomNavigator.pushNavigate(context, const LeaderboardScreen());
+                      CustomNavigator.pushNavigate(
+                        context,
+                        const LeaderboardScreen(),
+                      );
                     },
                   ),
 

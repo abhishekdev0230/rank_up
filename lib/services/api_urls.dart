@@ -4,15 +4,13 @@ class ApiUrls {
   /// --------------------->>>>>  Google Map Keys  <<<<<----------------------------
   static const String googleApiKey = 'AIzaSyBCi-I8dhVghsr20HVVyCfkxBpsXVe2O60';
 
+  /// --------------------->>>>>  razor pay key   <<<<<----------------------------
 
   static const String razorPayKey = 'rzp_live_RqH4FL7Vqs3wMf';
 
-  static const String googlePlaceBaseUrl = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?';
-  static const String googlePlaceDetailBaseUrl =
-      'https://maps.googleapis.com/maps/api/place/details/json?';
-
   /// --------------------->>>>>  Base URL (Production)  <<<<<----------------------------
-  static const String baseUrl = "https://rankup-api-temp.onrender.com/api/v1/";
+  // static const String baseUrl = "https://rankup-api-temp.onrender.com/api/v1/";
+  static const String baseUrl = "https://api.rankupp.in/api/v1/";
 
   /// --------------------->>>>>  Auth APIs  <<<<<----------------------------
   static const String sendOtp = "${baseUrl}auth/send-otp";
@@ -72,7 +70,7 @@ class ApiUrls {
   static const String attemptReview = "${baseUrl}quiz/attempt/review";
   static const String quizBookmark = "${baseUrl}quiz/attempt/bookmark";
 
-  ///..............test..............................
+  ///..................test..............................
   static const String testsDashboard = "${baseUrl}tests/dashboard";
   static const String testsEnroll = "${baseUrl}tests/:id/enroll";
   static const String testsEnrollStart = "${baseUrl}tests/:id";

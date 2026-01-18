@@ -29,7 +29,6 @@ class _FeaturedDeckFlashcardsScreenState
   @override
   void initState() {
     super.initState();
-
     Future.microtask(() {
       Provider.of<FeaturedDeckQuestionsProvider>(
         context,
@@ -81,10 +80,10 @@ class _FeaturedDeckFlashcardsScreenState
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                           child: Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 18,
-                              vertical: 16,
-                            ),
+                            // margin: const EdgeInsets.symmetric(
+                            //   horizontal: 18,
+                            //   vertical: 16,
+                            // ),
                             padding: const EdgeInsets.all(20),
 
                             decoration: BoxDecoration(
@@ -107,15 +106,12 @@ class _FeaturedDeckFlashcardsScreenState
                             ),
 
                             child: Column(
-                              // crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
-
                               children: [
                                 /// Card Count
                                 Row(
                                   children: [
                                     Text(
-
                                       "Card ${index + 1}/${provider.questions.length}",
                                       style: TextStyle(
                                         fontSize: 14,
@@ -125,7 +121,6 @@ class _FeaturedDeckFlashcardsScreenState
                                     ),
                                   ],
                                 ),
-
                                 const SizedBox(height: 40),
 
                                 /// Question
@@ -149,7 +144,10 @@ class _FeaturedDeckFlashcardsScreenState
                                       maxHeight: 350,
                                     ),
                                     child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           "Ans :- ",
@@ -159,7 +157,8 @@ class _FeaturedDeckFlashcardsScreenState
                                             color: Colors.black,
                                             height: 1.4,
                                           ),
-                                        ), Text(
+                                        ),
+                                        Text(
                                           q.answer ?? "",
                                           style: const TextStyle(
                                             fontSize: 15,
@@ -183,16 +182,82 @@ class _FeaturedDeckFlashcardsScreenState
                                     ),
                                   ),
                                 Spacer(),
-                                Center(
-                                  child: CommonButton1(
-                                    height: 35,
-                                    width: 160,
-                                    title: "Reveal Answer",
-                                    onPressed: () {
-                                      setState(() => showAnswer = true);
-                                    },
-                                  ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    /// Prev Button
+                                    InkWell(
+                                      onTap: () {
+                                        if (pageController.page!.round() > 0) {
+                                          pageController.previousPage(
+                                            duration: const Duration(milliseconds: 300),
+                                            curve: Curves.easeInOut,
+                                          );
+                                        }
+                                      },
+                                      child: Container(
+                                        height: 38,
+                                        width: 38,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white38,
+                                          shape: BoxShape.circle,
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.black26,
+                                              blurRadius: 6,
+                                              offset: Offset(1, 2),
+                                            )
+                                          ],
+                                        ),
+                                        child: const Icon(Icons.arrow_back_ios_new, size: 18),
+                                      ),
+                                    ),
+
+                                    const SizedBox(width: 16),
+
+                                    /// Reveal Answer Button
+                                    CommonButton1(
+                                      height: 38,
+                                      width: 160,
+                                      title: "Reveal Answer",
+                                      onPressed: () {
+                                        setState(() => showAnswer = true);
+                                      },
+                                    ),
+
+                                    const SizedBox(width: 16),
+
+                                    /// Next Button
+                                    InkWell(
+                                      onTap: () {
+                                        if (pageController.page!.round() <
+                                            provider.questions.length - 1) {
+                                          pageController.nextPage(
+                                            duration: const Duration(milliseconds: 300),
+                                            curve: Curves.easeInOut,
+                                          );
+                                        }
+                                      },
+                                      child: Container(
+                                        height: 38,
+                                        width: 38,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white38,
+                                          shape: BoxShape.circle,
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.black26,
+                                              blurRadius: 6,
+                                              offset: Offset(1, 2),
+                                            )
+                                          ],
+                                        ),
+                                        child: const Icon(Icons.arrow_forward_ios, size: 18),
+                                      ),
+                                    ),
+                                  ],
                                 ),
+
                               ],
                             ),
                           ),

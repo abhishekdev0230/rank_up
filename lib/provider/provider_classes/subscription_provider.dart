@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:rank_up/models/subscription_model.dart';
 import 'package:rank_up/services/api_methods.dart';
 import 'package:rank_up/services/api_urls.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class SubscriptionProvider extends ChangeNotifier {
 
@@ -35,37 +36,51 @@ class SubscriptionProvider extends ChangeNotifier {
     } catch (e) {
       print("❌ Error Fetching Plans: $e");
     }
-
     isLoading = false;
     notifyListeners();
   }
 
   /// ------- ACTIVATE PREMIUM API -------
-  Future<void> activatePremium(String paymentId, String planId, Map<String, dynamic> fullPayload) async {
+  Future<void> activatePremium(
+      String transactionId,
+      String planId,
+      PaymentSuccessResponse response,
+      int amount,
+      ) async {
     try {
       final headers = await ApiHeaders.withStoredToken();
 
       final body = {
         "planId": planId,
-        "transactionId": paymentId,
+        "transactionId": transactionId,
         "paymentMethod": "RAZOR",
-        "rawPayload": fullPayload, // Razorpay full response
+        "rawPayload": {
+          "id": response.paymentId,
+          "status": "SUCCESS",
+          "paymentMethod": "RAZOR",
+          "amount": amount.toString(),
+        }
       };
 
-      String res = await ApiMethods().postMethod(
+      debugPrint("📤 Activate Premium Payload: $body");
+
+      final res = await ApiMethods().postMethod(
         method: ApiUrls.activateSubscription,
         body: body,
         header: headers,
       );
 
       final jsonData = jsonDecode(res);
-      print("⭐ Premium Activated Response: $jsonData");
+      debugPrint("⭐ Premium Activated Response: $jsonData");
 
-      await fetchPlans();
+      if (jsonData["status"] == true) {
+        await fetchPlans(); // refresh user subscription
+      }
 
     } catch (e) {
-      print("❌ Premium activation error: $e");
+      debugPrint("❌ Premium activation error: $e");
     }
   }
+
 
 }

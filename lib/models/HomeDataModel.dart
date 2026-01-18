@@ -163,23 +163,31 @@ class DailyQuestionSubject {
 class FeaturedDeck {
   String? id;
   String? name;
+  bool? isFree;
+  bool? isLocked;
   List<Flashcard>? flashcards;
 
   FeaturedDeck({
     this.id,
     this.name,
+    this.isFree,
+    this.isLocked,
     this.flashcards,
   });
 
   factory FeaturedDeck.fromJson(Map<String, dynamic> json) => FeaturedDeck(
     id: json["id"],
     name: json["name"],
+    isFree: json["isFree"],
+    isLocked: json["isLocked"],
     flashcards: json["flashcards"] == null ? [] : List<Flashcard>.from(json["flashcards"]!.map((x) => Flashcard.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "name": name,
+    "isLocked": isLocked,
+    "isFree": isFree,
     "flashcards": flashcards == null ? [] : List<dynamic>.from(flashcards!.map((x) => x.toJson())),
   };
 }
@@ -524,22 +532,30 @@ class User {
   String? id;
   String? name;
   String? profilePicture;
+  bool? hasSubscription;
+  bool? subscriptionExpired;
 
   User({
     this.id,
     this.name,
     this.profilePicture,
+    this.subscriptionExpired,
+    this.hasSubscription,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
     id: json["id"],
     name: json["name"],
+    hasSubscription: json["hasSubscription"],
+    subscriptionExpired: json["subscriptionExpired"],
     profilePicture: json["profilePicture"],
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "name": name,
+    "hasSubscription": hasSubscription,
+    "subscriptionExpired": subscriptionExpired,
     "profilePicture": profilePicture,
   };
 }

@@ -28,7 +28,6 @@ import 'feature_deck_questions.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -53,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _initializeDeckColors() {
     final provider = Provider.of<HomeProvider>(context, listen: false);
     final decks = provider.homeData?.data?.featuredDecks ?? [];
+
     final colorList = [
       MyColors.appTheme,
       MyColors.color32B790,
@@ -63,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
       MyColors.color9696,
       MyColors.colorFA81C3,
     ];
+
     final random = Random();
 
     setState(() {
@@ -76,7 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final provider = Provider.of<HomeProvider>(context);
     final data = provider.homeData?.data;
-
     return CommonScaffold(
       backgroundColor: MyColors.appTheme,
       appBarVisible: false,
@@ -93,19 +93,19 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               _headerSection(data, provider),
               _mainBody(data, provider),
-
             ],
           ),
         ),
       ),
     );
   }
+
   ///,..............Leaderboard................
 
   Widget _homeLeaderboardSection() {
     return Consumer<LeaderboardProvider>(
       builder: (context, lbProvider, _) {
-        final users = lbProvider.leaderboardData[0]; // All time
+        final users = lbProvider.leaderboardData[0];
         if (users.isEmpty) return const SizedBox();
 
         final top3 = users.take(3).toList();
@@ -143,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(
                   top3.length,
-                      (index) => _leaderboardUser(top3[index]),
+                  (index) => _leaderboardUser(top3[index]),
                 ),
               ),
             ),
@@ -152,6 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
   Widget _leaderboardUser(LeaderboardUser user) {
     return Column(
       children: [
@@ -161,29 +162,26 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             CircleAvatar(
               radius: 26,
-              backgroundImage: (user.profilePicture != null &&
-                  user.profilePicture!.isNotEmpty)
+              backgroundImage:
+                  (user.profilePicture != null &&
+                      user.profilePicture!.isNotEmpty)
                   ? NetworkImage(user.profilePicture!)
                   : const AssetImage("assets/images/defultImage.png")
-              as ImageProvider,
+                        as ImageProvider,
             ),
 
             /// Rank Badge
             Positioned(
-              bottom: -6, // ✅ allowed here
+              bottom: -6,
               child: Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: MyColors.color19B287,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   "#${user.rank}",
-                  style: semiBoldTextStyle(
-                    fontSize: 10,
-                    color: Colors.white,
-                  ),
+                  style: semiBoldTextStyle(fontSize: 10, color: Colors.white),
                 ),
               ),
             ),
@@ -200,7 +198,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   /// ---------------- Header Section ----------------
   Widget _headerSection(HomeData? data, HomeProvider provider) {
     final user = data?.user;
@@ -214,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _headerTop(user,provider),
+          _headerTop(user, provider),
           const SizedBox(height: 24),
           _progressSection(progress, completedModules),
         ],
@@ -222,13 +219,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _headerTop(User? user,provider) {
+  Widget _headerTop(User? user, provider) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         GestureDetector(
           onTap: () {
-
             CustomNavigator.pushNavigate(context, ProfileScreen());
           },
           child: Row(
@@ -244,10 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text(
                     "${provider.getGreeting()},",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.white70,
-                    ),
+                    style: const TextStyle(fontSize: 14, color: Colors.white70),
                   ),
 
                   Text(
@@ -263,19 +256,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-         GestureDetector(
-
-
-
-             onTap: (){
-               pushScreen(
-                 context,
-                 screen: NotificationScreen(),
-                 withNavBar: false,
-               );
-
-             },
-             child: Icon(Icons.notifications_none, color: Colors.white, size: 28)),
+        GestureDetector(
+          onTap: () {
+            pushScreen(
+              context,
+              screen: NotificationScreen(),
+              withNavBar: false,
+            );
+          },
+          child: Icon(Icons.notifications_none, color: Colors.white, size: 28),
+        ),
       ],
     );
   }
@@ -318,23 +308,23 @@ class _HomeScreenState extends State<HomeScreen> {
           hSized24,
           _title("Question/Flashcard of the Day"),
           hSized10,
-          if (data?.dailyQuestion != null) _qotdSection(data!.dailyQuestion!),
+          if (data?.dailyQuestion != null) _qotdSection(data!.dailyQuestion!,data.user),
           hSized24,
-
-          if (data?.featuredDecks?.isNotEmpty == true)     Text(
-            "Featured Deck",
-            style: semiBoldTextStyle(fontSize: 19, color: MyColors.blackColor),
-          ),
-          if (data?.featuredDecks?.isNotEmpty == true)  hSized10,
           if (data?.featuredDecks?.isNotEmpty == true)
-            featuredDecks(data!.featuredDecks!, provider),
-          hSized24,
+            Text(
+              "Featured Deck",
+              style: semiBoldTextStyle(
+                fontSize: 19,
+                color: MyColors.blackColor,
+              ),
+            ),
+          if (data?.featuredDecks?.isNotEmpty == true) hSized10,
+          if (data?.featuredDecks?.isNotEmpty == true) featuredDecks(data!.featuredDecks!, provider),
+          if (data?.liveTest != null)   hSized24,
           if (data?.liveTest != null) _liveTestCard(data!.liveTest!),
-          hSized24,
-
+          if (data?.pausedModule != null)  hSized24,
           if (data?.pausedModule != null) _moduleCard(data!.pausedModule!),
-          hSized24,
-
+          if (data?.solveNext != null)    hSized24,
           if (data?.solveNext != null) solveNext(data!.solveNext!),
           hSized24,
           Row(
@@ -347,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ImportantTopicsScreen(),
+                        builder: (_) => ImportantTopicsScreen(isPremium: data?.user?.hasSubscription.toString() ?? "false"),
                       ),
                     );
                   });
@@ -357,7 +347,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(color: MyColors.darkBlue),
                 ),
               ),
-
             ],
           ),
           if (data?.importantTopics?.isNotEmpty == true)
@@ -366,12 +355,13 @@ class _HomeScreenState extends State<HomeScreen> {
           _homeLeaderboardSection(),
           hSized20,
 
-          _subscriptionButton(),
-          hSized20,
+         if(data?.user?.hasSubscription.toString() != "true") _subscriptionButton(),
+          if(data?.user?.hasSubscription.toString() != "true")  hSized20,
         ],
       ),
     );
   }
+
 
   /// ---------------- Title Widget ----------------
   Widget _title(String text) => Text(
@@ -397,13 +387,21 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// ---------------- QOTD ----------------
-  Widget _qotdSection(DailyQuestion qotd) {
+  Widget _qotdSection(DailyQuestion qotd, User? user) {
+    final bool hasSubscription = user?.hasSubscription == true;
+
     return commonContainer(
       Row(
         children: [
           if (qotd.icon != null)
-            CommonNetworkImage(imageUrl: qotd.icon!, height: 24, width: 24),
+            CommonNetworkImage(
+              imageUrl: qotd.icon!,
+              height: 24,
+              width: 24,
+            ),
+
           wSized7,
+
           Expanded(
             child: Text(
               "Q: ${qotd.questionText ?? ''}",
@@ -413,26 +411,48 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+
           wSized10,
-          CommonButton(title: "Reveal", onPressed: () {
 
-
-            pushScreen(
-              context,
-              screen: DimensionalAnalysis(
-                title: qotd.chapter?.name ?? "",
-                type: "TackQuiz",
-                totalFlashcards: "0",
-                totalQuizzes: qotd.chapter?.id.toString() ?? "0",
-                totalQuestions: "1",
-                topicId: qotd.topic?.id.toString() ?? "",
+          /// ✅ CONDITION HERE
+          hasSubscription
+              ? CommonButton(
+            title: "Reveal",
+            onPressed: () {
+              pushScreen(
+                context,
+                screen: DimensionalAnalysis(
+                  title: qotd.chapter?.name ?? "",
+                  type: "TackQuiz",
+                  totalFlashcards: "0",
+                  totalQuizzes: qotd.chapter?.id ?? "0",
+                  totalQuestions: "1",
+                  topicId: qotd.topic?.id ?? "",
+                ),
+                withNavBar: true,
+                pageTransitionAnimation:
+                PageTransitionAnimation.cupertino,
+              );
+            },
+          )
+              : GestureDetector(
+            onTap: () {
+              CustomNavigator.pushNavigate(context, SubscriptionScreen());
+            },
+            child: Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(10),
               ),
-              withNavBar: true,
-              pageTransitionAnimation:
-              PageTransitionAnimation.cupertino,
-            );
-
-          }),
+              child: const Icon(
+                Icons.lock,
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -440,42 +460,87 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// ---------------- Featured Decks ----------------
   Widget featuredDecks(List<FeaturedDeck> decks, HomeProvider provider) {
+    if (decks.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: List.generate(decks.length, (index) {
           final deck = decks[index];
-
           final isSelected = provider.selectedDeckIndex == index;
+          final isLocked = deck.isLocked == true && deck.isFree == false;
 
-          return GestureDetector(
-            onTap: () {
-              provider.setSelectedDeckIndex(index);
-              if (deck != null) {
+          final bgColor = deckColors.isEmpty
+              ? MyColors.appTheme
+              : deckColors[index % deckColors.length];
+
+          return Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: GestureDetector(
+              onTap: isLocked
+                  ? () {
                 CustomNavigator.pushNavigate(
                   context,
-                  FeaturedDeckFlashcardsScreen(deckId:deck.id.toString(), deckName: deck.name.toString(),),
+                  SubscriptionScreen(),
                 );
               }
-            },
-            child: Container(
-              margin: const EdgeInsets.only(right: 10),
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: deckColors[index] ?? MyColors.appTheme,
-                border: Border.all(
-                  color: isSelected ? MyColors.colorFA81C3 : Colors.transparent,
-                  width: 2,
-                ),
-                borderRadius: BorderRadius.circular(13),
-              ),
-              height: 65,
-              width: 78,
-              alignment: Alignment.center,
-              child: Text(
-                deck.name.toString() ?? "",
-                textAlign: TextAlign.center,
-                style: mediumTextStyle(fontSize: 12, color: MyColors.whiteText),
+                  : () {
+                provider.setSelectedDeckIndex(index);
+                CustomNavigator.pushNavigate(
+                  context,
+                  FeaturedDeckFlashcardsScreen(
+                    deckId: deck.id ?? "",
+                    deckName: deck.name ?? "",
+                  ),
+                );
+              },
+              child: Stack(
+                children: [
+                  Container(
+                    height: 65,
+                    width: 78,
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      borderRadius: BorderRadius.circular(13),
+                      border: Border.all(
+                        color: isSelected
+                            ? MyColors.colorFA81C3
+                            : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: Text(
+                      deck.name ?? "",
+                      textAlign: TextAlign.center,
+                      style: mediumTextStyle(
+                        fontSize: 12,
+                        color: MyColors.whiteText,
+                      ),
+                    ),
+                  ),
+
+                  /// 🔒 LOCK OVERLAY
+                  if (isLocked)
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(13),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.lock,
+                            color: Colors.white,
+                            size: 22,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           );
@@ -532,7 +597,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                           test.id.toString(),
                           test.title ?? "",
-                          totalQuetion:test.totalQuestions,
+                          totalQuetion: test.totalQuestions,
                           true,
                         );
                       }
@@ -704,7 +769,6 @@ class _HomeScreenState extends State<HomeScreen> {
         children: topics.map((topic) {
           return GestureDetector(
             onTap: () {
-
               if (topic.id != null) {
                 CustomNavigator.pushNavigate(
                   context,
@@ -714,9 +778,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             child: Container(
               margin: const EdgeInsets.only(right: 12),
-              child: _importantTopicCard(
-                topic.name ?? "",
-              ),
+              child: _importantTopicCard(topic.name ?? ""),
             ),
           );
         }).toList(),
@@ -725,7 +787,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// ---------------- Important Topic Card ----------------
-  Widget _importantTopicCard(String title, ) {
+  Widget _importantTopicCard(String title) {
     return Container(
       alignment: Alignment.center,
       padding: const EdgeInsets.all(12),
@@ -749,8 +811,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _subscriptionButton() {
     return Center(
       child: GestureDetector(
-        onTap: (){
-
+        onTap: () {
           CustomNavigator.pushNavigate(context, SubscriptionScreen());
         },
         child: Container(
@@ -769,16 +830,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-
-
-
-
-
-
-
-
-
 
   /// ---------------- Common Container ----------------
   Widget commonContainer(Widget child, {Color? containerBgColor}) {
@@ -916,7 +967,7 @@ class CommonButton1 extends StatelessWidget {
     this.borderColor,
     this.height,
     this.width,
-    this.padding, // <-- ADD THIS
+    this.padding,
   });
 
   @override

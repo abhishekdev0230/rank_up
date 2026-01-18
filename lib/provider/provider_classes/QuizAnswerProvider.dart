@@ -11,13 +11,13 @@ class QuizAnswerProvider extends ChangeNotifier {
   static int totalTimeUsed1 = 0;
   DateTime? _quizStartTime;
 
-
   void setTotalTime() {
     if (_quizStartTime != null) {
       totalTimeUsed1 = DateTime.now().difference(_quizStartTime!).inSeconds;
       notifyListeners();
     }
   }
+
   void startQuizTimer() {
     _quizStartTime = DateTime.now();
     totalTimeUsed1 = 0;
@@ -29,8 +29,8 @@ class QuizAnswerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-
   int get totalTimeUsed => totalTimeUsed1;
+
   /// Store selected answer per question
   final Map<String, String> _selectedAnswers = {};
 
@@ -44,6 +44,7 @@ class QuizAnswerProvider extends ChangeNotifier {
     _selectedAnswers[questionId] = optionId;
     notifyListeners();
   }
+
   String? getAnswerOrSubmitted(String questionId) {
     if (_selectedAnswers.containsKey(questionId)) {
       return _selectedAnswers[questionId];
@@ -94,10 +95,9 @@ class QuizAnswerProvider extends ChangeNotifier {
       } else {
         Helper.customToast(decoded.message ?? "Something went wrong");
       }
-    }  catch (e) {
+    } catch (e) {
       CommonLoaderApi.hide(context);
       Helper.customToast("Error submitting answer");
     }
   }
 }
-

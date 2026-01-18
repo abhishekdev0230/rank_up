@@ -13,6 +13,8 @@ import 'package:rank_up/provider/provider_classes/flashcard_provider.dart';
 import 'package:rank_up/views/FlashcardQ/NeetPYQsFlashcardsInner.dart';
 import 'package:rank_up/views/FlashcardQ/flashcards_innner_1.dart';
 
+import 'DimensionalAnalysis/dimensional_analysis.dart';
+
 class FlashcardScreen extends StatefulWidget {
   const FlashcardScreen({super.key});
 
@@ -168,14 +170,25 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                                         onTab: () {
                                           CustomNavigator.pushNavigate(
                                             context,
-                                            NeetPYQsFlashcardsInner(
+                                            DimensionalAnalysis(
+                                              title: item.topicName ?? "Untitled",
+                                              totalFlashcards: item.totalFlashcards.toString(),
+                                              totalQuestions: item.totalQuestions.toString(),
+                                              totalQuizzes: item.totalQuizzes.toString(),
+                                              type: "",
                                               topicId: item.topicId.toString(),
                                             ),
                                           ).then((value) {
-                                            print("sdfkdsklfsdfjhskf");
-                                            final provider = Provider.of<FlashcardProvider>(context, listen: false);
-                                            provider.init(context,showLoader: false);
-                                          },);
+                                            final provider =
+                                                Provider.of<FlashcardProvider>(
+                                                  context,
+                                                  listen: false,
+                                                );
+                                            provider.init(
+                                              context,
+                                              showLoader: false,
+                                            );
+                                          });
                                         },
                                       ),
                                     )
@@ -200,17 +213,21 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
     required String selectedClassCode,
   }) {
     return GestureDetector(
-      onTap: () => CustomNavigator.pushNavigate(
-        context,
-        FlashcardInnerPhysicsScreen(
-          selectIndexId: subjectId,
-          selectClass: selectedClassCode,
-        ),
-      ).then((value) {
-        print("sdfkdsklfsdfjhskf");
-        final provider = Provider.of<FlashcardProvider>(context, listen: false);
-        provider.init(context,showLoader: false);
-      },),
+      onTap: () =>
+          CustomNavigator.pushNavigate(
+            context,
+            FlashcardInnerPhysicsScreen(
+              selectIndexId: subjectId,
+              selectClass: selectedClassCode,
+            ),
+          ).then((value) {
+            print("sdfkdsklfsdfjhskf");
+            final provider = Provider.of<FlashcardProvider>(
+              context,
+              listen: false,
+            );
+            provider.init(context, showLoader: false);
+          }),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),

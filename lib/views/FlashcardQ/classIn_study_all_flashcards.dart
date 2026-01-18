@@ -10,6 +10,8 @@ import 'package:rank_up/custom_classes/loder.dart';
 import 'package:rank_up/provider/provider_classes/flashcard_topics_provider.dart';
 import 'package:rank_up/views/FlashcardQ/DimensionalAnalysis/dimensional_analysis.dart';
 
+import '../me_profile/SubscriptionScreen/SubscriptionScreen.dart';
+
 class ClassStudyFlashcardsScreen extends StatefulWidget {
   final String type;
   final String selectId;
@@ -105,32 +107,45 @@ class _ClassStudyFlashcardsScreenState
                                   const SizedBox(height: 12),
                               itemBuilder: (context, index) {
                                 final topic = topics[index];
+                                final bool isLocked =
+                                    topic.isLocked == true &&
+                                    topic.isFree == false;
                                 return GestureDetector(
-                                  onTap: () async {
-                                    final provider = context
-                                        .read<FlashcardTopicsProvider>();
-                                    provider.viewChapters(
-                                      context,
-                                      topic.id ?? "",
-                                    );
-
-                                    CustomNavigator.pushNavigate(
-                                      context,
-                                      DimensionalAnalysis(
-                                        title: topic.name.toString(),
-                                        totalQuizzes: topic.totalQuizzes.toString(),
-                                        totalQuestions: topic.totalQuizQuestions.toString(),
-                                        totalFlashcards: topic.totalFlashcards
-                                            .toString(),
-                                        type: topic.id ?? "",
-                                        topicId: topic.id ?? "",
-                                      ),
-                                    );
-                                  },
+                                  onTap: isLocked
+                                      ? () {
+                                          CustomNavigator.pushNavigate(
+                                            context,
+                                            SubscriptionScreen(),
+                                          );
+                                        }
+                                      : () async {
+                                          final provider = context.read<FlashcardTopicsProvider>();
+                                          provider.viewChapters(
+                                            context,
+                                            topic.id ?? "",
+                                          );
+                                          CustomNavigator.pushNavigate(
+                                            context,
+                                            DimensionalAnalysis(
+                                              title: topic.name.toString(),
+                                              totalQuizzes: topic.totalQuizzes
+                                                  .toString(),
+                                              totalQuestions: topic
+                                                  .totalQuizQuestions
+                                                  .toString(),
+                                              totalFlashcards: topic
+                                                  .totalFlashcards
+                                                  .toString(),
+                                              type: topic.id ?? "",
+                                              topicId: topic.id ?? "",
+                                            ),
+                                          );
+                                        },
                                   child: _topicCard(
                                     title: topic.name ?? "Untitled",
                                     flashcards: topic.totalFlashcards ?? 0,
                                     quizzes: topic.totalQuizzes ?? 0,
+                                    isLocked: isLocked,
                                   ),
                                 );
                               },
@@ -143,20 +158,11 @@ class _ClassStudyFlashcardsScreenState
     );
   }
 
-  num _getTotalFlashcards(List topics) {
-    num total = 0;
-    for (var t in topics) {
-      // fallback to totalQuizzes if flashcards is missing
-      total += (t.totalFlashcards ?? t.totalQuizzes ?? 0);
-    }
-    return total;
-  }
-
-
   Widget _topicCard({
     required String title,
     required int flashcards,
     required int quizzes,
+    required bool isLocked,
   }) {
     return Container(
       width: double.infinity,
@@ -165,33 +171,60 @@ class _ClassStudyFlashcardsScreenState
         color: const Color(0xFF1F4E79),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.menu_book_rounded,
-                color: Colors.white,
-                size: 26,
-              ),
-              wSized8,
-              Expanded(
-                child: Text(
-                  title,
-                  style: semiBoldTextStyle(color: Colors.white, fontSize: 18),
+          /// LEFT CONTENT
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.menu_book_rounded,
+                      color: Colors.white,
+                      size: 26,
+                    ),
+                    wSized8,
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: semiBoldTextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            "$flashcards Flashcards | $quizzes Quizzes",
-            style: regularTextStyle(
-              color: Colors.white.withOpacity(0.85),
-              fontSize: 14,
+                const SizedBox(height: 6),
+                Text(
+                  "$flashcards Flashcards | $quizzes Quizzes",
+                  style: regularTextStyle(
+                    color: Colors.white.withOpacity(0.85),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
           ),
+
+          /// RIGHT LOCK ICON
+          if (isLocked)
+            Container(
+              margin: const EdgeInsets.only(left: 8),
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.35),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(
+                Icons.lock_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
         ],
       ),
     );

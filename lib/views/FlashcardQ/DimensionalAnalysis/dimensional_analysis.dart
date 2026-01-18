@@ -60,8 +60,6 @@ class _DimensionalAnalysisState extends State<DimensionalAnalysis> {
   @override
   Widget build(BuildContext context) {
     final quizAnswerProvider = Provider.of<QuizAnswerProvider>(context, listen: false);
-    // final questions = startQuizProvider.startQuizModel?.data?.questions ?? [];
-    // final currentQuestion = questions[currentQuestionIndex];
     return CommonScaffold(
       backgroundColor: MyColors.appTheme,
       title: widget.title,
@@ -182,7 +180,6 @@ class _DimensionalAnalysisState extends State<DimensionalAnalysis> {
                                     listen: false,
                                   );
 
-                              // 🔹 Start quiz API call
                               await quizStartProvider.startQuiz(
                                 context,
                                 quiz.id ?? "",
@@ -207,7 +204,6 @@ class _DimensionalAnalysisState extends State<DimensionalAnalysis> {
                                   selectedOptionId = null;
                                 });
                               } else {
-                                // 🔹 Handle "Quiz already started" gracefully
                                 if (quizStartProvider.startQuizModel?.message ==
                                     "Quiz has already been started") {
                                   Helper.customToast(
