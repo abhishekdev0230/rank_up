@@ -37,7 +37,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '276170592360',
     projectId: 'rankup-956b5',
     storageBucket: 'rankup-956b5.firebasestorage.app',
-    iosBundleId: 'com.example.rankUp',
+    iosBundleId: 'com.rank_up',
   );
 
   // ------------------- WEB -------------------

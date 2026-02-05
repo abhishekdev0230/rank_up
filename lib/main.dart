@@ -13,7 +13,6 @@ import 'Utils/app_localization_delegates.dart';
 import 'Utils/notifiction_hendler.dart';
 import 'firebase_options.dart';
 
-// NotificationServices notificationService = NotificationServices();
 NotificationServices notificationService = NotificationServices();
 String deviceId = "";
 String deviceType = "";
@@ -24,8 +23,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  bool isLogin = await StorageManager.readData(StorageManager.isLogin.toString()) ?? false;
-
   runApp(
     AppProviders.init(
       child: const MyApp(),
