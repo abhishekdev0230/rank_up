@@ -14,16 +14,23 @@ class LeaderboardUser {
     required this.name,
     this.profilePicture,
   });
+
   factory LeaderboardUser.fromJson(Map<String, dynamic> json) {
     final user = json['user'] ?? {};
     return LeaderboardUser(
-      rank: json['rank'] ?? 0,
-      userId: json['userId'] ?? "",
-      avgPercentage: json['avg_percentage'] ?? 0,
-      attempts: json['attempts'] ?? 0,
+      rank: _toInt(json['rank']),
+      userId: json['userId']?.toString() ?? "",
+      avgPercentage: _toInt(json['avg_percentage']),
+      attempts: _toInt(json['attempts']),
       name: user['fullName'] ?? "Unknown",
       profilePicture: user['profilePicture'],
     );
   }
 
+  static int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.round();
+    return int.tryParse(value.toString()) ?? 0;
+  }
 }

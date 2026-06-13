@@ -158,12 +158,14 @@ class _FeaturedDeckFlashcardsScreenState
                                             height: 1.4,
                                           ),
                                         ),
-                                        Text(
-                                          q.answer ?? "",
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            color: Colors.black87,
-                                            height: 1.4,
+                                        Expanded(
+                                          child: Text(
+                                            q.answer ?? "",
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black87,
+                                              height: 1.4,
+                                            ),
                                           ),
                                         ),
                                       ],

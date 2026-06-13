@@ -17,16 +17,17 @@ import '../../custom_classes/custom_navigator.dart';
 import '../../provider/provider_classes/LoginOptionContainer.dart';
 import '../../services/local_storage.dart';
 import '../bottom_navigation_bar.dart';
-import 'ProfileSetupContainer.dart';
 
 class PhoneNumberContainer extends StatefulWidget {
   final dynamic lang;
   final Function(String phone, String countryCode, bool rememberMe)? onSignInTap;
+  final void Function(Map<String, dynamic>? data)? onGoogleProfileSetupNeeded;
 
   const PhoneNumberContainer({
     super.key,
     required this.lang,
     this.onSignInTap,
+    this.onGoogleProfileSetupNeeded,
   });
 
   @override
@@ -49,6 +50,7 @@ class _PhoneNumberContainerState extends State<PhoneNumberContainer> {
   Widget build(BuildContext context) {
     final lang = widget.lang;
     final otpProvider = Provider.of<OtpProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context);
 
     return Container(
       key: const ValueKey('otpContainer'),
@@ -203,29 +205,43 @@ class _PhoneNumberContainerState extends State<PhoneNumberContainer> {
                   /// 🔹 Google Sign-In Button
                   CommonButton(
                     borderRadius: 30,
-                    text: lang.signInWithGoogle,
-                    icon: SvgPicture.asset(
-                      IconsPath.googleWithColore,
-                      height: context.hp(0.025),
-                    ),
+                    text: authProvider.isLoading
+                        ? "Please wait..."
+                        : lang.signInWithGoogle,
+                    icon: authProvider.isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: MyColors.whiteText,
+                            ),
+                          )
+                        : SvgPicture.asset(
+                            IconsPath.googleWithColore,
+                            height: context.hp(0.025),
+                          ),
                     textColor: MyColors.whiteText,
                     backgroundColor: MyColors.appTheme,
-                    onTap: () async {
-                      final authProvider = Provider.of<AuthProvider>(
-                        context,
-                        listen: false,
-                      );
-
+                    onTap: authProvider.isLoading
+                        ? null
+                        : () async {
                       final result = await authProvider.login(context);
 
                       if (result != null && result["success"] == true) {
                         final data = result["data"];
+                        final isNewUser = result["isNewUser"] ?? false;
                         final profileComplete = data != null
                             ? (data["profileComplete"] ?? false)
                             : false;
 
-                        if (profileComplete.toString().toLowerCase() == "true") {
-                          await StorageManager.savingData(StorageManager.isLogin, true);
+                        if (!isNewUser ||
+                            profileComplete.toString().toLowerCase() ==
+                                "true") {
+                          await StorageManager.savingData(
+                            StorageManager.isLogin,
+                            true,
+                          );
                           if (!context.mounted) return;
                           CustomNavigator.pushRemoveUntil(
                             context,
@@ -233,14 +249,10 @@ class _PhoneNumberContainerState extends State<PhoneNumberContainer> {
                           );
                         } else {
                           if (!context.mounted) return;
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (_) => ProfileSetupContainer(lang: lang),
-                          );
+                          widget.onGoogleProfileSetupNeeded?.call(data);
                         }
-                      } else {
+                      } else if (result?["canceled"] != true) {
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Google Sign-In canceled or failed.'),

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:rank_up/Utils/languages.dart';
 import 'package:rank_up/constraints/font_family.dart';
 import 'package:rank_up/constraints/icon_path.dart';
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
 import 'package:rank_up/constraints/sizedbox_height.dart';
+import 'package:rank_up/provider/provider_classes/ProfileSetupProvider.dart';
 
 import 'LoginOptionContainer.dart';
 import 'PhoneNumberContainer.dart';
@@ -27,6 +29,21 @@ class _RankUpLoginScreenState extends State<RankUpLoginScreen> {
 
   String phoneNumber = '';
   String countryCode = '+91';
+
+  void _openGoogleProfileSetup(Map<String, dynamic>? data) {
+    final profileProvider = Provider.of<ProfileSetupProvider>(
+      context,
+      listen: false,
+    );
+    profileProvider.setFullName(data?["fullName"] ?? "");
+    profileProvider.setEmail(data?["email"] ?? "");
+    profileProvider.setLoggedInViaGoogle(true);
+    setState(() {
+      showOtpContainer = false;
+      showOtpVerifyContainer = false;
+      showProfileSetup = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +129,7 @@ class _RankUpLoginScreenState extends State<RankUpLoginScreen> {
                     : showOtpContainer
                     ? PhoneNumberContainer(
                   lang: lang,
+                  onGoogleProfileSetupNeeded: _openGoogleProfileSetup,
                   onSignInTap: (phone, code,rememberMe) {
                     setState(() {
                       rememberMe1 = rememberMe;
@@ -123,6 +141,7 @@ class _RankUpLoginScreenState extends State<RankUpLoginScreen> {
                 )
                     : LoginOptionContainer(
                   lang: lang,
+                  onGoogleProfileSetupNeeded: _openGoogleProfileSetup,
                   onMobileLoginTap: () {
                     setState(() {
                       showOtpContainer = true;

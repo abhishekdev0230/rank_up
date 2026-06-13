@@ -67,7 +67,7 @@ class SettingsSheet {
                     Navigator.pop(context);
 
                     Share.share(
-                      'Check out this amazing app:\nhttps://play.google.com/store/apps/details?id=com.yourapp',
+                      'Check out this amazing app:\nhttps://play.google.com/store/apps/details?id=com.rank_up&pcampaignid=web_share',
                       subject: 'RankUp App',
                     );
                   },

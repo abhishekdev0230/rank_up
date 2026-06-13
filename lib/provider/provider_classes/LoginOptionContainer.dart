@@ -10,6 +10,7 @@ import 'package:rank_up/main.dart';
 class AuthProvider extends ChangeNotifier {
   GoogleSignInAccount? currentUser;
   bool isInitialized = false;
+  bool isLoading = false;
 
   AuthProvider() {
     initGoogle();
@@ -56,23 +57,22 @@ class AuthProvider extends ChangeNotifier {
   /// LOGIN (authenticate → get idToken → Firebase → backend)
   /// ---------------------------------------------------------
   Future<Map<String, dynamic>?> login(BuildContext context) async {
+    isLoading = true;
+    notifyListeners();
+
     try {
       debugPrint("==============================================");
       debugPrint("🔵 GOOGLE LOGIN STARTED");
       debugPrint("==============================================");
 
-      // Step 1 → Authenticate UI Open
-      await GoogleSignIn.instance.authenticate();
-      debugPrint("✔ Step 1: Google Authentication UI Opened");
-
-      if (currentUser == null) {
-        debugPrint("❌ ERROR: Google user is NULL after authentication");
-        return null;
-      }
+      // Step 1 → Authenticate and use returned account (avoids stream race)
+      final user = await GoogleSignIn.instance.authenticate();
+      currentUser = user;
+      notifyListeners();
+      debugPrint("✔ Step 1: Google Authentication successful");
 
       // Step 2 → Get IdToken (NEW API)
-      final GoogleSignInAuthentication auth =
-      await currentUser!.authentication;
+      final GoogleSignInAuthentication auth = user.authentication;
 
       final idToken = auth.idToken;
       if (idToken == null) {
@@ -80,7 +80,7 @@ class AuthProvider extends ChangeNotifier {
         return null;
       }
 
-      debugPrint("✔ Step 2: ID Token Fetched${currentUser!.email}");
+      debugPrint("✔ Step 2: ID Token Fetched ${user.email}");
       debugPrint("🟦 ID Token (Short) → ${idToken.substring(0, 25)}...");
 
       // Step 3 → Firebase Sign In
@@ -91,7 +91,7 @@ class AuthProvider extends ChangeNotifier {
 
       // Step 4 → Your backend login
       final requestBody = {
-        "email": currentUser!.email,
+        "email": user.email,
         "device_id": deviceId ?? "",
         "device_type": deviceType ?? "android",
         "fcm_token": fcmToken ?? "",
@@ -135,9 +135,20 @@ class AuthProvider extends ChangeNotifier {
       debugPrint("🔴 BACKEND LOGIN FAILED");
 
       return {"success": false};
+    } on GoogleSignInException catch (e) {
+      debugPrint("Google Sign-In exception: $e");
+      if (e.code == GoogleSignInExceptionCode.canceled ||
+          e.code == GoogleSignInExceptionCode.interrupted ||
+          e.code == GoogleSignInExceptionCode.uiUnavailable) {
+        return {"success": false, "canceled": true};
+      }
+      return null;
     } catch (e) {
       debugPrint("🔥 Google Login Error: $e");
       return null;
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
   }
 
