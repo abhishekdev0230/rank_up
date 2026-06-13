@@ -7,6 +7,7 @@ import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/constraints/my_fonts_style.dart';
 import 'package:rank_up/views/tests_screen/tests_screen.dart';
 import '../provider/provider_classes/HomeProvider.dart';
+import '../provider/provider_classes/NotificationBadgeProvider.dart';
 import '../provider/provider_classes/leaderboard_provider.dart';
 import 'FlashcardQ/flashcard_screen.dart';
 import 'Home/home_view.dart';
@@ -37,6 +38,10 @@ class _BottomNavControllerState extends State<BottomNavController> {
     _controller = PersistentTabController(initialIndex: widget.initialIndex);
     _lastIndex = widget.initialIndex;
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationBadgeProvider.handleAppResumed();
+    });
+
     _controller.addListener(() {
       if (_suppressMeTap) return;
 
@@ -46,6 +51,7 @@ class _BottomNavControllerState extends State<BottomNavController> {
         // Home tab
         context.read<HomeProvider>().fetchHomeData(context);
         context.read<LeaderboardProvider>().fetchLeaderboard();
+        NotificationBadgeProvider.handleAppResumed();
       }
 
       if (idx == 1) {

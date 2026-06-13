@@ -23,6 +23,7 @@ import 'package:rank_up/provider/provider_classes/quiz_complete_provider.dart';
 import 'package:rank_up/provider/provider_classes/subscription_provider.dart';
 import 'provider_classes/BookmarkedCardsProvider.dart';
 import 'provider_classes/ImportantTopicsProvider.dart';
+import 'provider_classes/NotificationBadgeProvider.dart';
 import 'provider_classes/OnboardingProvider.dart';
 
 class AppProviders {
@@ -53,6 +54,7 @@ class AppProviders {
         ChangeNotifierProvider(create: (_) => AuthActionsProvider()),
         ChangeNotifierProvider(create: (_) => FeaturedDeckQuestionsProvider()),
         ChangeNotifierProvider(create: (_) => LeaderboardProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationBadgeProvider()),
       ],
       child: child,
     );

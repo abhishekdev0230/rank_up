@@ -9,11 +9,25 @@ import 'package:rank_up/services/local_storage.dart';
 import 'package:rank_up/views/bottom_navigation_bar.dart';
 import 'package:rank_up/views/splash_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rank_up/firebase_options.dart';
+import 'package:rank_up/provider/provider_classes/NotificationBadgeProvider.dart';
 import 'Utils/app_localization_delegates.dart';
 import 'Utils/notifiction_hendler.dart';
-import 'firebase_options.dart';
 
 NotificationServices notificationService = NotificationServices();
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await NotificationBadgeProvider.incrementPersisted(
+    notificationId: message.messageId ??
+        message.data['notificationId']?.toString() ??
+        message.data['id']?.toString(),
+  );
+}
+
 String deviceId = "";
 String deviceType = "";
 String fcmToken = "";
@@ -23,6 +37,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   runApp(
     AppProviders.init(
       child: const MyApp(),
@@ -43,7 +58,7 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Locale? _locale;
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
@@ -56,13 +71,37 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     Future.microtask(() {
       getId();
       pushFCMToken();
       notificationService.requestNotificationPermission();
       notificationService.setupInteractMessage(context);
-      // Provider.of<DeviceProvider>(context, listen: false).initDeviceInfo();
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+        NotificationBadgeProvider.markAppBackgrounded();
+        break;
+      case AppLifecycleState.resumed:
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          NotificationBadgeProvider.handleAppResumed();
+        });
+        break;
+      case AppLifecycleState.inactive:
+        break;
+    }
   }
 
   @override

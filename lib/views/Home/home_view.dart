@@ -17,6 +17,7 @@ import 'package:rank_up/provider/provider_classes/HomeProvider.dart';
 import 'package:rank_up/views/FlashcardQ/NeetPYQsFlashcardsInner.dart';
 import 'package:rank_up/views/Home/ImportantTopicsScreen.dart';
 import '../../models/LeaderboardModel.dart';
+import '../../provider/provider_classes/NotificationBadgeProvider.dart';
 import '../../provider/provider_classes/leaderboard_provider.dart';
 import '../FlashcardQ/DimensionalAnalysis/dimensional_analysis.dart';
 import '../me_profile/LeaderboardScreen.dart';
@@ -32,19 +33,36 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.microtask(() {
         context.read<LeaderboardProvider>().fetchLeaderboard();
+        context.read<NotificationBadgeProvider>().reloadFromStorage();
       });
       Provider.of<HomeProvider>(
         context,
         listen: false,
       ).fetchHomeData(context).then((_) => _initializeDeckColors());
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        NotificationBadgeProvider.handleAppResumed();
+      });
+    }
   }
 
   Map<int, Color> deckColors = {};
@@ -256,15 +274,57 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        GestureDetector(
-          onTap: () {
-            pushScreen(
-              context,
-              screen: NotificationScreen(),
-              withNavBar: false,
+        Consumer<NotificationBadgeProvider>(
+          builder: (context, badgeProvider, _) {
+            return GestureDetector(
+              onTap: () async {
+                await badgeProvider.clearUnread();
+                if (!context.mounted) return;
+                pushScreen(
+                  context,
+                  screen: NotificationScreen(),
+                  withNavBar: false,
+                );
+              },
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Icon(
+                    Icons.notifications_none,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                  if (badgeProvider.hasUnread)
+                    Positioned(
+                      right: -4,
+                      top: -4,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        constraints: const BoxConstraints(
+                          minWidth: 18,
+                          minHeight: 18,
+                        ),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          badgeProvider.unreadCount > 99
+                              ? '99+'
+                              : '${badgeProvider.unreadCount}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             );
           },
-          child: Icon(Icons.notifications_none, color: Colors.white, size: 28),
         ),
       ],
     );

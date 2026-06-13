@@ -184,7 +184,7 @@ class _TestLeaderboardScreenState extends State<TestLeaderboardScreen> {
               const Spacer(),
 
               Icon(
-                test.isPremium == true ? Icons.lock : Icons.check_circle,
+                test.isPremium != true ? Icons.lock : Icons.check_circle,
                 color: Colors.white,
               ),
             ],

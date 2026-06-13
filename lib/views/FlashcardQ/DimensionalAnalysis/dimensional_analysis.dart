@@ -105,6 +105,7 @@ class _DimensionalAnalysisState extends State<DimensionalAnalysis> {
                     question: currentQuestion,
                     currentIndex: currentQuestionIndex,
                     totalQuestions: questions.length,
+                    isLastQuestion: currentQuestionIndex == questions.length - 1,
                     duration: startQuizProvider.startQuizModel?.data?.duration ?? 15,
                     selectedOptionId: quizAnswerProvider.getSelectedAnswer(currentQuestion.id ?? ""),
                     onSelectOption: (id) {

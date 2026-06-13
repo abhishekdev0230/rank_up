@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:rank_up/constraints/icon_path.dart';
 import 'package:rank_up/constraints/my_colors.dart';
 import 'package:rank_up/services/local_storage.dart';
+import 'package:rank_up/provider/provider_classes/NotificationBadgeProvider.dart';
 import 'package:rank_up/views/bottom_navigation_bar.dart';
 import 'package:rank_up/views/onboarding_screen/onboarding_screen.dart';
 import 'package:rank_up/custom_classes/custom_navigator.dart';
@@ -27,6 +28,8 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 3));
     final bool? isLogin = await StorageManager.getBool(StorageManager.isLogin);
     if (isLogin == true) {
+      await NotificationBadgeProvider.handleAppResumed();
+      if (!mounted) return;
       CustomNavigator.pushRemoveUntil(
         context,
         BottomNavController(initialIndex: 0),
