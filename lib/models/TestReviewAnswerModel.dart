@@ -66,7 +66,7 @@ class AttemptMeta {
   dynamic completedAt;
   int? score;
   int? totalScore;
-  int? percentage;
+  double? percentage;
   dynamic timeTaken;
   int? totalQuestions;
   int? attemptedQuestions;

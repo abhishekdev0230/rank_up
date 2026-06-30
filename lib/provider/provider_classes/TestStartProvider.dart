@@ -11,6 +11,7 @@ import 'package:rank_up/services/common_response.dart';
 import 'package:rank_up/Utils/helper.dart';
 import 'package:rank_up/models/TestResumeBottomStartTestModel.dart';
 import 'package:rank_up/views/tests_screen/DimensionalAnalysis.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/FetchedGridStatus.dart';
 import '../../models/TestReviewAnswerModel.dart';
@@ -36,20 +37,76 @@ class StartTestProvider extends ChangeNotifier {
 
   void startTimer() {
     remainingSeconds = duration * 60;
+    _startPeriodicTimer();
+  }
 
+
+  Future<void> _initTimerFromAttempt() async {
+    final totalSeconds = duration * 60;
+    final attempt = startModel?.data?.attempt;
+    final attemptId = attempt?.id ?? "";
+
+    int usedSeconds = 0;
+
+    // 1. Try local saved value first (most reliable, real elapsed time)
+    final prefs = await SharedPreferences.getInstance();
+    final localTimeTaken = prefs.getInt("timeTaken_$attemptId");
+
+    // 2. API value as fallback
+    final apiTimeTaken = int.tryParse(attempt?.timeTaken?.toString() ?? '');
+
+    if (localTimeTaken != null) {
+      usedSeconds = localTimeTaken;
+    } else if (apiTimeTaken != null) {
+      usedSeconds = apiTimeTaken;
+    }
+
+    remainingSeconds = (totalSeconds - usedSeconds).clamp(0, totalSeconds);
+
+    _startPeriodicTimer();
+  }
+
+  void _startPeriodicTimer() {
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       if (remainingSeconds > 0) {
         remainingSeconds--;
         notifyListeners();
+
+        final attemptId = startModel?.data?.attempt?.id ?? "";
+        if (attemptId.isNotEmpty) {
+          final prefs = await SharedPreferences.getInstance();
+          final used = duration * 60 - remainingSeconds;
+          prefs.setInt("timeTaken_$attemptId", used);
+        }
       } else {
         timer.cancel();
       }
     });
+    notifyListeners();
   }
 
   void stopTimer() {
     _timer?.cancel();
+  }
+
+  bool _isResumedAttempt() {
+    if (startModel?.data?.resumed == true) return true;
+
+    final attempted = startModel?.data?.attempt?.attemptedQuestions ?? 0;
+    return attempted > 0;
+  }
+
+  void _syncQuestionProgressOnResume() {
+    if (!_isResumedAttempt()) {
+      currentQuestionNumber = 1;
+      return;
+    }
+
+    final attempted = startModel?.data?.attempt?.attemptedQuestions ?? 0;
+    if (attempted > 0) {
+      currentQuestionNumber = (attempted + 1).clamp(1, totalQuestion);
+    }
   }
 
   Future<void> startTest(
@@ -103,8 +160,14 @@ class StartTestProvider extends ChangeNotifier {
       }
       duration = startModel?.data?.test?.duration ?? 0;
 
-      /// Start Timer
-      startTimer();
+      _syncQuestionProgressOnResume();
+
+      if (_isResumedAttempt()) {
+        await _initTimerFromAttempt();
+      } else {
+        currentQuestionNumber = 1;
+        startTimer();
+      }
 
       CustomNavigator.pushNavigate(
         context,
@@ -377,28 +440,27 @@ class StartTestProvider extends ChangeNotifier {
         body: body,
       );
 
-      /// ---------------------------
-      /// ALWAYS HIDE LOADER
-      /// ---------------------------
       CommonLoaderApi.hide(context);
 
       if (response == null) return;
 
-      /// ---------------------------
       /// CASE 1 → Already Submitted
-      /// ---------------------------
       if (response.statusCode == 400 &&
           response.message.toString().contains("Attempt already submitted")) {
         print("⚠️ Already submitted → Going to result");
+
+        stopTimer();
+        await _clearSavedTime(attemptId);
 
         await fetchResult(context);
         return;
       }
 
-      /// ---------------------------
       /// CASE 2 → Normal Success
-      /// ---------------------------
       if (response.status.toString() == "true") {
+        stopTimer();
+        await _clearSavedTime(attemptId);
+
         await fetchResult(context);
       }
     } catch (e) {
@@ -407,8 +469,16 @@ class StartTestProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> _clearSavedTime(String attemptId) async {
+    if (attemptId.isNotEmpty) {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.remove("timeTaken_$attemptId");
+    }
+  }
+
   /// .................... RESULT PROVIDER ............................
-  TestReviewAnswerModel? reviewModel;
+  TestReviewAnswerModel? 
+  reviewModel;
 
   Future<void> fetchResult(
     BuildContext context, {

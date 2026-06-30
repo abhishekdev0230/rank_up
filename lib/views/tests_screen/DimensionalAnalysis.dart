@@ -26,17 +26,11 @@ class _DimensionAlanalysisTestState extends State<DimensionAlanalysisTest> {
   void initState() {
     super.initState();
     if (!widget.fromGrid) {
-
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final provider = Provider.of<StartTestProvider>(context, listen: false);
-
-        provider.fetchNextQuestion(context, 1);
+        provider.fetchNextQuestion(context, provider.currentQuestionNumber);
       });
-
-      // provider.fetchNextQuestion(context, 1);
     }
-
-
   }
 
   @override

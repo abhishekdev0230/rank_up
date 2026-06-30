@@ -128,7 +128,7 @@ class _FeaturedDeckFlashcardsScreenState
                                   textAlign: TextAlign.center,
                                   "Q: ${q.question}",
                                   style: const TextStyle(
-                                    fontSize: 22,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.w800,
                                     color: Colors.black87,
                                     height: 1.3,

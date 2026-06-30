@@ -152,8 +152,11 @@ class TestResultScreen extends StatelessWidget {
                   hSized5,
 
                   Text(
-                    "$percentile% Percentile",
-                    style: mediumTextStyle(fontSize: 16, color: MyColors.blackColor),
+                    "${percentile.toStringAsFixed(2)}% Percentile",
+                    style: mediumTextStyle(
+                      fontSize: 16,
+                      color: MyColors.blackColor,
+                    ),
                   ),
 
                   hSized20,
